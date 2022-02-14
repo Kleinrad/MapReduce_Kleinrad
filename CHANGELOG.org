@@ -1,0 +1,8 @@
+* Changelog
+** [Unreleased]
+** [0.0.1] - 2022-02-14
+*** Added
+- Create repository and send invitation
+- Instantiate template
+- Fill .gitignore
+- Add IEEE latex template
