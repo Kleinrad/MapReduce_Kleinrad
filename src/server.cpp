@@ -1,7 +1,7 @@
-#include <asio.hpp>
 #include <iostream>
 #include <string>
 #include <spdlog/spdlog.h>
+#include "pipe.hpp"
 
 int main() {
     asio::io_context ctx;
@@ -12,18 +12,10 @@ int main() {
         acceptor.listen();
         spdlog::info("just before accept");
         acceptor.accept(socket);
-        asio::ip::tcp::iostream strm{std::move(socket)};
-        if(strm){
-            try{
-                strm << "Hello";
-                spdlog::info("Accepted connection from");
-            }
-            catch(const std::exception& e){
-                spdlog::error("Sending failed: {}", e.what());
-            }
-        }else{
-            spdlog::error("Connection unsuccessful!");
-        }
-        strm.close();
+        Pipe pipe(std::move(socket));
+        std::string line;
+        pipe >> line;
+        spdlog::info(line);
+        pipe << "Hello from server!";
     }
 }
