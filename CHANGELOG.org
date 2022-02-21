@@ -1,5 +1,10 @@
 * Changelog
 ** [Unreleased]
+** [0.1.0] - 2022-02-21
+*** Added
+- Added test enviroment, for testing protobuf & gRPC
+- Implemented basic asio communication
+- Added class pipe as an communication interface
 ** [0.0.1] - 2022-02-14
 *** Added
 - Create repository and send invitation
