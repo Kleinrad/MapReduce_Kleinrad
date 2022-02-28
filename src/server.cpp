@@ -8,14 +8,18 @@ int main() {
     asio::ip::tcp::endpoint ep{asio::ip::tcp::v4(), 1500};
     asio::ip::tcp::acceptor acceptor(ctx, ep);
     asio::ip::tcp::socket socket(ctx);
+    spdlog::set_level(spdlog::level::debug);
     while(true){
         acceptor.listen();
         spdlog::info("just before accept");
         acceptor.accept(socket);
+        spdlog::info("just after accept");
         Pipe pipe(std::move(socket));
-        std::string line;
-        pipe >> line;
-        spdlog::info(line);
-        pipe << "Hello from server!";
+        if(pipe){
+            pipe << "Hello from server!";
+            std::string line;
+            //pipe >> line;
+            spdlog::info(line);
+        }
     }
 }
