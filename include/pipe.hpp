@@ -32,14 +32,12 @@ class Pipe {
             Msg *message = new Msg();
             message->set_text(value);
             message->SerializeToOstream(strm);
-            spdlog::debug("Sent: {}", value);
             return *this;
         }
 
         Pipe &operator>>(std::string &value){
             Msg* message = new Msg();
             spdlog::debug("Reading");
-            spdlog::debug(strm->rdstate());
             message->ParseFromIstream(strm);
             spdlog::debug("Read: {}", message->text());
             value = message->text();

@@ -10,6 +10,6 @@ int main() {
         std::string line;
         pipe >> line;
         spdlog::info(line);
-        //pipe << "Hello from client!";
+        pipe << "Hello from client!";
     }
 }
