@@ -8,11 +8,11 @@ enum JobType {
     job_letter_count
 };
 
-class Job {
-    public:
-        Job(JobType type, std::string data) : type(type), data(data) {}
-        JobType type;
-        std::string data;
+struct Job {
+    JobType type;
+    std::string data;
+    
+    Job(JobType type, std::string data) : type(type), data(data) {}
 };
 
 #endif
