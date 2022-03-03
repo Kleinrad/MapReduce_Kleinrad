@@ -1,3 +1,6 @@
+#ifndef PIPE_H
+#define PIPE_H
+
 #include <asio.hpp>
 #include <iostream>
 #include <string>
@@ -52,3 +55,5 @@ class Pipe {
             return *this;
         }
 };
+
+#endif

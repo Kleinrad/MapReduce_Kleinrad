@@ -37,18 +37,12 @@ protobuf_dep = dependency('protobuf', required : true)
 # subdir('SUBDIR1')
 
 inc_dir = include_directories('include')
-src_client = ['src/client.cpp', generated]
-src_server = ['src/server.cpp', generated]
+#src_client = ['src/client.cpp', generated]
+src_master = ['src/master.cpp', generated]
 #protobuf: src = ['src/main.cpp', generated]
 
-executable('testClient',
-           sources : src_client,
-           include_directories : inc_dir,
-           dependencies : [thread_dep, protobuf_dep]
-          )
-
-executable('testServer',
-           sources : src_server,
+executable('mr_master',
+           sources : src_master,
            include_directories : inc_dir,
            dependencies : [thread_dep, protobuf_dep]
           )
