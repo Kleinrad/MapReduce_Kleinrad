@@ -17,6 +17,9 @@ int main() {
         Pipe pipe(std::move(socket));
         if(pipe){
             pipe << "Hello from server!";
+            std::string line;
+            pipe >> line;
+            spdlog::info(line);
         }
     }
 }

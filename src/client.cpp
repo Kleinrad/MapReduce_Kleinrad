@@ -4,7 +4,12 @@
 #include "pipe.hpp"
 
 int main() {
-    Pipe pipe("127.0.0.1", "1500");
+    asio::ip::tcp::endpoint ep{
+        asio::ip::address::from_string("127.0.0.1"), 1500};
+    asio::io_service ctx;
+    asio::ip::tcp::socket socket{ctx, ep.protocol()};
+    socket.connect(ep);
+    Pipe pipe(std::move(socket));
     spdlog::set_level(spdlog::level::debug);
     if(pipe){
         std::string line;

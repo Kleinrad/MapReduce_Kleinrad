@@ -2,45 +2,53 @@
 #include <iostream>
 #include <string>
 #include <thread>
+#include <chrono>
 #include <spdlog/spdlog.h>
 #include "test.pb.h"
 
 class Pipe {
-    asio::ip::tcp::iostream* strm;
+    asio::ip::tcp::socket* socket{nullptr};
 
     public:
-        Pipe(std::string host, std::string port){
-            GOOGLE_PROTOBUF_VERIFY_VERSION;
-            strm = new asio::ip::tcp::iostream(host, port);
-        }
         Pipe(asio::ip::tcp::socket socket){
             GOOGLE_PROTOBUF_VERIFY_VERSION;
-            strm = new asio::ip::tcp::iostream(std::move(socket));
+            this->socket = new asio::ip::tcp::socket(std::move(socket));
         }
+
         ~Pipe(){
             google::protobuf::ShutdownProtobufLibrary();
-            strm->close();
-            delete strm;
+            socket->close();
+            delete socket;
         }
         
         explicit operator bool()
         {
-            return strm->good();
+            return socket->is_open();
         }
 
         Pipe &operator<<(std::string value){
-            Msg *message = new Msg();
-            message->set_text(value);
-            message->SerializeToOstream(strm);
+            Msg message;
+            message.set_text(value);
+            u_int64_t msg_size{message.ByteSizeLong()};
+
+            asio::write(*socket, asio::buffer(&msg_size, sizeof(msg_size)));
+            asio::streambuf buf;
+            std::ostream os(&buf);
+            message.SerializeToOstream(&os);
+            asio::write(*socket, buf);
             return *this;
         }
 
         Pipe &operator>>(std::string &value){
-            Msg* message = new Msg();
-            spdlog::debug("Reading");
-            message->ParseFromIstream(strm);
-            spdlog::debug("Read: {}", message->text());
-            value = message->text();
+            u_int64_t msg_size;
+            socket->receive(asio::buffer(&msg_size, sizeof(msg_size)));
+            asio::streambuf buf;
+            asio::streambuf::mutable_buffers_type bufs{buf.prepare(msg_size)};
+            buf.commit(asio::read(*socket, bufs));
+            std::istream is(&buf);
+            Msg message;
+            message.ParseFromIstream(&is);
+            value = message.text();
             return *this;
         }
 };
