@@ -16,6 +16,9 @@ struct WorkerObject {
 
 class WorkerManager{
     std::map<int, WorkerObject> workers;
+    asio::ip::port_type port{1500};
+
+    int generateWorkerId();
 
     public:
         WorkerManager();
