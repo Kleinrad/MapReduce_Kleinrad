@@ -1,11 +1,11 @@
 * Changelog
 ** [Unreleased]
-***Added
+*** Added
 - Master, to manage jobs send from clients
 - WorkerManager, to manage workers
 - struct Job, used to uniformly structure data for each job
 - struct Worker, used to uniformly structure data for each worker
-***Removed
+*** Removed
 - Test Client / Server
 ** [0.1.1] - 2022-02-28
 *** Changed
