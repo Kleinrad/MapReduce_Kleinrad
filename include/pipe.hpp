@@ -29,11 +29,8 @@ class Pipe {
             return socket->is_open();
         }
 
-        Pipe &operator<<(std::string value){
-            Msg message;
-            message.set_text(value);
+        Pipe &operator<<(google::protobuf::Message &message){
             u_int64_t msg_size{message.ByteSizeLong()};
-
             asio::write(*socket, asio::buffer(&msg_size, sizeof(msg_size)));
             asio::streambuf buf;
             std::ostream os(&buf);
