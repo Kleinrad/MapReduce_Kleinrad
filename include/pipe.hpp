@@ -30,6 +30,7 @@ class Pipe {
         }
 
         Pipe &operator<<(google::protobuf::Message &message){
+            spdlog::debug(message.GetDescriptor()->name());
             u_int64_t msg_size{message.ByteSizeLong()};
             asio::write(*socket, asio::buffer(&msg_size, sizeof(msg_size)));
             asio::streambuf buf;
