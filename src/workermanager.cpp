@@ -1,6 +1,6 @@
 #include "workermanager.h"
+#include "protoutils.hpp"
 #include <asio.hpp>
-
 WorkerManager::WorkerManager()
 {
 }
@@ -20,13 +20,12 @@ void WorkerManager::operator()(){
         acceptor.listen();
         acceptor.accept(socket);
         Pipe pipe(std::move(socket));
-        std::string worker_id = "" + generateWorkerId();
-        pipe << worker_id;
+        int worker_id = generateWorkerId();
+        pipe << generateWorkerAssignment(worker_id);
         std::string line;
         pipe >> line;
-        if(line == worker_id){
-            int wId = std::stoi(worker_id);
-            workers[wId] = WorkerObject(pipe, wId);
+        if(std::stoi(line) == worker_id){
+            workers[worker_id] = WorkerObject(pipe, worker_id);
             spdlog::info("Worker {} connected", worker_id);
         }
     }

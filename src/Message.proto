@@ -15,44 +15,53 @@ enum MessageType {
 }
 
 message WorkerAssignment{
-    int32 worker_id = 1;
+    MessageType type = 1;
+    int32 worker_id = 2;
 }
 
 message WorkerSignOff{
+    MessageType type = 1;
     int32 worker_id = 2;
 }
 
 message TaskMap{
-    string data = 3;
+    MessageType type = 1;
+    string data = 2;
 }
 
 message TaskReduce{
-    int32 key = 1;
-    repeated string values = 2;
+    MessageType type = 1;
+    int32 key = 2;
+    repeated string values = 3;
 }
 
 message ResultMap{
-    int32 key = 1;
-    string value = 2;
+    MessageType type = 1;
+    int32 key = 2;
+    string value = 3;
 }
 
 message ResultReduce{
-    int32 key = 1;
-    string value = 2;
+    MessageType type = 1;
+    int32 key = 2;
+    string value = 3;
 }
 
 message Confirm{
-    int32 worker_id = 1;
+    MessageType type = 1;
+    int32 worker_id = 2;
 }
 
 message JobRequest{
-    int32 job_id = 1;
-    string data = 2;
-    int32 num_mappers = 3;
-    int32 num_reducers = 4;
+    MessageType type = 1;
+    int32 job_id = 2;
+    string data = 3;
+    int32 num_mappers = 4;
+    int32 num_reducers = 5;
 }
 
 message JobResult{
-    int32 job_id = 1;
-    string data = 2;
+    MessageType type = 1;
+    int32 job_id = 2;
+    string data = 3;
 }
