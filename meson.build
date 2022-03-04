@@ -31,7 +31,7 @@ protobuf_dep = dependency('protobuf', required : true)
    arguments : ['--proto_path=@CURRENT_SOURCE_DIR@/src', '--cpp_out=@BUILD_DIR@', '@PLAINNAME@'])
 
 # # change proto file accordingly
- generated = gen.process('src/test.proto')
+ generated = gen.process('src/Message.proto')
 # # end protobuf
 
 # subdir('SUBDIR1')

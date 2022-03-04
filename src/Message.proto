@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package mapreduce;
+
+enum MessageType {
+    WORKER_ASSIGNMENT = 0;
+    WORKER_SIGN_OFF = 1;
+    TASK_MAP = 2;
+    TASK_REDUCE = 3;
+    RESULT_MAP = 4;
+    RESULT_REDUCE = 5;
+    CONFIRM = 6;
+    JOB_REQUEST = 7;
+    JOB_RESULT = 8;
+}
+
+message Message {
+    MessageType type = 1;
+
+    message WorkerAssignment{
+        int32 worker_id = 1;
+    }
+
+    message WorkerSignOff{
+        int32 worker_id = 2;
+    }
+
+    message TaskMap{
+        string data = 3;
+    }
+
+    message TaskReduce{
+        int32 key = 1;
+        repeated string values = 2;
+    }
+
+    message ResultMap{
+        int32 key = 1;
+        string value = 2;
+    }
+
+    message ResultReduce{
+        int32 key = 1;
+        string value = 2;
+    }
+
+    message Confirm{
+        int32 worker_id = 1;
+    }
+
+    message JobRequest{
+        int32 job_id = 1;
+        string data = 2;
+        int32 num_mappers = 3;
+        int32 num_reducers = 4;
+    }
+
+    message JobResult{
+        int32 job_id = 1;
+        string data = 2;
+    }
+}

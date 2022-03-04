@@ -7,7 +7,7 @@
 #include <thread>
 #include <chrono>
 #include <spdlog/spdlog.h>
-#include "test.pb.h"
+#include "Message.pb.h"
 
 class Pipe {
     asio::ip::tcp::socket* socket{nullptr};
