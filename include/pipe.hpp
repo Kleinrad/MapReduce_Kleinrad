@@ -41,14 +41,14 @@ class Pipe {
         }
 
         Pipe &operator>>(std::string &value){
-            /*u_int64_t msg_size;
+            u_int64_t msg_size;
             socket->receive(asio::buffer(&msg_size, sizeof(msg_size)));
             asio::streambuf buf;
             asio::streambuf::mutable_buffers_type bufs{buf.prepare(msg_size)};
             buf.commit(asio::read(*socket, bufs));
             std::istream is(&buf);
-            Msg message;
-            message.ParseFromIstream(&is);*/
+            mapreduce::WorkerSignOff message;
+            message.ParseFromIstream(&is);
             value = "test";
             return *this;
         }

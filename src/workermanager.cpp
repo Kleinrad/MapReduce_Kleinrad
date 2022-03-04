@@ -19,19 +19,10 @@ void WorkerManager::operator()(){
     asio::ip::tcp::acceptor acceptor(ctx, ep);
     asio::ip::tcp::socket socket(ctx);
     while(true){
-        spdlog::info("Waiting for worker");
+        spdlog::info("Waiting for worker {}", socket.is_open());
         acceptor.listen();
         acceptor.accept(socket);
         Pipe pipe(std::move(socket));
-        int worker_id = generateWorkerId();
-        mapreduce::WorkerAssignment msg = generateWorkerAssignment(worker_id);
-        pipe << msg;
-        std::string line;
-        pipe >> line;
-        if(std::stoi(line) == worker_id){
-            workers[worker_id] = WorkerObject(&pipe, worker_id);
-            spdlog::info("Worker {} connected", worker_id);
-        }
     }
 }
 

@@ -6,13 +6,12 @@
 #include "pipe.hpp"
 
 struct WorkerObject {
-    Pipe* pipe{nullptr};
     int id{-1};
     bool is_available;
 
     WorkerObject(){};
-    WorkerObject(Pipe* pipe, int id) 
-      : pipe(pipe), id(id), is_available(true) {};
+    WorkerObject(int id) 
+      : id(id), is_available(true) {};
 };
 
 class WorkerManager{
