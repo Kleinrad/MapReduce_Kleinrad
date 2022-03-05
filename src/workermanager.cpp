@@ -3,9 +3,8 @@
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
 
-WorkerManager::WorkerManager()
-{
-}
+WorkerManager::WorkerManager(asio::io_context &ctx, asio::ip::tcp::endpoint ep)
+: acceptor(ctx, ep) {}
 
 
 WorkerManager::~WorkerManager()
@@ -13,17 +12,26 @@ WorkerManager::~WorkerManager()
 }
 
 
-void WorkerManager::operator()(){
-    asio::io_context ctx;
-    asio::ip::tcp::endpoint ep{asio::ip::tcp::v4(), port};
-    asio::ip::tcp::acceptor acceptor(ctx, ep);
-    asio::ip::tcp::socket socket(ctx);
-    while(true){
-        spdlog::info("Waiting for worker {}", socket.is_open());
-        acceptor.listen();
-        acceptor.accept(socket);
-        Pipe pipe(std::move(socket));
-    }
+void WorkerManager::acceptWorker(){
+    spdlog::info("Waiting for worker");
+    acceptor.listen();
+    acceptor.async_accept(
+        [this](const asio::error_code &ec, asio::ip::tcp::socket socket){
+        if(ec){
+            spdlog::error("Error accepting worker {}", ec.message());
+            return;
+        }
+        std::make_shared<WorkerSession>(*this, std::move(socket),
+            generateWorkerId())->start();
+        spdlog::info("Worker connected");
+        acceptWorker();
+    });
+}
+
+
+void WorkerManager::join(worker_ptr worker)
+{
+    workers.insert(worker);
 }
 
 

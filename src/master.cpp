@@ -4,6 +4,9 @@
 #include "workermanager.h"
 
 int main(){
-    std::thread worker_manager_thread{WorkerManager()};
-    worker_manager_thread.join();
+    asio::io_context ctx;
+    asio::ip::tcp::endpoint ep{asio::ip::address_v4(), 1500};
+    WorkerManager manager(ctx, ep);
+    manager.acceptWorker();
+    ctx.run();
 }
