@@ -29,27 +29,36 @@ class Pipe {
             return socket->is_open();
         }
 
-        Pipe &operator<<(google::protobuf::Message &message){
-            spdlog::debug(message.GetDescriptor()->name());
-            u_int64_t msg_size{message.ByteSizeLong()};
-            asio::write(*socket, asio::buffer(&msg_size, sizeof(msg_size)));
+        void sendMessage(google::protobuf::Message &message){
+            u_int8_t msgIndex = message.GetDescriptor()->index();
+            u_int64_t msgSize{message.ByteSizeLong()};
+            asio::write(*socket, asio::buffer(&msgIndex, sizeof(msgIndex)));
+            asio::write(*socket, asio::buffer(&msgSize, sizeof(msgSize)));
+
             asio::streambuf buf;
             std::ostream os(&buf);
+            
             message.SerializeToOstream(&os);
             asio::write(*socket, buf);
-            return *this;
         }
 
-        Pipe &operator>>(std::string &value){
-            u_int64_t msg_size;
-            socket->receive(asio::buffer(&msg_size, sizeof(msg_size)));
+        mapreduce::MessageType reciveMessageType(){
+            u_int8_t msgIndex;
+            socket->receive(asio::buffer(&msgIndex, sizeof(msgIndex)));
+            return static_cast<mapreduce::MessageType>(msgIndex);
+        }
+
+        Pipe &operator>>(google::protobuf::Message &message){
+            u_int64_t msgSize;
+            socket->receive(asio::buffer(&msgSize, sizeof(msgSize)));
+
             asio::streambuf buf;
-            asio::streambuf::mutable_buffers_type bufs{buf.prepare(msg_size)};
+            asio::streambuf::mutable_buffers_type bufs{buf.prepare(msgSize)};
+
             buf.commit(asio::read(*socket, bufs));
             std::istream is(&buf);
-            mapreduce::WorkerSignOff message;
+
             message.ParseFromIstream(&is);
-            value = "test";
             return *this;
         }
 };

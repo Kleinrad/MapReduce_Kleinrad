@@ -2,6 +2,7 @@
 #define PROTOUTILS_H
 
 #include "Message.pb.h"
+#include <spdlog/spdlog.h>
 #include <map>
 
 mapreduce::WorkerAssignment generateWorkerAssignment(int id){

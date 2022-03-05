@@ -14,6 +14,8 @@ enum MessageType {
     JOB_RESULT = 8;
 }
 
+message Emtpy{}
+
 message WorkerAssignment{
     MessageType type = 1;
     int32 worker_id = 2;

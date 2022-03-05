@@ -4,7 +4,9 @@
 #include <asio.hpp>
 
 WorkerManager::WorkerManager(asio::io_context &ctx, asio::ip::tcp::endpoint ep)
-: acceptor(ctx, ep) {}
+: acceptor(ctx, ep) {
+    acceptor.listen();
+}
 
 
 WorkerManager::~WorkerManager()
@@ -14,7 +16,6 @@ WorkerManager::~WorkerManager()
 
 void WorkerManager::acceptWorker(){
     spdlog::info("Waiting for worker");
-    acceptor.listen();
     acceptor.async_accept(
         [this](const asio::error_code &ec, asio::ip::tcp::socket socket){
         if(ec){
@@ -23,8 +24,9 @@ void WorkerManager::acceptWorker(){
         }
         int id = generateWorkerId();
         Pipe pipe(std::move(socket));
-        mapreduce::WorkerAssignment assignment(generateWorkerAssignment(id));
-        pipe << assignment;
+        mapreduce::WorkerAssignment assignment{generateWorkerAssignment(id)};
+        int str = assignment.GetDescriptor()->index();
+        pipe.sendMessage(assignment);
         std::make_shared<WorkerSession>(*this, std::move(socket),
             id)->start();
         spdlog::info("Worker connected");

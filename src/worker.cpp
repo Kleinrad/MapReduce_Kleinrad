@@ -10,7 +10,10 @@ int main(){
     asio::ip::tcp::socket socket(ctx);
     socket.connect(ep);
     Pipe pipe(std::move(socket));
-    std::string line;
-    pipe >> line;
-    spdlog::info("{}", line);
+    if(pipe.reciveMessageType() == mapreduce::MessageType::WORKER_SIGN_OFF){
+        mapreduce::WorkerAssignment assignment;
+        pipe >> assignment;
+        spdlog::info("Worker id: {}", assignment.worker_id());
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
