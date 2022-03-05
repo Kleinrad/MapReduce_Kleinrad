@@ -21,8 +21,12 @@ void WorkerManager::acceptWorker(){
             spdlog::error("Error accepting worker {}", ec.message());
             return;
         }
+        int id = generateWorkerId();
+        Pipe pipe(std::move(socket));
+        mapreduce::WorkerAssignment assignment(generateWorkerAssignment(id));
+        pipe << assignment;
         std::make_shared<WorkerSession>(*this, std::move(socket),
-            generateWorkerId())->start();
+            id)->start();
         spdlog::info("Worker connected");
         acceptWorker();
     });

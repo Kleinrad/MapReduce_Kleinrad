@@ -10,7 +10,7 @@ int main(){
     asio::ip::tcp::socket socket(ctx);
     socket.connect(ep);
     Pipe pipe(std::move(socket));
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    mapreduce::WorkerSignOff msg{generateWorkerSignOff(0)};
-    pipe << msg;
+    std::string line;
+    pipe >> line;
+    spdlog::info("{}", line);
 }
