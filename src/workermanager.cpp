@@ -24,9 +24,7 @@ void WorkerManager::acceptWorker(){
         }
         int id = generateWorkerId();
         Pipe pipe(std::move(socket));
-        mapreduce::WorkerAssignment assignment{generateWorkerAssignment(id)};
-        int str = assignment.GetDescriptor()->index();
-        pipe.sendMessage(assignment);
+        pipe.sendMessage(generateWorkerAssignment(id));
         std::make_shared<WorkerSession>(*this, std::move(socket),
             id)->start();
         spdlog::info("Worker connected");

@@ -3,6 +3,8 @@
 #include <chrono>
 #include "protoutils.hpp"
 
+Worker::Worker(asio::ip::tcp::socket* socket)
+
 int main(){
     asio::io_service ctx;
     asio::ip::tcp::endpoint ep{
@@ -15,5 +17,4 @@ int main(){
         pipe >> assignment;
         spdlog::info("Worker id: {}", assignment.worker_id());
     }
-    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
