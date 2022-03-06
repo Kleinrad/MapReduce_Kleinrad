@@ -3,15 +3,16 @@ syntax = "proto3";
 package mapreduce;
 
 enum MessageType {
-    WORKER_ASSIGNMENT = 0;
-    WORKER_SIGN_OFF = 1;
-    TASK_MAP = 2;
-    TASK_REDUCE = 3;
-    RESULT_MAP = 4;
-    RESULT_REDUCE = 5;
-    CONFIRM = 6;
-    JOB_REQUEST = 7;
-    JOB_RESULT = 8;
+    EMPTY = 0;
+    WORKER_ASSIGNMENT = 1;
+    WORKER_SIGN_OFF = 2;
+    TASK_MAP = 3;
+    TASK_REDUCE = 4;
+    RESULT_MAP = 5;
+    RESULT_REDUCE = 6;
+    CONFIRM = 7;
+    JOB_REQUEST = 8;
+    JOB_RESULT = 9;
 }
 
 message Emtpy{}

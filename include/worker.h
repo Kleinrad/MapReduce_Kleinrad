@@ -2,13 +2,19 @@
 #define WORKER_H
 
 #include <asio.hpp>
+#include "pipe.hpp"
 
 class Worker {
-    asio::ip::tcp::socket* socket;
+    int worker_id;
+    Pipe* pipe;
 
+    void waitForTask();
     public:
-        Worker(asio::ip::tcp::socket* socket);
+        Worker(Pipe* pipe);
         ~Worker();
+
+        void signOff();
+        void signOn();
 };
 
 #endif

@@ -24,10 +24,22 @@ void WorkerManager::acceptWorker(){
         }
         int id = generateWorkerId();
         Pipe pipe(std::move(socket));
-        pipe.sendMessage(generateWorkerAssignment(id));
-        std::make_shared<WorkerSession>(*this, std::move(socket),
-            id)->start();
-        spdlog::info("Worker connected");
+        mapreduce::WorkerAssignment assignment = generateWorkerAssignment(id);
+        pipe.sendMessage(assignment);
+        mapreduce::MessageType type = pipe.reciveMessageType();
+        if(type == mapreduce::MessageType::CONFIRM){
+            mapreduce::Confirm confirm;
+            pipe >> confirm;
+            if(confirm.worker_id() == id){
+                std::make_shared<WorkerSession>(*this, std::move(socket),
+                    id)->start();
+                spdlog::info("Worker {} connected", id);
+            }else{
+                spdlog::error("Worker confirmation vailed: Invalid worker id");
+            }
+        }else{
+            spdlog::error("Worker confirmation vailed: Invalid message type ({})", type);
+        }
         acceptWorker();
     });
 }
