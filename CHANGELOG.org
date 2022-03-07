@@ -1,10 +1,15 @@
 * Changelog
 ** [Unreleased]
+** [0.2.0] - 2022-03-07
 *** Added
 - Master, to manage jobs send from clients
-- WorkerManager, to manage workers
+- WorkerManager, to manage worker connections
+- WorkerObject, used to uniformly structure data for each worker
+- WorkerSession, used to connect as an connection interface
+- Worker, connects to master and in future performes map&reduce tasks
 - struct Job, used to uniformly structure data for each job
-- struct Worker, used to uniformly structure data for each worker
+*** Changed
+- protobuf Message, defined message types used for communication
 *** Removed
 - Test Client / Server
 ** [0.1.1] - 2022-02-28
