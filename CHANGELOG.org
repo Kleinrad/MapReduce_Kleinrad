@@ -5,7 +5,7 @@
 - Master, to manage jobs send from clients
 - WorkerManager, to manage worker connections
 - WorkerObject, used to uniformly structure data for each worker
-- WorkerSession, used to connect as an connection interface
+- WorkerSession, used as an connection interface
 - Worker, connects to master and in future performes map&reduce tasks
 - struct Job, used to uniformly structure data for each job
 *** Changed
