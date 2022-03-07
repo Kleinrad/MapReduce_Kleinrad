@@ -44,7 +44,15 @@ class Pipe {
 
         mapreduce::MessageType reciveMessageType(){
             u_int8_t msgIndex;
-            socket->receive(asio::buffer(&msgIndex, sizeof(msgIndex)));
+            bool recived = false;
+            while(!recived){
+                try{
+                    socket->receive(asio::buffer(&msgIndex, sizeof(msgIndex)));
+                    recived = true;
+                }catch(const std::exception& e){
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+            }
             return static_cast<mapreduce::MessageType>(msgIndex);
         }
 

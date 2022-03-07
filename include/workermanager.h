@@ -6,8 +6,9 @@
 #include "pipe.hpp"
 
 class WorkerObject {
-    int id{-1};
-    bool is_available;
+    protected:
+        int id{-1};
+        bool is_available;
 
     public:
         WorkerObject(int id) 
@@ -37,17 +38,32 @@ class WorkerManager{
 class WorkerSession : public WorkerObject,
                       public std::enable_shared_from_this<WorkerObject>{ 
     WorkerManager &manager;
-    asio::ip::tcp::socket socket;
+    std::thread* reciveThread;
+    Pipe pipe;
+
+    void readMessage(){
+        mapreduce::MessageType type = pipe.reciveMessageType();
+        if(type == mapreduce::MessageType::WORKER_SIGN_OFF){
+            spdlog::info("Worker {} sign off", id);
+        }
+    }
 
     public:
         WorkerSession(WorkerManager &manager, 
                       asio::ip::tcp::socket socket,
                       int id) 
                 : WorkerObject(id), manager(manager),
-                  socket(std::move(socket)) {};
+                  pipe(Pipe(std::move(socket))) {};
+
+        ~WorkerSession(){
+        }
 
         void start(){
             manager.join(shared_from_this());
+            reciveThread = new std::thread([this](){
+                readMessage();
+            });
+            reciveThread->detach();
         }
 };
 

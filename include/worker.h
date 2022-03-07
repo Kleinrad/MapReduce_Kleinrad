@@ -6,11 +6,11 @@
 
 class Worker {
     int worker_id;
-    Pipe* pipe;
+    Pipe pipe;
 
     void waitForTask();
     public:
-        Worker(Pipe* pipe);
+        Worker(asio::ip::tcp::socket socket);
         ~Worker();
 
         void signOff();
