@@ -33,6 +33,7 @@ class WorkerManager{
 
         void acceptWorker();
         void join(worker_ptr worker);
+        void leave(worker_ptr worker);
         bool assignJob(Job job);
 };
 
@@ -44,15 +45,14 @@ class WorkerSession : public WorkerObject,
 
     void readMessage(){
         mapreduce::MessageType type = pipe.reciveMessageType();
-        spdlog::info("Worker {} received message type {}", id, type);
         if(type == mapreduce::MessageType::WORKER_SIGN_OFF){
+            manager.leave(shared_from_this());
             spdlog::info("Worker {} sign off", id);
         }
     }
 
     bool assignID(){
-        mapreduce::WorkerAssignment assignment =
-            generateWorkerAssignment(id);
+        mapreduce::WorkerAssignment assignment = MessageGenerator::WorkerAssignment(id);
         pipe.sendMessage(assignment);
         mapreduce::MessageType type = pipe.reciveMessageType();
         if(type == mapreduce::MessageType::CONFIRM){
@@ -86,7 +86,7 @@ class WorkerSession : public WorkerObject,
                 reciveThread = new std::thread([this](){
                     readMessage();
                 });
-                reciveThread->join();
+                reciveThread->detach();
             }
         }
 };

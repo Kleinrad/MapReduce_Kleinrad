@@ -46,7 +46,6 @@ class Pipe {
             u_int8_t msgIndex;
             while(true){
                 try{
-                    spdlog::info("wait for message type");
                     socket->receive(asio::buffer(&msgIndex, sizeof(msgIndex)));
                     break;
                 }catch(const std::exception& e){

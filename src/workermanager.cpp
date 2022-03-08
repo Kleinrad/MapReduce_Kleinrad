@@ -22,7 +22,6 @@ void WorkerManager::acceptWorker(){
             return;
         }
         int id = generateWorkerId();
-        Pipe pipe(std::move(socket));
         std::make_shared<WorkerSession>(*this, std::move(socket),
             id)->start();
         acceptWorker();
@@ -33,6 +32,12 @@ void WorkerManager::acceptWorker(){
 void WorkerManager::join(worker_ptr worker)
 {
     workers.insert(worker);
+}
+
+
+void WorkerManager::leave(worker_ptr worker)
+{
+    workers.erase(worker);
 }
 
 
