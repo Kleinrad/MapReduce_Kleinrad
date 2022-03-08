@@ -35,6 +35,9 @@ void Worker::signOn(){
         worker_id = assignment.worker_id();
         mapreduce::Confirm confirm = generateConfirm(worker_id);
         pipe.sendMessage(confirm);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        mapreduce::MessageType type = pipe.reciveMessageType();
+        spdlog::info("Worker {} received message type {}", worker_id, type);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         signOff();
         //waitForTask();
@@ -49,6 +52,7 @@ void Worker::signOff() {
     mapreduce::WorkerSignOff signOff = generateWorkerSignOff(worker_id);
     pipe.sendMessage(signOff);
     spdlog::info("Worker {} sign off", worker_id);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     exit(0);
 }
 

@@ -4,6 +4,7 @@
 #include <set>
 #include "job.hpp"
 #include "pipe.hpp"
+#include "protoutils.hpp"
 
 class WorkerObject {
     protected:
@@ -43,9 +44,30 @@ class WorkerSession : public WorkerObject,
 
     void readMessage(){
         mapreduce::MessageType type = pipe.reciveMessageType();
+        spdlog::info("Worker {} received message type {}", id, type);
         if(type == mapreduce::MessageType::WORKER_SIGN_OFF){
             spdlog::info("Worker {} sign off", id);
         }
+    }
+
+    bool assignID(){
+        mapreduce::WorkerAssignment assignment =
+            generateWorkerAssignment(id);
+        pipe.sendMessage(assignment);
+        mapreduce::MessageType type = pipe.reciveMessageType();
+        if(type == mapreduce::MessageType::CONFIRM){
+            mapreduce::Confirm confirm;
+            pipe >> confirm;
+            if(confirm.worker_id() == id){
+                spdlog::info("Worker {} connected", id);
+                return true;
+            }else{
+                spdlog::error("Worker confirmation vailed: Invalid worker id");
+            }
+        }else{
+            spdlog::error("Worker confirmation vailed: Invalid message type ({})", type);
+        }
+        return false;
     }
 
     public:
@@ -59,11 +81,13 @@ class WorkerSession : public WorkerObject,
         }
 
         void start(){
-            manager.join(shared_from_this());
-            reciveThread = new std::thread([this](){
-                readMessage();
-            });
-            reciveThread->detach();
+            if(assignID()){
+                manager.join(shared_from_this());
+                reciveThread = new std::thread([this](){
+                    readMessage();
+                });
+                reciveThread->join();
+            }
         }
 };
 
