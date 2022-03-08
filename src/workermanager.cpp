@@ -1,4 +1,5 @@
 #include "workermanager.h"
+#include "workersession.h"
 #include <spdlog/spdlog.h>
 #include <asio.hpp>
 

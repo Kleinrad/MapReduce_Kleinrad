@@ -2,9 +2,8 @@
 #define WORKMANAGER_H
 
 #include <set>
-#include "job.hpp"
 #include "pipe.hpp"
-#include "protoutils.hpp"
+#include "job.hpp"
 
 class WorkerObject {
     protected:
@@ -36,60 +35,6 @@ class WorkerManager{
         void join(worker_ptr worker);
         void leave(worker_ptr worker);
         bool assignJob(Job job);
-};
-
-class WorkerSession : public WorkerObject,
-                      public std::enable_shared_from_this<WorkerObject>{ 
-    WorkerManager &manager;
-    std::thread* reciveThread;
-    Pipe pipe;
-
-    void readMessage(){
-        mapreduce::MessageType type = pipe.reciveMessageType();
-        if(type == mapreduce::MessageType::WORKER_SIGN_OFF){
-            manager.leave(shared_from_this());
-            spdlog::info("Worker {} sign off", id);
-        }
-    }
-
-    bool assignID(){
-        mapreduce::WorkerAssignment assignment = MessageGenerator::WorkerAssignment(id);
-        pipe.sendMessage(assignment);
-        mapreduce::MessageType type = pipe.reciveMessageType();
-        if(type == mapreduce::MessageType::CONFIRM){
-            mapreduce::Confirm confirm;
-            pipe >> confirm;
-            if(confirm.worker_id() == id){
-                spdlog::info("Worker {} connected", id);
-                return true;
-            }else{
-                spdlog::error("Worker confirmation vailed: Invalid worker id");
-            }
-        }else{
-            spdlog::error("Worker confirmation vailed: Invalid message type ({})", type);
-        }
-        return false;
-    }
-
-    public:
-        WorkerSession(WorkerManager &manager, 
-                      asio::ip::tcp::socket socket,
-                      int id) 
-                : WorkerObject(id), manager(manager),
-                  pipe(Pipe(std::move(socket))) {};
-
-        ~WorkerSession(){
-        }
-
-        void start(){
-            if(assignID()){
-                manager.join(shared_from_this());
-                reciveThread = new std::thread([this](){
-                    readMessage();
-                });
-                reciveThread->detach();
-            }
-        }
 };
 
 #endif

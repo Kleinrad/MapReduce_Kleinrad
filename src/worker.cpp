@@ -36,9 +36,7 @@ void Worker::signOn(){
         mapreduce::Confirm confirm = MessageGenerator::Confirm(worker_id);
         pipe.sendMessage(confirm);
         spdlog::info("Worker {} sign on", worker_id);
-        std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-        signOff();
-        //waitForTask();
+        waitForTask();
     }else{
         spdlog::error("Invalid message type");
         throw std::runtime_error("Worker::signOn: Invalid Message recived");
