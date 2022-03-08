@@ -23,6 +23,7 @@ class WorkerManager{
     std::set<worker_ptr> workers;
     asio::ip::port_type port{1500};
     asio::ip::tcp::acceptor acceptor;
+    int totalWorkerConnections{0};
 
     int generateWorkerId();
 

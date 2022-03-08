@@ -31,6 +31,7 @@ void WorkerManager::acceptWorker(){
 
 void WorkerManager::join(worker_ptr worker)
 {
+    totalWorkerConnections++;
     workers.insert(worker);
 }
 
@@ -42,5 +43,5 @@ void WorkerManager::leave(worker_ptr worker)
 
 
 int WorkerManager::generateWorkerId(){
-    return workers.size();
+    return totalWorkerConnections;
 }
