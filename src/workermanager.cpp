@@ -32,6 +32,7 @@ void WorkerManager::acceptWorker(){
 
 void WorkerManager::join(worker_ptr worker)
 {
+    std::lock_guard<std::mutex> lock(mtx);
     totalWorkerConnections++;
     workers.insert(worker);
 }
@@ -39,6 +40,7 @@ void WorkerManager::join(worker_ptr worker)
 
 void WorkerManager::leave(worker_ptr worker)
 {
+    std::lock_guard<std::mutex> lock(mtx);
     workers.erase(worker);
 }
 
