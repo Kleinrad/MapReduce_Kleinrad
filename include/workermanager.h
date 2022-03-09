@@ -22,17 +22,14 @@ typedef std::shared_ptr<WorkerObject> worker_ptr;
 class WorkerManager{
     std::set<worker_ptr> workers;
     asio::ip::port_type port{1500};
-    asio::ip::tcp::acceptor acceptor;
     std::mutex mtx;
     int totalWorkerConnections{0};
 
-    int generateWorkerId();
-
     public:
-        WorkerManager(asio::io_context &ctx
-                    , asio::ip::tcp::endpoint ep);
+        WorkerManager();
         ~WorkerManager();
 
+        int generateWorkerId();
         void acceptWorker();
         void join(worker_ptr worker);
         void leave(worker_ptr worker);

@@ -1,12 +1,7 @@
 #include "workermanager.h"
-#include "workersession.h"
 #include <spdlog/spdlog.h>
-#include <asio.hpp>
 
-WorkerManager::WorkerManager(asio::io_context &ctx, asio::ip::tcp::endpoint ep)
-: acceptor(ctx, ep) {
-    acceptor.listen();
-}
+WorkerManager::WorkerManager(){}
 
 
 WorkerManager::~WorkerManager()
@@ -15,18 +10,6 @@ WorkerManager::~WorkerManager()
 
 
 void WorkerManager::acceptWorker(){
-    spdlog::info("Waiting for worker");
-    acceptor.async_accept(
-        [this](const asio::error_code &ec, asio::ip::tcp::socket socket){
-        if(ec){
-            spdlog::error("Error accepting worker {}", ec.message());
-            return;
-        }
-        int id = generateWorkerId();
-        std::make_shared<WorkerSession>(*this, std::move(socket),
-            id)->start();
-        acceptWorker();
-    });
 }
 
 
