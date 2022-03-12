@@ -1,5 +1,5 @@
-#ifndef WORKMANAGER_H
-#define WORKMANAGER_H
+#ifndef CLIENTMANAGER_H
+#define CLIENTMANAGER_H
 
 #include <set>
 #include <thread>
@@ -7,18 +7,17 @@
 #include "job.hpp"
 #include "connectionobject.hpp"
 
-class WorkerManager{
-    std::set<connection_ptr> workers;
+class ClientManager{
+    std::set<connection_ptr> clients;
     asio::ip::port_type port{1500};
     std::mutex mtx;
 
     public:
-        WorkerManager();
-        ~WorkerManager();
+        ClientManager();
+        ~ClientManager();
 
         void join(connection_ptr worker);
         void leave(connection_ptr worker);
-        bool assignJob(Job job);
 };
 
 #endif

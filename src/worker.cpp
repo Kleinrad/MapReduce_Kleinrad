@@ -29,6 +29,9 @@ void Worker::waitForTask(){
 
 
 void Worker::signOn(){
+    mapreduce::Authentication auth = MessageGenerator::Authentication(
+        mapreduce::ConnectionType::WORKER);
+    pipe.sendMessage(auth);
     if(pipe.reciveMessageType() == mapreduce::MessageType::WORKER_ASSIGNMENT){
         mapreduce::WorkerAssignment assignment;
         pipe >> assignment;

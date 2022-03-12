@@ -3,13 +3,16 @@
 
 #include <asio.hpp>
 #include "workermanager.h"
+#include "clientmanager.h"
 
 class Master {
     asio::ip::tcp::acceptor acceptor;
-    WorkerManager &manager;
+    WorkerManager &workerManager;
+    ClientManager &clientManager;
 
     public:
-      Master(WorkerManager &manager,
+      Master(WorkerManager &workerManager,
+            ClientManager &clientManager,
             asio::ip::tcp::endpoint ep,
             asio::io_context &ctx);
       ~Master();

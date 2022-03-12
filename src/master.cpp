@@ -2,14 +2,16 @@
 #include <thread>
 #include "pipe.hpp"
 #include "protoutils.hpp"
-#include "workersession.h"
+#include "connectionsession.h"
 #include "master.h"
 
 
-Master::Master(WorkerManager &manager, 
+Master::Master(WorkerManager &workerManager,
+                ClientManager &clientManager,
                 asio::ip::tcp::endpoint ep,
                 asio::io_context &ctx) 
-    : acceptor(ctx, ep), manager(manager){}
+    : acceptor(ctx, ep), workerManager(workerManager),
+    clientManager(clientManager){}
 
 
 Master::~Master(){}
@@ -23,9 +25,8 @@ void Master::acceptConnection(){
             spdlog::error("Error accepting worker {}", ec.message());
             return;
         }
-        int id = manager.generateWorkerId();
-        std::make_shared<WorkerSession>(manager, std::move(socket),
-            id)->start();
+        std::make_shared<ConnectionSession>(workerManager, clientManager,
+            std::move(socket))->start();
         acceptConnection();
     });
 }
@@ -34,8 +35,9 @@ int main(){
     asio::io_context ctx;
     asio::ip::tcp::endpoint ep{asio::ip::address_v4(), 1500};
     spdlog::set_level(spdlog::level::debug);
-    WorkerManager manager;
-    Master master(manager, ep, ctx);
+    WorkerManager workerManager;
+    ClientManager clientManager;
+    Master master(workerManager, clientManager, ep, ctx);
     master.acceptConnection();
     ctx.run();
 }

@@ -27,6 +27,12 @@ class MessageGenerator{
             confirm.set_worker_id(id);
             return confirm;
         }
+
+        static mapreduce::Authentication Authentication(mapreduce::ConnectionType type){
+            mapreduce::Authentication auth;
+            auth.set_type(type);
+            return auth;
+        }
 };
 
 #endif

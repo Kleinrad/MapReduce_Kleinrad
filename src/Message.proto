@@ -13,6 +13,12 @@ enum MessageType {
     CONFIRM = 7;
     JOB_REQUEST = 8;
     JOB_RESULT = 9;
+    AUTHENTICATION = 10;
+}
+
+enum ConnectionType {
+    CLIENT = 0;
+    WORKER = 1;
 }
 
 message Emtpy{}
@@ -67,4 +73,8 @@ message JobResult{
     MessageType type = 1;
     int32 job_id = 2;
     string data = 3;
+}
+
+message Authentication{
+    ConnectionType type = 1;
 }
