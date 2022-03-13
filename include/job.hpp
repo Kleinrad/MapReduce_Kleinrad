@@ -2,11 +2,7 @@
 #define JOBTYPES_H
 
 #include <string>
-
-enum JobType {
-    job_word_count,
-    job_letter_count
-};
+#include "Message.pb.h"
 
 enum JobStatus {
     job_new,
@@ -17,11 +13,12 @@ enum JobStatus {
 };
 
 struct Job {
-    JobType type;
+    mapreduce::JobType type;
     std::string data;
     JobStatus status{JobStatus::job_new};
     
-    Job(JobType type, std::string data) : type(type), data(data) {}
+    Job(mapreduce::JobType type, std::string data) 
+        : type(type), data(data) {}
 };
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <asio.hpp>
 #include "pipe.hpp"
+#include "job.hpp"
 
 class Client{
     int client_id;
@@ -15,6 +16,7 @@ class Client{
 
         void signOff();
         void signOn();
+        void sendJob(Job job);
 };
 
 #endif

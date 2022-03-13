@@ -21,6 +21,11 @@ enum ConnectionType {
     WORKER = 1;
 }
 
+enum JobType {
+    WORD_COUNT = 0;
+    LETTER_COUNT = 1;
+}
+
 message Emtpy{}
 
 message Assignment{
@@ -66,7 +71,7 @@ message Confirm{
 
 message JobRequest{
     MessageType type = 1;
-    int32 job_id = 2;
+    JobType job_type = 2;
     string data = 3;
     int32 num_mappers = 4;
     int32 num_reducers = 5;

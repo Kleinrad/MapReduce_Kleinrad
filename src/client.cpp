@@ -1,5 +1,7 @@
 #include <spdlog/spdlog.h>
+#include <thread>
 #include "protoutils.hpp"
+#include "job.hpp"
 #include "client.h"
 
 
@@ -55,6 +57,13 @@ void Client::waitForResponse(){
 }
 
 
+void Client::sendJob(Job job){
+    mapreduce::JobRequest jobRequest = 
+        MessageGenerator::JobRequest(job.type, job.data, -1, -1);
+    pipe.sendMessage(jobRequest);
+}
+
+
 int main(){
     asio::io_service ctx;
     asio::ip::tcp::endpoint ep{
@@ -62,5 +71,10 @@ int main(){
     asio::ip::tcp::socket socket(ctx);
     socket.connect(ep);
     Client client(std::move(socket));
-    client.signOn();
+    std::thread t([&](){
+        client.signOn();
+    });
+    std::cin >> std::cin.rdbuf();
+    Job job(mapreduce::JobType::LETTER_COUNT, "abcdefghijklmnopqrstuvwxyz");
+    client.sendJob(job);
 }
