@@ -16,6 +16,8 @@ class WorkerManager{
     std::mutex mtx;
     int totalConnections{0};
 
+    void splitRawData(
+        std::string *data, int workes, bool cropWords);
     void assignMapping(Job job
         , std::set<connection_ptr> &availableWorkes);
     void assignReduce(Job job

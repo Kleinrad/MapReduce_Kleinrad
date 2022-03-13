@@ -81,11 +81,37 @@ int WorkerManager::generateID(){
 }
 
 
+void WorkerManager::splitRawData(std::string *data, int workes, bool cropWords){
+    int size = data[0].size();
+    int chunk = size / workes;
+    int i = 0;
+    int chunk_counter = 0;
+    std::string rawData = data[0];
+    data = new std::string[workes];
+    for(int j=0; i<size; j++){
+        if(chunk_counter >= chunk && (rawData[j] == ' ' || cropWords)){
+            chunk_counter = 0;
+            data[i] = rawData.substr(0, j);
+            rawData = rawData.substr(j+1);
+            i++;
+        }
+        chunk_counter++;
+    }
+}
+
+
 void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWorkes){
-    for(auto &worker : availableWorkes){
+    std::string data[1];
+    data[0] = job.data;
+    splitRawData(data, availableWorkes.size(), false);
+    for(auto d : data){
+        spdlog::debug("Mapping data {}", d);
+    }
+    /*for(auto &worker : availableWorkes){
         worker->is_available = false;
         mapreduce::TaskMap task;
         worker->sendMessage(task);
         spdlog::info("Job {} assigned to worker {}", job.id, worker->id);
-    }
+    }*/
 }
+
