@@ -15,6 +15,7 @@ class ConnectionSession : public ConnectionObject,
     mapreduce::ConnectionType type;
 
     void readMessage();
+    void sendMessage(google::protobuf::Message& message);
     bool assignID();
     void auth();
 

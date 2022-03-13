@@ -11,6 +11,12 @@ ConnectionSession::ConnectionSession(WorkerManager &workerManager,
 ConnectionSession::~ConnectionSession(){}
 
 
+void ConnectionSession::sendMessage(
+            google::protobuf::Message& message){
+    pipe.sendMessage(message);
+}
+
+
 void ConnectionSession::readMessage(){
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::SIGN_OFF){

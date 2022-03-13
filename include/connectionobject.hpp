@@ -4,11 +4,11 @@
 class ConnectionObject {
     public:
         int id{-1};
-        bool is_available;
+        bool is_available{true};
 
-        ConnectionObject() {};
-        ConnectionObject(int id) 
-        : id(id), is_available(true) {};
+        virtual ~ConnectionObject() {}
+        virtual void sendMessage(
+            google::protobuf::Message& message) = 0;
 
 };
 
