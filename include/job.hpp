@@ -31,6 +31,4 @@ public:
         : id(id), type(type), data(data) {}
 };
 
-int Job::job_counter = 0;
-
 #endif

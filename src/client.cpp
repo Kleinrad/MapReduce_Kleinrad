@@ -4,6 +4,7 @@
 #include "job.hpp"
 #include "client.h"
 
+int Job::job_counter = 0;
 
 Client::Client(asio::ip::tcp::socket socket):
     pipe(Pipe(std::move(socket))) {}
@@ -26,7 +27,6 @@ void Client::signOn(){
             , mapreduce::ConnectionType::CLIENT);
         pipe.sendMessage(confirm);
         spdlog::info("Client {} sign on", client_id);
-        waitForResponse();
     }else{
         spdlog::error("Invalid message type");
         throw std::runtime_error("Client::signOn: Invalid Message recived");
@@ -59,8 +59,9 @@ void Client::waitForResponse(){
 
 void Client::sendJob(Job job){
     mapreduce::JobRequest jobRequest = 
-        MessageGenerator::JobRequest(job.type, job.id, job.data, -1, -1);
+        MessageGenerator::JobRequest(job.type, job.data, -1, -1);
     pipe.sendMessage(jobRequest);
+    waitForResponse();
 }
 
 
@@ -71,10 +72,9 @@ int main(){
     asio::ip::tcp::socket socket(ctx);
     socket.connect(ep);
     Client client(std::move(socket));
-    std::thread t([&](){
-        client.signOn();
-    });
+    client.signOn();
     std::cin >> std::cin.rdbuf();
-    Job job(mapreduce::JobType::LETTER_COUNT, "abcdefghijklmnopqrstuvwxyz");
+    Job job(mapreduce::JobType::LETTER_COUNT
+           , "abcdefghijklmnopqrstuvwxyz");
     client.sendJob(job);
 }

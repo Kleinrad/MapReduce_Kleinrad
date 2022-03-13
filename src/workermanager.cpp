@@ -30,14 +30,16 @@ bool WorkerManager::assignJob(Job job)
 {
     std::lock_guard<std::mutex> lock(mtx);
     std::set<connection_ptr> availableWorkes;
+    spdlog::debug("JOB assigned {}", job.id);
     for(auto &worker : workers){
         if(worker->is_available){
             availableWorkes.insert(worker);
         }
     }
+    int available = availableWorkes.size();
     if(job.status == JobStatus::job_new){
-        if((job.mappers == -1 && availableWorkes.size() > 0) 
-        || availableWorkes.size() >= job.mappers){
+        if((job.mappers == -1 && available > 0) 
+        || available >= job.mappers){
             job.status = JobStatus::job_mapping;
         }else{
             job.status = JobStatus::job_queued;
@@ -46,8 +48,8 @@ bool WorkerManager::assignJob(Job job)
             return false;
         }
     }if(job.status == JobStatus::job_queued){
-        if((job.mappers == -1 && availableWorkes.size() > 0) 
-        || availableWorkes.size() >= job.mappers){
+        if((job.mappers == -1 && available > 0) 
+        || available >= job.mappers){
             
         }else{
             job.status = JobStatus::job_queued;
@@ -56,8 +58,8 @@ bool WorkerManager::assignJob(Job job)
             return false;
         }
     }if(job.status == JobStatus::job_mapped){
-        if((job.reducers == -1 && availableWorkes.size() > 0) 
-        || availableWorkes.size() >= job.reducers){
+        if((job.reducers == -1 && available > 0) 
+        || available >= job.reducers){
             
         }else{
             job.status = JobStatus::job_queued;

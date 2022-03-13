@@ -37,11 +37,10 @@ class MessageGenerator{
             return auth;
         }
 
-        static mapreduce::JobRequest JobRequest(mapreduce::JobType type, int id,
+        static mapreduce::JobRequest JobRequest(mapreduce::JobType type,
                 std::string data, int mappers, int reducers){
             mapreduce::JobRequest jobRequest;
             jobRequest.set_type(mapreduce::MessageType::JOB_REQUEST);
-            jobRequest.set_id(id);
             jobRequest.set_job_type(type);
             jobRequest.set_data(data);
             if(mappers > 0){

@@ -26,7 +26,8 @@ void ConnectionSession::readMessage(){
     }if(type == mapreduce::MessageType::JOB_REQUEST){
         mapreduce::JobRequest jobRequest;
         pipe >> jobRequest;
-        Job job(jobRequest.job_type(), jobRequest.data(), jobRequest.id());
+        Job job(jobRequest.job_type(), jobRequest.data());
+        clientManager.registerJob(job.id, id);
         workerManager.assignJob(job);
     }
 }
