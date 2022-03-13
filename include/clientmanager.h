@@ -11,6 +11,7 @@ class ClientManager{
     std::set<connection_ptr> clients;
     asio::ip::port_type port{1500};
     std::mutex mtx;
+    int totalConnections{0};
 
     public:
         ClientManager();
@@ -18,6 +19,7 @@ class ClientManager{
 
         void join(connection_ptr worker);
         void leave(connection_ptr worker);
+        int generateID();
 };
 
 #endif

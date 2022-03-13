@@ -53,9 +53,6 @@ void ConnectionSession::auth(){
         mapreduce::Authentication auth;
         pipe >> auth;
         type = auth.type();
-        if(assignID()){
-            readMessage();
-        }
     }else{
         spdlog::error("Worker {} received invalid connection type ", id);
     }
@@ -63,8 +60,12 @@ void ConnectionSession::auth(){
 
 
 void ConnectionSession::start(){
-    id = generateID();
     auth();
+    if(type == mapreduce::ConnectionType::WORKER){
+        id = workerManager.generateID();
+    }else if(type == mapreduce::ConnectionType::CLIENT){
+        id = clientManager.generateID();
+    }
     if(assignID()){
         if(type == mapreduce::ConnectionType::WORKER){
             workerManager.join(shared_from_this());
@@ -76,9 +77,4 @@ void ConnectionSession::start(){
         });
         reciveThread->detach();
     }
-}
-
-
-int ConnectionSession::generateID(){
-    return totalConnections;
 }

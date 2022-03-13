@@ -2,11 +2,11 @@
 #define CONNECTIONOBJECT_H
 
 class ConnectionObject {
-    protected:
+    
+    public:
         int id{-1};
         bool is_available;
 
-    public:
         ConnectionObject() {};
         ConnectionObject(int id) 
         : id(id), is_available(true) {};

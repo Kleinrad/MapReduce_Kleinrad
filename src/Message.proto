@@ -59,6 +59,7 @@ message ResultReduce{
 message Confirm{
     MessageType type = 1;
     int32 worker_id = 2;
+    ConnectionType connection_type = 3;
 }
 
 message JobRequest{

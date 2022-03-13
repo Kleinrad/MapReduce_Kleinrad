@@ -36,7 +36,8 @@ void Worker::signOn(){
         mapreduce::WorkerAssignment assignment;
         pipe >> assignment;
         worker_id = assignment.worker_id();
-        mapreduce::Confirm confirm = MessageGenerator::Confirm(worker_id);
+        mapreduce::Confirm confirm = MessageGenerator::Confirm(worker_id
+            , mapreduce::ConnectionType::WORKER);
         pipe.sendMessage(confirm);
         spdlog::info("Worker {} sign on", worker_id);
         waitForTask();

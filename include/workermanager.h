@@ -11,6 +11,7 @@ class WorkerManager{
     std::set<connection_ptr> workers;
     asio::ip::port_type port{1500};
     std::mutex mtx;
+    int totalConnections{0};
 
     public:
         WorkerManager();
@@ -19,6 +20,7 @@ class WorkerManager{
         void join(connection_ptr worker);
         void leave(connection_ptr worker);
         bool assignJob(Job job);
+        int generateID();
 };
 
 #endif

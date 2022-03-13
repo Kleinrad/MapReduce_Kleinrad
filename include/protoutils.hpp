@@ -21,10 +21,11 @@ class MessageGenerator{
             return signOff;
         }
 
-        static mapreduce::Confirm Confirm(int id){
+        static mapreduce::Confirm Confirm(int id, mapreduce::ConnectionType type){
             mapreduce::Confirm confirm;
             confirm.set_type(mapreduce::MessageType::CONFIRM);
             confirm.set_worker_id(id);
+            confirm.set_connection_type(type);
             return confirm;
         }
 

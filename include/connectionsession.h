@@ -13,11 +13,9 @@ class ConnectionSession : public ConnectionObject,
     std::thread* reciveThread;
     Pipe pipe;
     mapreduce::ConnectionType type;
-    int totalConnections{0};
 
     void readMessage();
     bool assignID();
-    int generateID();
     void auth();
 
     public:
