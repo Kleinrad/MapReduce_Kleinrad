@@ -23,6 +23,11 @@ void ConnectionSession::readMessage(){
             clientManager.leave(shared_from_this());
             return;
         }
+    }if(type == mapreduce::MessageType::JOB_REQUEST){
+        mapreduce::JobRequest jobRequest;
+        pipe >> jobRequest;
+        Job job(jobRequest.job_type(), jobRequest.data(), jobRequest.id());
+        workerManager.assignJob(job);
     }
 }
 

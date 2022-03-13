@@ -71,10 +71,11 @@ message Confirm{
 
 message JobRequest{
     MessageType type = 1;
-    JobType job_type = 2;
-    string data = 3;
-    int32 num_mappers = 4;
-    int32 num_reducers = 5;
+    int32 id = 2;
+    JobType job_type = 3;
+    string data = 4;
+    int32 num_mappers = 5;
+    int32 num_reducers = 6;
 }
 
 message JobResult{

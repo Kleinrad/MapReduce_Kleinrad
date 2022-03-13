@@ -2,6 +2,8 @@
 #define WORKMANAGER_H
 
 #include <set>
+#include <queue>
+#include <map>
 #include <thread>
 #include "pipe.hpp"
 #include "job.hpp"
@@ -9,6 +11,7 @@
 
 class WorkerManager{
     std::set<connection_ptr> workers;
+    std::queue<Job> jobs;
     asio::ip::port_type port{1500};
     std::mutex mtx;
     int totalConnections{0};

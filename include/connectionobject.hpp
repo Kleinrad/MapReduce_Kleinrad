@@ -2,7 +2,6 @@
 #define CONNECTIONOBJECT_H
 
 class ConnectionObject {
-    
     public:
         int id{-1};
         bool is_available;
