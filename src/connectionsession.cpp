@@ -23,7 +23,6 @@ void ConnectionSession::readMessage(){
             clientManager.leave(shared_from_this());
             return;
         }
-        spdlog::info("Worker {} sign off", id);
     }
 }
 
@@ -36,13 +35,12 @@ bool ConnectionSession::assignID(){
         mapreduce::Confirm confirm;
         pipe >> confirm;
         if(confirm.id() == id){
-            spdlog::info("Worker {} connected", id);
             return true;
         }else{
-            spdlog::error("Worker confirmation vailed: Invalid worker id");
+            spdlog::error("Confirmation failed: Invalid id");
         }
     }else{
-        spdlog::error("Worker confirmation vailed: Invalid message type ({})", type);
+        spdlog::error("Confirmation failed: Invalid message type ({})", type);
     }
     return false;
 }

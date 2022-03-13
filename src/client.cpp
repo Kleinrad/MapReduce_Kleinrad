@@ -31,6 +31,15 @@ void Client::signOn(){
     }
 }
 
+
+void Client::signOff() {
+    mapreduce::SignOff signOff = MessageGenerator::SignOff(client_id, mapreduce::ConnectionType::CLIENT);
+    pipe.sendMessage(signOff);
+    spdlog::info("Client {} sign off", client_id);
+    exit(0);
+}
+
+
 void Client::waitForResponse(){
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::JOB_REQUEST){
@@ -43,4 +52,15 @@ void Client::waitForResponse(){
     }else{
         spdlog::error("Client {} received invalid message type ({})", client_id, type);
     }
+}
+
+
+int main(){
+    asio::io_service ctx;
+    asio::ip::tcp::endpoint ep{
+        asio::ip::address::from_string("127.0.0.1"), 1500};
+    asio::ip::tcp::socket socket(ctx);
+    socket.connect(ep);
+    Client client(std::move(socket));
+    client.signOn();
 }
