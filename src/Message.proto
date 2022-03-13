@@ -4,8 +4,8 @@ package mapreduce;
 
 enum MessageType {
     EMPTY = 0;
-    WORKER_ASSIGNMENT = 1;
-    WORKER_SIGN_OFF = 2;
+    ASSIGNMENT = 1;
+    SIGN_OFF = 2;
     TASK_MAP = 3;
     TASK_REDUCE = 4;
     RESULT_MAP = 5;
@@ -23,14 +23,16 @@ enum ConnectionType {
 
 message Emtpy{}
 
-message WorkerAssignment{
+message Assignment{
     MessageType type = 1;
-    int32 worker_id = 2;
+    int32 id = 2;
+    ConnectionType connection_type = 3;
 }
 
-message WorkerSignOff{
+message SignOff{
     MessageType type = 1;
-    int32 worker_id = 2;
+    int32 id = 2;
+    ConnectionType connection_type = 3;
 }
 
 message TaskMap{
@@ -58,7 +60,7 @@ message ResultReduce{
 
 message Confirm{
     MessageType type = 1;
-    int32 worker_id = 2;
+    int32 id = 2;
     ConnectionType connection_type = 3;
 }
 

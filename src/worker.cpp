@@ -20,7 +20,7 @@ void Worker::waitForTask(){
         pipe >> task;
         spdlog::info("Worker {} received task {}", worker_id, task.data());
         waitForTask();
-    }else if(type == mapreduce::MessageType::WORKER_SIGN_OFF){
+    }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();
     }else{
         spdlog::error("Worker {} received invalid message type ({})", worker_id, type);
@@ -32,10 +32,10 @@ void Worker::signOn(){
     mapreduce::Authentication auth = MessageGenerator::Authentication(
         mapreduce::ConnectionType::WORKER);
     pipe.sendMessage(auth);
-    if(pipe.reciveMessageType() == mapreduce::MessageType::WORKER_ASSIGNMENT){
-        mapreduce::WorkerAssignment assignment;
+    if(pipe.reciveMessageType() == mapreduce::MessageType::ASSIGNMENT){
+        mapreduce::Assignment assignment;
         pipe >> assignment;
-        worker_id = assignment.worker_id();
+        worker_id = assignment.id();
         mapreduce::Confirm confirm = MessageGenerator::Confirm(worker_id
             , mapreduce::ConnectionType::WORKER);
         pipe.sendMessage(confirm);
@@ -49,7 +49,7 @@ void Worker::signOn(){
 
 
 void Worker::signOff() {
-    mapreduce::WorkerSignOff signOff = MessageGenerator::WorkerSignOff(worker_id);
+    mapreduce::SignOff signOff = MessageGenerator::SignOff(worker_id, mapreduce::ConnectionType::WORKER);
     pipe.sendMessage(signOff);
     spdlog::info("Worker {} sign off", worker_id);
     exit(0);

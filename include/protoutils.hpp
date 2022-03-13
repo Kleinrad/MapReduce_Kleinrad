@@ -7,24 +7,26 @@
 
 class MessageGenerator{
     public: 
-        static mapreduce::WorkerAssignment WorkerAssignment(int id){
-            mapreduce::WorkerAssignment assignment;
-            assignment.set_type(mapreduce::MessageType::WORKER_ASSIGNMENT);
-            assignment.set_worker_id(id);
+        static mapreduce::Assignment Assignment(int id, mapreduce::ConnectionType type){
+            mapreduce::Assignment assignment;
+            assignment.set_type(mapreduce::MessageType::ASSIGNMENT);
+            assignment.set_id(id);
+            assignment.set_connection_type(type);
             return assignment;
         }
 
-        static mapreduce::WorkerSignOff WorkerSignOff(int id){
-            mapreduce::WorkerSignOff signOff;
-            signOff.set_type(mapreduce::MessageType::WORKER_SIGN_OFF);
-            signOff.set_worker_id(id);
+        static mapreduce::SignOff SignOff(int id, mapreduce::ConnectionType type){
+            mapreduce::SignOff signOff;
+            signOff.set_type(mapreduce::MessageType::SIGN_OFF);
+            signOff.set_id(id);
+            signOff.set_connection_type(type);
             return signOff;
         }
 
         static mapreduce::Confirm Confirm(int id, mapreduce::ConnectionType type){
             mapreduce::Confirm confirm;
             confirm.set_type(mapreduce::MessageType::CONFIRM);
-            confirm.set_worker_id(id);
+            confirm.set_id(id);
             confirm.set_connection_type(type);
             return confirm;
         }

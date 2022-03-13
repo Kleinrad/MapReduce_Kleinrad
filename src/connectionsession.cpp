@@ -13,7 +13,7 @@ ConnectionSession::~ConnectionSession(){}
 
 void ConnectionSession::readMessage(){
     mapreduce::MessageType type = pipe.reciveMessageType();
-    if(type == mapreduce::MessageType::WORKER_SIGN_OFF){
+    if(type == mapreduce::MessageType::SIGN_OFF){
         if(this->type == mapreduce::ConnectionType::WORKER){
             spdlog::info("Worker {} sign off", id);
             workerManager.leave(shared_from_this());
@@ -29,13 +29,13 @@ void ConnectionSession::readMessage(){
 
 
 bool ConnectionSession::assignID(){
-    mapreduce::WorkerAssignment assignment = MessageGenerator::WorkerAssignment(id);
+    mapreduce::Assignment assignment = MessageGenerator::Assignment(id, type);
     pipe.sendMessage(assignment);
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::CONFIRM){
         mapreduce::Confirm confirm;
         pipe >> confirm;
-        if(confirm.worker_id() == id){
+        if(confirm.id() == id){
             spdlog::info("Worker {} connected", id);
             return true;
         }else{
