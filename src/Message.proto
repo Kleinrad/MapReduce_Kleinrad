@@ -42,7 +42,8 @@ message SignOff{
 
 message TaskMap{
     MessageType type = 1;
-    string data = 2;
+    JobType job_type = 2;
+    string data = 3;
 }
 
 message TaskReduce{

@@ -1,4 +1,5 @@
 #include "workermanager.h"
+#include "protoutils.hpp"
 #include <spdlog/spdlog.h>
 
 WorkerManager::WorkerManager(){}
@@ -101,14 +102,12 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
 void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWorkes){
     std::vector<std::string> data;
     splitRawData(job.data, data, availableWorkes.size(), true);
-    for(auto d : data){
-        spdlog::debug("Mapping data {}", d);
-    }
-    /*for(auto &worker : availableWorkes){
+    for(auto &worker : availableWorkes){
         worker->is_available = false;
-        mapreduce::TaskMap task;
+        mapreduce::TaskMap task = MessageGenerator::TaskMap(job.type, data.back());
+        data.pop_back();
         worker->sendMessage(task);
         spdlog::info("Job {} assigned to worker {}", job.id, worker->id);
-    }*/
+    }
 }
 

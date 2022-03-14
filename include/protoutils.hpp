@@ -55,6 +55,15 @@ class MessageGenerator{
             }
             return jobRequest;
         }
+
+        static mapreduce::TaskMap TaskMap(mapreduce::JobType type
+            , std::string data){
+            mapreduce::TaskMap taskMap;
+            taskMap.set_type(mapreduce::MessageType::TASK_MAP);
+            taskMap.set_job_type(type);
+            taskMap.set_data(data);
+            return taskMap;
+        }
 };
 
 #endif
