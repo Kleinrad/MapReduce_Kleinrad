@@ -33,7 +33,6 @@ bool WorkerManager::assignJob(Job job)
     spdlog::debug("JOB assigned {}, status {}", job.id, job.status);
     spdlog::debug("Workers connected {}", workers.size());
     for(auto &worker : workers){
-        spdlog::debug("Worker {} is available {}", worker->id, worker->is_available);
         if(worker->is_available){
             availableWorkes.insert(worker);
         }
@@ -81,29 +80,27 @@ int WorkerManager::generateID(){
 }
 
 
-void WorkerManager::splitRawData(std::string *data, int workes, bool cropWords){
-    int size = data[0].size();
+void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &data,
+                            int workes, bool cropWords){
+    int size = rawData.size();
     int chunk = size / workes;
-    int i = 0;
     int chunk_counter = 0;
-    std::string rawData = data[0];
-    data = new std::string[workes];
-    for(int j=0; i<size; j++){
+    for(int j=1; j<size; j++){
         if(chunk_counter >= chunk && (rawData[j] == ' ' || cropWords)){
+            std::string dataChunk = rawData.substr(0, chunk_counter);
+            data.push_back(dataChunk);
+            rawData = rawData.substr(chunk_counter);
             chunk_counter = 0;
-            data[i] = rawData.substr(0, j);
-            rawData = rawData.substr(j+1);
-            i++;
         }
         chunk_counter++;
     }
+    data.push_back(rawData);
 }
 
 
 void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWorkes){
-    std::string data[1];
-    data[0] = job.data;
-    splitRawData(data, availableWorkes.size(), false);
+    std::vector<std::string> data;
+    splitRawData(job.data, data, availableWorkes.size(), true);
     for(auto d : data){
         spdlog::debug("Mapping data {}", d);
     }

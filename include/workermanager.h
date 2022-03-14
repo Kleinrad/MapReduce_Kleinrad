@@ -4,6 +4,7 @@
 #include <set>
 #include <queue>
 #include <map>
+#include <vector>
 #include <thread>
 #include "pipe.hpp"
 #include "job.hpp"
@@ -16,8 +17,8 @@ class WorkerManager{
     std::mutex mtx;
     int totalConnections{0};
 
-    void splitRawData(
-        std::string *data, int workes, bool cropWords);
+    void splitRawData(std::string rawData, std::vector<std::string> &data
+        , int workes, bool cropWords);
     void assignMapping(Job job
         , std::set<connection_ptr> &availableWorkes);
     void assignReduce(Job job
