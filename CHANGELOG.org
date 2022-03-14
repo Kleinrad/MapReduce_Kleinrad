@@ -1,5 +1,12 @@
 * Changelog
 ** [Unreleased]
+** [0.2.1] - 2022-03-14
+*** Added
+- Client, sends jobs to master 
+- ClientManager, manages client connections
+*** Changed
+- WorkerSession renamed to ConnectionSession, because of use with clients
+- WorkerObject renamed to ConnectionObject
 ** [0.2.0] - 2022-03-07
 *** Added
 - Master, to manage jobs send from clients
