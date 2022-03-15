@@ -1,11 +1,14 @@
 #include "connectionsession.h"
+#include <chrono>
 
 
 ConnectionSession::ConnectionSession(WorkerManager &workerManager, 
                                     ClientManager &clientManager,
                             asio::ip::tcp::socket socket) 
     : ConnectionObject(), workerManager(workerManager), 
-    clientManager(clientManager), pipe(Pipe(std::move(socket))) {}
+    clientManager(clientManager), pipe(Pipe(std::move(socket))) {
+        last_active = std::chrono::system_clock::now();
+}
 
 
 ConnectionSession::~ConnectionSession(){}
@@ -19,13 +22,12 @@ void ConnectionSession::sendMessage(
 
 void ConnectionSession::readMessage(){
     mapreduce::MessageType type = pipe.reciveMessageType();
+    last_active = std::chrono::system_clock::now();
     if(type == mapreduce::MessageType::SIGN_OFF){
         if(this->type == mapreduce::ConnectionType::WORKER){
-            spdlog::info("Worker {} sign off", id);
             workerManager.leave(shared_from_this());
             return;
         }else if(this->type == mapreduce::ConnectionType::CLIENT){
-            spdlog::info("Client {} sign off", id);
             clientManager.leave(shared_from_this());
             return;
         }
@@ -36,6 +38,12 @@ void ConnectionSession::readMessage(){
         clientManager.registerJob(job.id, id);
         workerManager.assignJob(job);
     }
+    if(type == mapreduce::MessageType::PING){
+        mapreduce::Ping p;
+        pipe >> p;
+        spdlog::debug("{} received ping", id);
+    }
+    readMessage();
 }
 
 
@@ -62,10 +70,15 @@ void ConnectionSession::auth(){
     if(pipe.reciveMessageType() == mapreduce::MessageType::AUTHENTICATION){
         mapreduce::Authentication auth;
         pipe >> auth;
-        type = auth.type();
+        type = auth.connection_type();
     }else{
         spdlog::error("Worker {} received invalid connection type ", id);
     }
+}
+
+
+bool ConnectionSession::isConnected(){
+    return pipe.operator bool();
 }
 
 

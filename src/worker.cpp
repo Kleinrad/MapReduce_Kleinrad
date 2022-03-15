@@ -15,16 +15,24 @@ Worker::~Worker() {
 
 void Worker::waitForTask(){
     mapreduce::MessageType type = pipe.reciveMessageType();
+    spdlog::debug("Recieved {}", type);
     if(type == mapreduce::MessageType::TASK_MAP){
         mapreduce::TaskMap task;
         pipe >> task;
         spdlog::info("Worker {} received task {}", worker_id, task.data());
-        waitForTask();
     }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();
+        return;
+    }else if(type == mapreduce::MessageType::PING){
+        mapreduce::Ping ping;
+        pipe >> ping;
+        spdlog::info("Worker {} received ping", worker_id);
+        pipe.sendMessage(ping);
     }else{
         spdlog::error("Worker {} received invalid message type ({})", worker_id, type);
+        return;
     }
+    waitForTask();
 }
 
 
@@ -56,6 +64,7 @@ void Worker::signOff() {
 }
 
 int main(){
+    spdlog::set_level(spdlog::level::debug);
     asio::io_service ctx;
     asio::ip::tcp::endpoint ep{
         asio::ip::address::from_string("127.0.0.1"), 1500};

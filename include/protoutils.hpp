@@ -33,7 +33,8 @@ class MessageGenerator{
 
         static mapreduce::Authentication Authentication(mapreduce::ConnectionType type){
             mapreduce::Authentication auth;
-            auth.set_type(type);
+            auth.set_type(mapreduce::MessageType::AUTHENTICATION);
+            auth.set_connection_type(type);
             return auth;
         }
 
@@ -63,6 +64,12 @@ class MessageGenerator{
             taskMap.set_job_type(type);
             taskMap.set_data(data);
             return taskMap;
+        }
+
+        static mapreduce::Ping Ping(){
+            mapreduce::Ping ping;
+            ping.set_type(mapreduce::MessageType::PING);
+            return ping;
         }
 };
 

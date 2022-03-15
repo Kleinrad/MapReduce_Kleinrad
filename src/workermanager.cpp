@@ -2,11 +2,15 @@
 #include "protoutils.hpp"
 #include <spdlog/spdlog.h>
 
-WorkerManager::WorkerManager(){}
+WorkerManager::WorkerManager(){
+    timeout_thread = std::thread(&WorkerManager::checkConnections, this);
+    timeout_thread.detach();
+}
 
 
 WorkerManager::~WorkerManager()
 {
+    timeout_thread.join();
 }
 
 void WorkerManager::join(connection_ptr worker)
@@ -20,7 +24,6 @@ void WorkerManager::join(connection_ptr worker)
 
 void WorkerManager::leave(connection_ptr worker)
 {
-    totalConnections--;
     spdlog::info("Worker {} sign off", worker->id);
     std::lock_guard<std::mutex> lock(mtx);
     workers.erase(worker);
@@ -108,3 +111,27 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
     }
 }
 
+
+void WorkerManager::checkConnections(){
+    while(true){
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::lock_guard<std::mutex> lock(mtx);
+        for(auto &worker : workers){
+            if(worker->isConnected()){
+                if(worker->last_active + std::chrono::seconds(10) < std::chrono::system_clock::now()){
+                    mapreduce::Ping ping = MessageGenerator::Ping();
+                    worker->sendMessage(ping);
+                    spdlog::info("Worker {} ping", worker->id);
+                }else if(worker->last_active + std::chrono::seconds(20) < std::chrono::system_clock::now()){
+                    spdlog::info("Worker {} timeout", worker->id);
+                    mapreduce::SignOff signOff = MessageGenerator::SignOff(0, mapreduce::ConnectionType::WORKER);
+                    worker->sendMessage(signOff);
+                    leave(worker);
+                }
+            }else{
+                    spdlog::info("Worker {} connection lost", worker->id);
+                    leave(worker);
+            }
+        }
+    }
+}

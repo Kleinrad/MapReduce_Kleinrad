@@ -14,6 +14,7 @@ class WorkerManager{
     std::set<connection_ptr> workers;
     std::queue<Job> jobs;
     asio::ip::port_type port{1500};
+    std::thread timeout_thread;
     std::mutex mtx;
     int totalConnections{0};
 
@@ -23,6 +24,7 @@ class WorkerManager{
         , std::set<connection_ptr> &availableWorkes);
     void assignReduce(Job job
         , std::set<connection_ptr> &availableWorkes);
+    void checkConnections();
 
     public:
         WorkerManager();

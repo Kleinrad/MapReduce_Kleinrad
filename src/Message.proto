@@ -14,6 +14,7 @@ enum MessageType {
     JOB_REQUEST = 8;
     JOB_RESULT = 9;
     AUTHENTICATION = 10;
+    PING = 11;
 }
 
 enum ConnectionType {
@@ -85,5 +86,10 @@ message JobResult{
 }
 
 message Authentication{
-    ConnectionType type = 1;
+    MessageType type = 1;
+    ConnectionType connection_type = 2;
+}
+
+message Ping{
+    MessageType type = 1;
 }
