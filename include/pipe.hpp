@@ -11,6 +11,7 @@
 
 class Pipe {
     asio::ip::tcp::socket* socket{nullptr};
+    bool is_closed{false};
 
     public:
         Pipe(asio::ip::tcp::socket socket){
@@ -26,7 +27,7 @@ class Pipe {
         
         explicit operator bool()
         {
-            return socket->is_open();
+            return !is_closed;
         }
 
         void sendMessage(google::protobuf::Message &message){
@@ -48,7 +49,7 @@ class Pipe {
                 socket->read_some(asio::buffer(&msgIndex, sizeof(msgIndex)));
             }catch(std::system_error &e){
                 spdlog::error("Connection ended", e.what());
-                socket->close();
+                is_closed = true;
             }
             return static_cast<mapreduce::MessageType>(msgIndex);
         }

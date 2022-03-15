@@ -24,9 +24,9 @@ void WorkerManager::join(connection_ptr worker)
 
 void WorkerManager::leave(connection_ptr worker)
 {
-    spdlog::info("Worker {} sign off", worker->id);
     std::lock_guard<std::mutex> lock(mtx);
-    workers.erase(worker);
+    spdlog::info("Worker {} sign off", worker->id);
+    workers.erase(std::find(workers.begin(), workers.end(), worker));
 }
 
 
@@ -129,6 +129,7 @@ void WorkerManager::checkConnections(){
                 }
             }else{
                     spdlog::info("Worker {} connection lost", worker->id);
+                    mtx.unlock();
                     leave(worker);
             }
         }
