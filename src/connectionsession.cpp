@@ -21,29 +21,31 @@ void ConnectionSession::sendMessage(
 
 
 void ConnectionSession::readMessage(){
-    mapreduce::MessageType type = pipe.reciveMessageType();
-    last_active = std::chrono::system_clock::now();
-    if(type == mapreduce::MessageType::SIGN_OFF){
-        if(this->type == mapreduce::ConnectionType::WORKER){
-            workerManager.leave(shared_from_this());
-            return;
-        }else if(this->type == mapreduce::ConnectionType::CLIENT){
-            clientManager.leave(shared_from_this());
-            return;
+    if(pipe){
+        mapreduce::MessageType type = pipe.reciveMessageType();
+        last_active = std::chrono::system_clock::now();
+        if(type == mapreduce::MessageType::SIGN_OFF){
+            if(this->type == mapreduce::ConnectionType::WORKER){
+                workerManager.leave(shared_from_this());
+                return;
+            }else if(this->type == mapreduce::ConnectionType::CLIENT){
+                clientManager.leave(shared_from_this());
+                return;
+            }
+        }if(type == mapreduce::MessageType::JOB_REQUEST){
+            mapreduce::JobRequest jobRequest;
+            pipe >> jobRequest;
+            Job job(jobRequest.job_type(), jobRequest.data());
+            clientManager.registerJob(job.id, id);
+            workerManager.assignJob(job);
         }
-    }if(type == mapreduce::MessageType::JOB_REQUEST){
-        mapreduce::JobRequest jobRequest;
-        pipe >> jobRequest;
-        Job job(jobRequest.job_type(), jobRequest.data());
-        clientManager.registerJob(job.id, id);
-        workerManager.assignJob(job);
+        if(type == mapreduce::MessageType::PING){
+            mapreduce::Ping p;
+            pipe >> p;
+            spdlog::debug("{} received ping", id);
+        }
+        readMessage();
     }
-    if(type == mapreduce::MessageType::PING){
-        mapreduce::Ping p;
-        pipe >> p;
-        spdlog::debug("{} received ping", id);
-    }
-    readMessage();
 }
 
 
