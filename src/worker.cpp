@@ -1,6 +1,7 @@
 #include <thread>
 #include <chrono>
 #include <spdlog/spdlog.h>
+#include <set>
 #include "protoutils.hpp"
 #include "worker.h"
 
@@ -13,13 +14,27 @@ Worker::~Worker() {
 }
 
 
+void Worker::handleMap(int type, std::string data) {
+    spdlog::info("Worker {}: handleMap", worker_id);
+    std::set<std::pair<std::string, int>> result;
+    for(int i = 0; i < data.size(); i++){
+        result.insert(std::make_pair(data.substr(i, 1), 1));
+    }
+    is_busy = false;
+}
+
+
 void Worker::waitForTask(){
     mapreduce::MessageType type = pipe.reciveMessageType();
     spdlog::debug("Recieved {}", type);
-    if(type == mapreduce::MessageType::TASK_MAP){
+    if(type == mapreduce::MessageType::TASK_MAP && !is_busy){
         mapreduce::TaskMap task;
         pipe >> task;
-        spdlog::info("Worker {} received task {}", worker_id, task.data());
+        std::thread t([this, task](){
+            handleMap(task.type(), task.data());
+        });
+        is_busy = true;
+        t.detach();
     }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();
         return;
