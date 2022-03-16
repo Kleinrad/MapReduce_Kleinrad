@@ -44,7 +44,6 @@ void ConnectionSession::readMessage(){
         if(type == mapreduce::MessageType::PING){
             mapreduce::Ping p;
             pipe >> p;
-            spdlog::debug("{} received ping", id);
         }
         readMessage();
     }else{
@@ -93,6 +92,11 @@ void ConnectionSession::auth(){
 
 bool ConnectionSession::isConnected(){
     return pipe.operator bool();
+}
+
+
+void ConnectionSession::closeConnection(){
+    pipe.close();
 }
 
 

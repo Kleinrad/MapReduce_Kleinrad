@@ -13,6 +13,7 @@ class ConnectionObject {
         virtual void sendMessage(
             google::protobuf::Message& message) = 0;
         virtual bool isConnected() = 0;
+        virtual void closeConnection() = 0;
 
 };
 

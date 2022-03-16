@@ -19,6 +19,7 @@ class ConnectionSession : public ConnectionObject,
     void readMessage();
     void sendMessage(google::protobuf::Message& message);
     bool isConnected();
+    void closeConnection();
     bool assignID();
     void auth();
 

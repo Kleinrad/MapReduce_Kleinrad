@@ -30,6 +30,14 @@ class Pipe {
             return !is_closed;
         }
 
+
+        void close(){
+            is_closed = true;
+            if(socket)
+                socket->close();
+        }
+
+
         void sendMessage(google::protobuf::Message &message){
             u_int8_t msgIndex = message.GetDescriptor()->index();
             u_int64_t msgSize{message.ByteSizeLong()};

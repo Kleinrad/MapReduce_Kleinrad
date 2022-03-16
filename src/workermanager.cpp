@@ -119,14 +119,16 @@ void WorkerManager::checkConnections(){
         std::lock_guard<std::mutex> lock(mtx);
         for(auto &worker : workers){
             if(worker->isConnected()){
-                if(worker->last_active + std::chrono::seconds(15) < std::chrono::system_clock::now()){
+                if(worker->last_active + std::chrono::seconds(25) < std::chrono::system_clock::now()){
+                    spdlog::error("Worker {} unreachable", worker->id);
+                }else if(worker->last_active + std::chrono::seconds(15) < std::chrono::system_clock::now()){
                     spdlog::info("Worker {} timeout", worker->id);
                     mapreduce::SignOff signOff = MessageGenerator::SignOff(0, mapreduce::ConnectionType::WORKER);
                     worker->sendMessage(signOff);
+                    worker->closeConnection();
                 }else if(worker->last_active + std::chrono::seconds(10) < std::chrono::system_clock::now()){
                     mapreduce::Ping ping = MessageGenerator::Ping();
                     worker->sendMessage(ping);
-                    spdlog::info("Worker {} ping", worker->id);
                 }
             }
         }
