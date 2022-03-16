@@ -11,7 +11,11 @@ ConnectionSession::ConnectionSession(WorkerManager &workerManager,
 }
 
 
-ConnectionSession::~ConnectionSession(){}
+ConnectionSession::~ConnectionSession(){
+    spdlog::debug("ConnectionSession Deconst");
+    pipe.~Pipe();
+    spdlog::debug("ConnectionSession Deconst ended");
+}
 
 
 void ConnectionSession::sendMessage(
@@ -45,6 +49,14 @@ void ConnectionSession::readMessage(){
             spdlog::debug("{} received ping", id);
         }
         readMessage();
+    }else{
+        if(this->type == mapreduce::ConnectionType::WORKER){
+            workerManager.leave(shared_from_this());
+            return;
+        }else if(this->type == mapreduce::ConnectionType::CLIENT){
+            clientManager.leave(shared_from_this());
+            return;
+        }
     }
 }
 

@@ -26,7 +26,7 @@ void WorkerManager::leave(connection_ptr worker)
 {
     std::lock_guard<std::mutex> lock(mtx);
     spdlog::info("Worker {} sign off", worker->id);
-    workers.erase(std::find(workers.begin(), workers.end(), worker));
+    workers.erase(worker);
 }
 
 
@@ -113,6 +113,7 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
 
 
 void WorkerManager::checkConnections(){
+    spdlog::info("Checking connections");
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::lock_guard<std::mutex> lock(mtx);
@@ -127,10 +128,6 @@ void WorkerManager::checkConnections(){
                     worker->sendMessage(ping);
                     spdlog::info("Worker {} ping", worker->id);
                 }
-            }else{
-                    spdlog::info("Worker {} connection lost", worker->id);
-                    mtx.unlock();
-                    leave(worker);
             }
         }
     }
