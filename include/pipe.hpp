@@ -20,13 +20,9 @@ class Pipe {
         }
 
         ~Pipe(){
-            spdlog::debug("Pipe destructor");
             google::protobuf::ShutdownProtobufLibrary();
-            spdlog::debug("socket {}", socket != nullptr); 
             socket->close();
-            spdlog::debug("socket closed {}", socket != nullptr);
-            //delete socket;
-            spdlog::debug("Pipe dest ended");
+            delete socket;
         }
         
         explicit operator bool()

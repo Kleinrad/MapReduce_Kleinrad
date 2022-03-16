@@ -12,14 +12,12 @@ ConnectionSession::ConnectionSession(WorkerManager &workerManager,
 
 
 ConnectionSession::~ConnectionSession(){
-    spdlog::debug("ConnectionSession Deconst");
-    pipe.~Pipe();
-    spdlog::debug("ConnectionSession Deconst ended");
 }
 
 
 void ConnectionSession::sendMessage(
             google::protobuf::Message& message){
+    std::lock_guard<std::mutex> lock(mtx);
     pipe.sendMessage(message);
 }
 
@@ -63,6 +61,7 @@ void ConnectionSession::readMessage(){
 
 bool ConnectionSession::assignID(){
     mapreduce::Assignment assignment = MessageGenerator::Assignment(id, type);
+    std::lock_guard<std::mutex> lock(mtx);
     pipe.sendMessage(assignment);
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::CONFIRM){
@@ -81,6 +80,7 @@ bool ConnectionSession::assignID(){
 
 
 void ConnectionSession::auth(){
+    std::lock_guard<std::mutex> lock(mtx);
     if(pipe.reciveMessageType() == mapreduce::MessageType::AUTHENTICATION){
         mapreduce::Authentication auth;
         pipe >> auth;

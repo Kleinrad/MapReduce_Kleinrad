@@ -5,6 +5,7 @@
 #include "clientmanager.h"
 #include "pipe.hpp"
 #include "protoutils.hpp"
+#include <thread>
 
 class ConnectionSession : public ConnectionObject,
                       public std::enable_shared_from_this<ConnectionObject>{ 
@@ -12,6 +13,7 @@ class ConnectionSession : public ConnectionObject,
     ClientManager &clientManager;
     std::thread* reciveThread;
     Pipe pipe;
+    std::mutex mtx;
     mapreduce::ConnectionType type;
 
     void readMessage();
