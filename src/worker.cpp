@@ -14,13 +14,14 @@ Worker::~Worker() {
 }
 
 
-void Worker::handleMap(int type, std::string data) {
+void Worker::handleMap(int type, std::string data, int job_id) {
     spdlog::info("Worker {}: handleMap type {}", worker_id, type);
     std::set<std::pair<std::string, int>> result;
     for(int i = 0; i < (int)data.size(); i++){
         result.insert(std::make_pair(data.substr(i, 1), 1));
     }
-    mapreduce::ResultMap resultMsg = MessageGenerator::ResultMap(result);
+    mapreduce::ResultMap resultMsg = 
+        MessageGenerator::ResultMap(result, job_id);
     std::this_thread::sleep_for(std::chrono::seconds(10));
     pipe.sendMessage(resultMsg);
     is_busy = false;
@@ -33,7 +34,7 @@ void Worker::waitForTask(){
         mapreduce::TaskMap task;
         pipe >> task;
         std::thread t([this, task](){
-            handleMap(task.type(), task.data());
+            handleMap(task.type(), task.data(), task.job_id());
         });
         is_busy = true;
         t.detach();

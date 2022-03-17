@@ -43,14 +43,16 @@ message SignOff{
 
 message TaskMap{
     MessageType type = 1;
-    JobType job_type = 2;
-    string data = 3;
+    int32 job_id = 2;
+    JobType job_type = 3;
+    string data = 4;
 }
 
 message TaskReduce{
     MessageType type = 1;
-    int32 key = 2;
-    repeated string values = 3;
+    int32 job_id = 2;
+    int32 key = 3;
+    repeated string values = 4;
 }
 
 message ResultMap{
@@ -60,13 +62,15 @@ message ResultMap{
     }
 
     MessageType type = 1;
+    int32 job_id = 2;
     repeated MapValues values = 3;
 }
 
 message ResultReduce{
     MessageType type = 1;
-    int32 key = 2;
-    string value = 3;
+    int32 job_id = 2;
+    int32 key = 3;
+    string value = 4;
 }
 
 message Confirm{

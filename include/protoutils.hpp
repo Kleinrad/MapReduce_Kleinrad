@@ -59,9 +59,10 @@ class MessageGenerator{
         }
 
         static mapreduce::TaskMap TaskMap(mapreduce::JobType type
-            , std::string data){
+            , std::string data, int job_id){
             mapreduce::TaskMap taskMap;
             taskMap.set_type(mapreduce::MessageType::TASK_MAP);
+            taskMap.set_job_id(job_id);
             taskMap.set_job_type(type);
             taskMap.set_data(data);
             return taskMap;
@@ -73,9 +74,11 @@ class MessageGenerator{
             return ping;
         }
 
-        static mapreduce::ResultMap ResultMap(std::set<std::pair<std::string, int>> result){
+        static mapreduce::ResultMap ResultMap(
+            std::set<std::pair<std::string, int>> result, int job_id){
             mapreduce::ResultMap resultMap;
             resultMap.set_type(mapreduce::MessageType::RESULT_MAP);
+            resultMap.set_job_id(job_id);
             for(auto& pair : result){
                 mapreduce::ResultMap::MapValues* v = resultMap.add_values();
                 v->set_key(pair.first);

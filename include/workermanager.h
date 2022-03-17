@@ -13,9 +13,12 @@
 class WorkerManager{
     std::set<connection_ptr> workers;
     std::queue<Job> jobs;
+    std::map<int, ActiveJob> activeJobs;
     asio::ip::port_type port{1500};
     std::thread timeout_thread;
-    std::mutex mtx;
+    std::mutex workerMtx;
+    std::mutex activeJobMtx;
+    std::mutex jobsMtx;
     int totalConnections{0};
 
     void splitRawData(std::string rawData, std::vector<std::string> &data
@@ -24,6 +27,7 @@ class WorkerManager{
         , std::set<connection_ptr> &availableWorkes);
     void assignReduce(Job job
         , std::set<connection_ptr> &availableWorkes);
+    void reAssignTask(int worker_id);
     void checkConnections();
 
     public:

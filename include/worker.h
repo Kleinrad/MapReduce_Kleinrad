@@ -10,7 +10,7 @@ class Worker {
     Pipe pipe;
 
     void waitForTask();
-    void handleMap(int type, std::string data);
+    void handleMap(int type, std::string data, int job_id);
     public:
         Worker(asio::ip::tcp::socket socket);
         ~Worker();

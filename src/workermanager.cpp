@@ -17,14 +17,14 @@ void WorkerManager::join(connection_ptr worker)
 {
     totalConnections++;
     spdlog::info("Worker {} connected", worker->id);
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(workerMtx);
     workers.insert(worker);
 }
 
 
 void WorkerManager::leave(connection_ptr worker)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::info("Worker {} sign off", worker->id);
     workers.erase(worker);
 }
@@ -32,7 +32,7 @@ void WorkerManager::leave(connection_ptr worker)
 
 bool WorkerManager::assignJob(Job job)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    std::lock_guard<std::mutex> lock(workerMtx);
     std::set<connection_ptr> availableWorkes;
     for(auto &worker : workers){
         if(worker->is_available){
@@ -48,6 +48,7 @@ bool WorkerManager::assignJob(Job job)
         }else{
             job.status = JobStatus::job_queuedMap;
             spdlog::info("Job {} is queued: not enough workes available", job.id);
+            std::lock_guard<std::mutex> lock(jobsMtx);
             jobs.push(job);
             return false;
         }
@@ -63,6 +64,7 @@ bool WorkerManager::assignJob(Job job)
             }
         }else{
             spdlog::info("Job {} is queued: not enough workes available", job.id);
+            std::lock_guard<std::mutex> lock(jobsMtx);            
             jobs.push(job);
             return false;
         }
@@ -73,6 +75,7 @@ bool WorkerManager::assignJob(Job job)
         }else{
             job.status = JobStatus::job_queuedReduce;
             spdlog::info("Job {} is queued: not enough workes availible", job.id);
+            std::lock_guard<std::mutex> lock(jobsMtx);            
             jobs.push(job);
             return false;
         }
@@ -113,7 +116,8 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
     splitRawData(job.data, data, availableWorkes.size(), true);
     for(auto &worker : availableWorkes){
         worker->is_available = false;
-        mapreduce::TaskMap task = MessageGenerator::TaskMap(job.type, data.back());
+        mapreduce::TaskMap task = 
+            MessageGenerator::TaskMap(job.type, data.back(), job.id);
         data.pop_back();
         spdlog::debug("Assigning job {} to worker {}", job.id, worker->id);
         worker->sendMessage(task);
@@ -122,11 +126,22 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
 }
 
 
+void WorkerManager::reAssignTask(int worker_id){
+    std::lock_guard<std::mutex> lock(activeJobMtx);
+    for(auto &pair : activeJobs){
+        if(pair.second.contains(worker_id)){
+            Job job{pair.second, worker_id};
+            assignJob(job);
+        }    
+    }
+}
+
+
 void WorkerManager::checkConnections(){
     spdlog::info("Checking connections");
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        std::lock_guard<std::mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(workerMtx);
         bool has_available = false;
         for(auto &worker : workers){
             if(worker->isConnected()){
@@ -146,7 +161,8 @@ void WorkerManager::checkConnections(){
             }
         }
         if(has_available && jobs.size() > 0){
-            mtx.unlock();
+            workerMtx.unlock();
+            std::lock_guard<std::mutex> lock(jobsMtx);
             assignJob(jobs.front());
             jobs.pop();
         }
