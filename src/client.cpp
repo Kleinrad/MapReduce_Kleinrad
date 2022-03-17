@@ -35,8 +35,10 @@ void Client::signOn(){
 
 
 void Client::signOff() {
-    mapreduce::SignOff signOff = MessageGenerator::SignOff(client_id, mapreduce::ConnectionType::CLIENT);
-    pipe.sendMessage(signOff);
+    if(pipe){
+        mapreduce::SignOff signOff = MessageGenerator::SignOff(client_id, mapreduce::ConnectionType::CLIENT);
+        pipe.sendMessage(signOff);
+    }
     spdlog::info("Client {} sign off", client_id);
     exit(0);
 }
@@ -53,6 +55,11 @@ void Client::waitForResponse(){
         signOff();
     }else{
         spdlog::error("Client {} received invalid message type ({})", client_id, type);
+        if(!pipe){
+            spdlog::error("Client {} connection closed", client_id);
+            return;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 }
 
