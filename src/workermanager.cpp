@@ -42,31 +42,36 @@ bool WorkerManager::assignJob(Job job)
     int available = availableWorkes.size();
     if(job.status == JobStatus::job_new){
         if((job.mappers == -1 && available > 0) 
-        || available >= job.mappers){
+        || (available >= job.mappers && available > 0)){
             job.status = JobStatus::job_mapping;
             assignMapping(job, availableWorkes);
         }else{
-            job.status = JobStatus::job_queued;
-            spdlog::info("Job {} is queued: not enough workes availible", job.id);
+            job.status = JobStatus::job_queuedMap;
+            spdlog::info("Job {} is queued: not enough workes available", job.id);
             jobs.push(job);
             return false;
         }
-    }if(job.status == JobStatus::job_queued){
+    }if(job.status == JobStatus::job_queuedMap || job.status == JobStatus::job_queuedReduce){
         if((job.mappers == -1 && available > 0) 
-        || available >= job.mappers){
-            
+        || (available >= job.mappers && available > 0)){
+            if(job.status == JobStatus::job_queuedMap){
+                job.status = JobStatus::job_mapping;
+                assignMapping(job, availableWorkes);
+            }else if(job.status == JobStatus::job_queuedReduce){
+                job.status = JobStatus::job_reducing;
+                //assignReducing(job, availableWorkes);
+            }
         }else{
-            job.status = JobStatus::job_queued;
-            spdlog::info("Job {} is queued: not enough workes availible", job.id);
+            spdlog::info("Job {} is queued: not enough workes available", job.id);
             jobs.push(job);
             return false;
         }
     }if(job.status == JobStatus::job_mapped){
         if((job.reducers == -1 && available > 0) 
-        || available >= job.reducers){
+        || (available >= job.reducers && available > 0)){
             
         }else{
-            job.status = JobStatus::job_queued;
+            job.status = JobStatus::job_queuedReduce;
             spdlog::info("Job {} is queued: not enough workes availible", job.id);
             jobs.push(job);
             return false;
@@ -83,19 +88,23 @@ int WorkerManager::generateID(){
 
 void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &data,
                             int workes, bool cropWords){
-    int size = rawData.size();
-    int chunk = size / workes;
-    int chunk_counter = 0;
-    for(int j=1; j<size; j++){
-        if(chunk_counter >= chunk && (rawData[j] == ' ' || cropWords)){
-            std::string dataChunk = rawData.substr(0, chunk_counter);
-            data.push_back(dataChunk);
-            rawData = rawData.substr(chunk_counter);
-            chunk_counter = 0;
+    spdlog::info("Workers {}", workes);
+    if(workes != 0){
+        int size = rawData.size();
+        int chunk = size / workes;
+        spdlog::info("post divide");
+        int chunk_counter = 0;
+        for(int j=1; j<size; j++){
+            if(chunk_counter >= chunk && (rawData[j] == ' ' || cropWords)){
+                std::string dataChunk = rawData.substr(0, chunk_counter);
+                data.push_back(dataChunk);
+                rawData = rawData.substr(chunk_counter);
+                chunk_counter = 0;
+            }
+            chunk_counter++;
         }
-        chunk_counter++;
+        data.push_back(rawData);
     }
-    data.push_back(rawData);
 }
 
 
@@ -106,6 +115,7 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
         worker->is_available = false;
         mapreduce::TaskMap task = MessageGenerator::TaskMap(job.type, data.back());
         data.pop_back();
+        spdlog::debug("Assigning job {} to worker {}", job.id, worker->id);
         worker->sendMessage(task);
         spdlog::info("Job {} assigned to worker {}", job.id, worker->id);
     }
@@ -117,8 +127,11 @@ void WorkerManager::checkConnections(){
     while(true){
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::lock_guard<std::mutex> lock(mtx);
+        bool has_available = false;
         for(auto &worker : workers){
             if(worker->isConnected()){
+                if(worker->is_available)
+                    has_available = true;
                 if(worker->last_active + std::chrono::seconds(25) < std::chrono::system_clock::now()){
                     spdlog::error("Worker {} unreachable", worker->id);
                 }else if(worker->last_active + std::chrono::seconds(15) < std::chrono::system_clock::now()){
@@ -131,6 +144,11 @@ void WorkerManager::checkConnections(){
                     worker->sendMessage(ping);
                 }
             }
+        }
+        if(has_available && jobs.size() > 0){
+            mtx.unlock();
+            assignJob(jobs.front());
+            jobs.pop();
         }
     }
 }

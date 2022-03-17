@@ -45,6 +45,15 @@ void ConnectionSession::readMessage(){
             mapreduce::Ping p;
             pipe >> p;
         }
+        if(type == mapreduce::MessageType::RESULT_MAP){
+            mapreduce::ResultMap resultMap;
+            pipe >> resultMap;
+            spdlog::info("Map results worker {}", id);
+            /*for(auto& result : resultMap.values()){
+                spdlog::info("{} {}", result.key(), result.value());
+            }*/
+            is_available = true;
+        }
         readMessage();
     }else{
         if(this->type == mapreduce::ConnectionType::WORKER){

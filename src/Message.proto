@@ -54,9 +54,13 @@ message TaskReduce{
 }
 
 message ResultMap{
+    message MapValues{
+        string key = 1;
+        int32 value = 2;
+    }
+
     MessageType type = 1;
-    int32 key = 2;
-    string value = 3;
+    repeated MapValues values = 3;
 }
 
 message ResultReduce{

@@ -4,6 +4,7 @@
 #include "Message.pb.h"
 #include <spdlog/spdlog.h>
 #include <map>
+#include <set>
 
 class MessageGenerator{
     public: 
@@ -70,6 +71,17 @@ class MessageGenerator{
             mapreduce::Ping ping;
             ping.set_type(mapreduce::MessageType::PING);
             return ping;
+        }
+
+        static mapreduce::ResultMap ResultMap(std::set<std::pair<std::string, int>> result){
+            mapreduce::ResultMap resultMap;
+            resultMap.set_type(mapreduce::MessageType::RESULT_MAP);
+            for(auto& pair : result){
+                mapreduce::ResultMap::MapValues* v = resultMap.add_values();
+                v->set_key(pair.first);
+                v->set_value(pair.second);
+            }
+            return resultMap;
         }
 };
 

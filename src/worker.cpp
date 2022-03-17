@@ -15,18 +15,20 @@ Worker::~Worker() {
 
 
 void Worker::handleMap(int type, std::string data) {
-    spdlog::info("Worker {}: handleMap", worker_id);
+    spdlog::info("Worker {}: handleMap type {}", worker_id, type);
     std::set<std::pair<std::string, int>> result;
-    for(int i = 0; i < data.size(); i++){
+    for(int i = 0; i < (int)data.size(); i++){
         result.insert(std::make_pair(data.substr(i, 1), 1));
     }
+    mapreduce::ResultMap resultMsg = MessageGenerator::ResultMap(result);
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    pipe.sendMessage(resultMsg);
     is_busy = false;
 }
 
 
 void Worker::waitForTask(){
     mapreduce::MessageType type = pipe.reciveMessageType();
-    spdlog::debug("Recieved {}", type);
     if(type == mapreduce::MessageType::TASK_MAP && !is_busy){
         mapreduce::TaskMap task;
         pipe >> task;
@@ -45,7 +47,11 @@ void Worker::waitForTask(){
         pipe.sendMessage(ping);
     }else{
         spdlog::error("Worker {} received invalid message type ({})", worker_id, type);
-        return;
+        if(!pipe){
+            spdlog::error("Worker {} connection closed", worker_id);
+            return;
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
     waitForTask();
 }
@@ -72,8 +78,10 @@ void Worker::signOn(){
 
 
 void Worker::signOff() {
-    mapreduce::SignOff signOff = MessageGenerator::SignOff(worker_id, mapreduce::ConnectionType::WORKER);
-    pipe.sendMessage(signOff);
+    if(pipe){
+        mapreduce::SignOff signOff = MessageGenerator::SignOff(worker_id, mapreduce::ConnectionType::WORKER);
+        pipe.sendMessage(signOff);
+    }
     spdlog::info("Worker {} sign off", worker_id);
     exit(0);
 }

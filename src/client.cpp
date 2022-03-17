@@ -73,8 +73,12 @@ int main(){
     socket.connect(ep);
     Client client(std::move(socket));
     client.signOn();
-    std::cin >> std::cin.rdbuf();
     Job job(mapreduce::JobType::LETTER_COUNT
            , "abcdefghijklmnopqrstuvwxyz");
-    client.sendJob(job);
+    while (true)
+    {
+        std::cin >> std::cin.rdbuf();
+        client.sendJob(job);
+    }
+    
 }

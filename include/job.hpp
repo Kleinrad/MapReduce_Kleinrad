@@ -6,9 +6,10 @@
 
 enum JobStatus {
     job_new,
-    job_queued,
+    job_queuedMap,
     job_mapping,
     job_mapped,
+    job_queuedReduce,
     job_reducing,
     job_done
 };
