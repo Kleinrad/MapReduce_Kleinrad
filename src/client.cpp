@@ -80,10 +80,10 @@ int main(){
     socket.connect(ep);
     Client client(std::move(socket));
     client.signOn();
-    Job job(mapreduce::JobType::LETTER_COUNT
-           , "abcdefghijklmnopqrstuvwxyz");
     while (true)
     {
+        Job job(mapreduce::JobType::LETTER_COUNT
+            , "abcdefghijklmnopqrstuvwxyz");
         std::cin >> std::cin.rdbuf();
         client.sendJob(job);
     }

@@ -22,7 +22,7 @@ void Worker::handleMap(int type, std::string data, int job_id) {
     }
     mapreduce::ResultMap resultMsg = 
         MessageGenerator::ResultMap(result, job_id);
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     pipe.sendMessage(resultMsg);
     is_busy = false;
 }

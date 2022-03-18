@@ -96,7 +96,6 @@ void WorkerManager::queueJob(Job job)
     if(!found){
         jobs.push_back(job);
     }
-    spdlog::info("Queue size {}", jobs.size());
 }
 
 
@@ -107,11 +106,9 @@ int WorkerManager::generateID(){
 
 void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &data,
                             int workes, bool cropWords){
-    spdlog::info("Workers {}", workes);
     if(workes != 0){
         int size = rawData.size();
         int chunk = size / workes;
-        spdlog::info("post divide");
         int chunk_counter = 0;
         for(int j=1; j<size; j++){
             if(chunk_counter >= chunk && (rawData[j] == ' ' || cropWords)){
@@ -151,9 +148,7 @@ void WorkerManager::mapResult(int job_id, int worker_id
     spdlog::info("Job {} worker {} finished [Job active {}]"
     , job_id, worker_id, activeJobs[job_id].isActive());
     if(!activeJobs[job_id].isActive()){
-        for(auto &res : activeJobs[job_id].results){
-            spdlog::info("{} {}", res.first, res.second);
-        }
+        spdlog::error("USE MAP RESULT");
         activeJobs.erase(job_id);
     }
 }

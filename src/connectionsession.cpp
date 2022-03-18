@@ -58,7 +58,7 @@ void ConnectionSession::readMessage(){
         readMessage();
     }else{
         if(this->type == mapreduce::ConnectionType::WORKER){
-            if(is_available){
+            if(!is_available){
                 workerManager.reAssignTask(id);
             }
             workerManager.leave(shared_from_this());
