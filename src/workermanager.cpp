@@ -48,9 +48,7 @@ bool WorkerManager::assignJob(Job job)
             registerActiveJob(job);           
         }else{
             job.status = JobStatus::job_queuedMap;
-            spdlog::info("Job {} is queued: not enough workes available", job.id);
-            std::lock_guard<std::mutex> lock(jobsMtx);
-            jobs.push(job);
+            queueJob(job);
             return false;
         }
     }if(job.status == JobStatus::job_queuedMap || job.status == JobStatus::job_queuedReduce){
@@ -65,9 +63,7 @@ bool WorkerManager::assignJob(Job job)
                 //assignReducing(job, availableWorkes);
             }
         }else{
-            spdlog::info("Job {} is queued: not enough workes available", job.id);
-            std::lock_guard<std::mutex> lock(jobsMtx);            
-            jobs.push(job);
+            queueJob(job);
             return false;
         }
     }if(job.status == JobStatus::job_mapped){
@@ -76,13 +72,31 @@ bool WorkerManager::assignJob(Job job)
             
         }else{
             job.status = JobStatus::job_queuedReduce;
-            spdlog::info("Job {} is queued: not enough workes availible", job.id);
-            std::lock_guard<std::mutex> lock(jobsMtx);            
-            jobs.push(job);
+            queueJob(job);
             return false;
         }
     }
     return true;
+}
+
+
+void WorkerManager::queueJob(Job job)
+{
+    spdlog::info("Job {} is queued: not enough workes available", job.id);
+    std::lock_guard<std::mutex> lock(jobsMtx); 
+    bool found = false;
+    for(auto &j: jobs){
+        if(j.id == job.id && j.status == job.status 
+        && j.type == job.type){
+            found = true;
+            j.data += job.data;
+            break;
+        }
+    }
+    if(!found){
+        jobs.push_back(job);
+    }
+    spdlog::info("Queue size {}", jobs.size());
 }
 
 
@@ -123,7 +137,6 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
         std::lock_guard<std::mutex> lock(activeJobMtx);
         activeJobs[job.id].addWorker(worker->id, data.back());
         data.pop_back();
-        spdlog::debug("Assigning job {} to worker {}", job.id, worker->id);
         worker->sendMessage(task);
         spdlog::info("Job {} assigned to worker {}", job.id, worker->id);
     }
@@ -138,6 +151,9 @@ void WorkerManager::mapResult(int job_id, int worker_id
     spdlog::info("Job {} worker {} finished [Job active {}]"
     , job_id, worker_id, activeJobs[job_id].isActive());
     if(!activeJobs[job_id].isActive()){
+        for(auto &res : activeJobs[job_id].results){
+            spdlog::info("{} {}", res.first, res.second);
+        }
         activeJobs.erase(job_id);
     }
 }
@@ -148,9 +164,9 @@ void WorkerManager::reAssignTask(int worker_id){
     spdlog::info("Reassigning task from worker {}", worker_id);
     for(auto &pair : activeJobs){
         if(pair.second.contains(worker_id)){
-            pair.second.removeWorker(worker_id);
             Job job{pair.second, worker_id};
             assignJob(job);
+            pair.second.removeWorker(worker_id);
         }    
     }
 }
@@ -194,8 +210,8 @@ void WorkerManager::checkConnections(){
         if(has_available && jobs.size() > 0){
             workerMtx.unlock();
             std::lock_guard<std::mutex> lock(jobsMtx);
-            assignJob(jobs.front());
-            jobs.pop();
+            assignJob(jobs.back());
+            jobs.pop_back();
         }
     }
 }

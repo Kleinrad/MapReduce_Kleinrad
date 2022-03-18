@@ -45,13 +45,12 @@ struct ActiveJobStruct {
     }
 
     bool contains(int worker) {
-        spdlog::debug("Contains {} = {}", worker
-        , workerData.find(worker) != workerData.end());
         return workerData.find(worker) != workerData.end();
     }
 
     std::string getWorkerData(int worker) {
         if(workerData.find(worker) == workerData.end()) {
+            spdlog::error("Worker {} not found", worker);
             return "";
         }
         return workerData[worker];

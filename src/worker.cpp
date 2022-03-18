@@ -45,7 +45,7 @@ void Worker::waitForTask(){
         mapreduce::Ping ping;
         pipe >> ping;
         spdlog::info("Worker {} received ping", worker_id);
-        //pipe.sendMessage(ping);
+        pipe.sendMessage(ping);
     }else{
         spdlog::error("Worker {} received invalid message type ({})", worker_id, type);
         if(!pipe){

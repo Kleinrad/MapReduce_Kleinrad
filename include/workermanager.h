@@ -12,7 +12,7 @@
 
 class WorkerManager{
     std::set<connection_ptr> workers;
-    std::queue<Job> jobs;
+    std::vector<Job> jobs;
     std::map<int, ActiveJob> activeJobs;
     asio::ip::port_type port{1500};
     std::thread timeout_thread;
@@ -27,7 +27,7 @@ class WorkerManager{
         , std::set<connection_ptr> &availableWorkes);
     void assignReduce(Job job
         , std::set<connection_ptr> &availableWorkes);
-    void reAssignTask(int worker_id);
+    void queueJob(Job job);
     void registerActiveJob(Job job);
     void checkConnections();
 
@@ -40,6 +40,7 @@ class WorkerManager{
         void mapResult(int job_id, int worker_id
             , std::set<std::pair<std::string, int>> &result);
         bool assignJob(Job job);
+        void reAssignTask(int worker_id);
         int generateID();
 };
 
