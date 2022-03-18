@@ -86,6 +86,21 @@ class MessageGenerator{
             }
             return resultMap;
         }
+
+        static mapreduce::TaskReduce TaskReduce(mapreduce::JobType type
+            , std::set<std::pair<std::string, int>> data
+            , int job_id){
+            mapreduce::TaskReduce taskReduce;
+            taskReduce.set_type(mapreduce::MessageType::TASK_REDUCE);
+            taskReduce.set_job_id(job_id);
+            taskReduce.set_job_type(type);
+            for(auto& pair : data){
+                mapreduce::TaskReduce::ReduceData* v = taskReduce.add_data();
+                v->set_key(pair.first);
+                v->set_value(pair.second);
+            }
+            return taskReduce;
+        }
 };
 
 #endif

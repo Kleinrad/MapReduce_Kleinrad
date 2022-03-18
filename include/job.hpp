@@ -65,6 +65,7 @@ public:
     mapreduce::JobType type;
     std::string data;
     JobStatus status{JobStatus::job_new};
+    std::set<std::pair<std::string, int>> results;
     int mappers{-1};
     int reducers{-1};
     
@@ -79,6 +80,10 @@ public:
           status(activeJob.status) {
               data = activeJob.getWorkerData(worker_id);
     }
+
+    Job(ActiveJobStruct activeJob)
+        : id(activeJob.job_id), type(activeJob.type), 
+          status(activeJob.status), results(activeJob.results) {}
 };
 
 struct ActiveJob : public ActiveJobStruct {

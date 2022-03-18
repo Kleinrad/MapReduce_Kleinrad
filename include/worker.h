@@ -11,6 +11,8 @@ class Worker {
 
     void waitForTask();
     void handleMap(int type, std::string data, int job_id);
+    void handleReduce(int type
+        , std::set<std::pair<std::string, int>> data, int job_id);
     public:
         Worker(asio::ip::tcp::socket socket);
         ~Worker();

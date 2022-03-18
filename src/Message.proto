@@ -49,10 +49,15 @@ message TaskMap{
 }
 
 message TaskReduce{
+    message ReduceData{
+        string key = 1;
+        int32 value = 2;
+    }
+    
     MessageType type = 1;
     int32 job_id = 2;
-    int32 key = 3;
-    repeated string values = 4;
+    JobType job_type = 3;
+    repeated ReduceData data = 4;
 }
 
 message ResultMap{

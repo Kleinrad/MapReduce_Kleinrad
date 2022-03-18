@@ -45,7 +45,7 @@ bool WorkerManager::assignJob(Job job)
         || (available >= job.mappers && available > 0)){
             job.status = JobStatus::job_mapping;
             registerActiveJob(job);       
-            assignMapping(job, availableWorkes);    
+            assignMap(job, availableWorkes);    
         }else{
             job.status = JobStatus::job_queuedMap;
             queueJob(job);
@@ -57,19 +57,22 @@ bool WorkerManager::assignJob(Job job)
             if(job.status == JobStatus::job_queuedMap){
                 job.status = JobStatus::job_mapping;
                 registerActiveJob(job);
-                assignMapping(job, availableWorkes);
+                assignMap(job, availableWorkes);
             }else if(job.status == JobStatus::job_queuedReduce){
                 job.status = JobStatus::job_reducing;
-                //assignReducing(job, availableWorkes);
+                registerActiveJob(job);
+                assignReduce(job, availableWorkes);
             }
         }else{
             queueJob(job);
             return false;
         }
-    }if(job.status == JobStatus::job_mapped){
+    }if(job.status == JobStatus::job_mapped || job.status == JobStatus::job_reducing){
         if((job.reducers == -1 && available > 0) 
         || (available >= job.reducers && available > 0)){
-            
+            job.status = JobStatus::job_reducing;
+            registerActiveJob(job);
+            assignReduce(job, availableWorkes);
         }else{
             job.status = JobStatus::job_queuedReduce;
             queueJob(job);
@@ -123,8 +126,52 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
     }
 }
 
+std::vector<std::set<std::pair<std::string, int>>> WorkerManager::shuffle
+        (std::set<std::pair<std::string, int>> &results, int workes){
+    std::vector<std::set<std::pair<std::string, int>>> shuffled;
+    std::map<std::string, int> map;
+    for(auto &result: results){
+        if(map.find(result.first) == map.end()){
+            map[result.first] = result.second;
+        }else{
+            map[result.first] += result.second;
+        }
+    }
+    int chunk = map.size() / workes;
+    int chunk_counter = 0;
+    std::set<std::pair<std::string, int>> chunkResult;
+    for(auto &result: map){
+        if(chunk_counter >= chunk){
+            chunkResult.insert(result);
+            shuffled.push_back(chunkResult);
+            chunk_counter = 0;
+            chunkResult.clear();
+        }
+        chunkResult.insert(result);
+        chunk_counter++;
+    }
+    shuffled.push_back(chunkResult);
+    return shuffled;
+}
 
-void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWorkes){
+
+void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWorkes)
+{
+    std::vector<std::set<std::pair<std::string, int>>> shuffled =
+            shuffle(job.results, availableWorkes.size());
+    for(auto &worker : availableWorkes){
+        if(worker->is_available){
+            worker->is_available = false;
+            mapreduce::TaskReduce task = 
+                MessageGenerator::TaskReduce(job.type, shuffled.back(), job.id);
+            worker->sendMessage(task);
+            shuffled.pop_back();
+        }
+    }
+}
+
+
+void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes){
     std::vector<std::string> data;
     splitRawData(job.data, data, availableWorkes.size(), true);
     for(auto &worker : availableWorkes){
@@ -148,8 +195,11 @@ void WorkerManager::mapResult(int job_id, int worker_id
     spdlog::info("Job {} worker {} finished [Job active {}]"
     , job_id, worker_id, activeJobs[job_id].isActive());
     if(!activeJobs[job_id].isActive()){
-        spdlog::error("USE MAP RESULT");
+        Job job{activeJobs[job_id]};
+        job.status = JobStatus::job_mapped;
         activeJobs.erase(job_id);
+        activeJobMtx.unlock();
+        assignJob(job);
     }
 }
 

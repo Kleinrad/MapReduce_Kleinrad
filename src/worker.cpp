@@ -28,6 +28,16 @@ void Worker::handleMap(int type, std::string data, int job_id) {
 }
 
 
+void Worker::handleReduce(int type
+        , std::set<std::pair<std::string, int>> data, int job_id) {
+    spdlog::info("Worker {}: handleReduce type {} {}", worker_id, type, job_id);
+    for(auto &pair : data){
+        spdlog::info("{} {}", pair.first, pair.second);
+    }
+    is_busy = false;
+}
+
+
 void Worker::waitForTask(){
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::TASK_MAP && !is_busy){
@@ -35,6 +45,18 @@ void Worker::waitForTask(){
         pipe >> task;
         std::thread t([this, task](){
             handleMap(task.type(), task.data(), task.job_id());
+        });
+        is_busy = true;
+        t.detach();
+    }else if(type == mapreduce::MessageType::TASK_REDUCE && !is_busy){
+        mapreduce::TaskReduce task;
+        pipe >> task;
+        std::set<std::pair<std::string, int>> data;
+        for(auto &pair : task.data()){
+            data.insert({pair.key(), pair.value()});
+        }
+        std::thread t([&](){
+            handleReduce(task.type(), data, task.job_id());
         });
         is_busy = true;
         t.detach();

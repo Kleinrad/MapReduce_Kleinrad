@@ -83,7 +83,7 @@ int main(){
     while (true)
     {
         Job job(mapreduce::JobType::LETTER_COUNT
-            , "abcdefghijklmnopqrstuvwxyz");
+            , "abcdefghijklmnopqrststuvwxyzabcdefghijklmnopqrstuvwxyz");
             std::string d;
         std::cin >> d;
         client.sendJob(job);
