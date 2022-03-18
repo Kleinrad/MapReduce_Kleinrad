@@ -148,6 +148,7 @@ void WorkerManager::reAssignTask(int worker_id){
     spdlog::info("Reassigning task from worker {}", worker_id);
     for(auto &pair : activeJobs){
         if(pair.second.contains(worker_id)){
+            pair.second.removeWorker(worker_id);
             Job job{pair.second, worker_id};
             assignJob(job);
         }    
