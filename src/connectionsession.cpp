@@ -48,10 +48,11 @@ void ConnectionSession::readMessage(){
         if(type == mapreduce::MessageType::RESULT_MAP){
             mapreduce::ResultMap resultMap;
             pipe >> resultMap;
-            spdlog::info("Map results worker {}", id);
-            /*for(auto& result : resultMap.values()){
-                spdlog::info("{} {}", result.key(), result.value());
-            }*/
+            std::set<std::pair<std::string, int>> result;
+            for(auto& r : resultMap.values()){
+                result.insert(std::make_pair(r.key(), r.value()));
+            }
+            workerManager.mapResult(resultMap.job_id(), id, result);
             is_available = true;
         }
         readMessage();

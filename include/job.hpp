@@ -15,17 +15,33 @@ enum JobStatus {
 };
 
 
-struct ActiveJob {
+struct ActiveJobStruct {
     std::map<int, std::string> workerData;
+    std::set<std::pair<std::string, int>> results;
     int job_id;
+    bool is_active{false};
     JobStatus status;
     mapreduce::JobType type;
 
-    ActiveJob(int id, JobStatus status, mapreduce::JobType type) 
-        : status(status), type(type), job_id(id) {}
+    ActiveJobStruct() {}
+
+    ActiveJobStruct(int id, JobStatus status, mapreduce::JobType type) 
+        : job_id(id), status(status), type(type) {}
 
     void addWorker(int worker, std::string data) {
         workerData.insert({worker, data});
+        is_active = true;
+    }
+
+    void removeWorker(int worker) {
+        workerData.erase(worker);
+        if(workerData.size() == 0) {
+            is_active = false;
+        }
+    }
+
+    void addResults(std::set<std::pair<std::string, int>> results) {
+        this->results.insert(results.begin(), results.end());
     }
 
     bool contains(int worker) {
@@ -57,10 +73,21 @@ public:
     Job(mapreduce::JobType type, std::string data, int id)
         : id(id), type(type), data(data) {}
 
-    Job(ActiveJob activeJob, int worker_id)
+    Job(ActiveJobStruct activeJob, int worker_id)
         : id(activeJob.job_id), type(activeJob.type), 
           status(activeJob.status) {
               data = activeJob.getWorkerData(worker_id);
+    }
+};
+
+struct ActiveJob : public ActiveJobStruct {
+    ActiveJob() {}
+
+    ActiveJob(Job job)
+        : ActiveJobStruct(job.id, job.status, job.type) {}
+
+    bool isActive(){
+        return is_active;
     }
 };
 

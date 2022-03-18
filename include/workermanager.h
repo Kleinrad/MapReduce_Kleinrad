@@ -28,6 +28,7 @@ class WorkerManager{
     void assignReduce(Job job
         , std::set<connection_ptr> &availableWorkes);
     void reAssignTask(int worker_id);
+    void registerActiveJob(Job job);
     void checkConnections();
 
     public:
@@ -36,6 +37,8 @@ class WorkerManager{
 
         void join(connection_ptr worker);
         void leave(connection_ptr worker);
+        void mapResult(int job_id, int worker_id
+            , std::set<std::pair<std::string, int>> &result);
         bool assignJob(Job job);
         int generateID();
 };
