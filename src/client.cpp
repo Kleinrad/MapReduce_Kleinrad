@@ -68,7 +68,7 @@ void Client::sendJob(Job job){
     mapreduce::JobRequest jobRequest = 
         MessageGenerator::JobRequest(job.type, job.data, -1, -1);
     pipe.sendMessage(jobRequest);
-    waitForResponse();
+    //waitForResponse();
 }
 
 
@@ -84,7 +84,8 @@ int main(){
     {
         Job job(mapreduce::JobType::LETTER_COUNT
             , "abcdefghijklmnopqrstuvwxyz");
-        std::cin >> std::cin.rdbuf();
+            std::string d;
+        std::cin >> d;
         client.sendJob(job);
     }
     

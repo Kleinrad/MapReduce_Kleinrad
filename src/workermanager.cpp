@@ -40,12 +40,12 @@ bool WorkerManager::assignJob(Job job)
         }
     }
     int available = availableWorkes.size();
-    if(job.status == JobStatus::job_new){
+    if(job.status == JobStatus::job_new || job.status == JobStatus::job_mapping){
         if((job.mappers == -1 && available > 0) 
         || (available >= job.mappers && available > 0)){
             job.status = JobStatus::job_mapping;
-            assignMapping(job, availableWorkes);
-            registerActiveJob(job);           
+            registerActiveJob(job);       
+            assignMapping(job, availableWorkes);    
         }else{
             job.status = JobStatus::job_queuedMap;
             queueJob(job);
@@ -56,8 +56,8 @@ bool WorkerManager::assignJob(Job job)
         || (available >= job.mappers && available > 0)){
             if(job.status == JobStatus::job_queuedMap){
                 job.status = JobStatus::job_mapping;
-                assignMapping(job, availableWorkes);
                 registerActiveJob(job);
+                assignMapping(job, availableWorkes);
             }else if(job.status == JobStatus::job_queuedReduce){
                 job.status = JobStatus::job_reducing;
                 //assignReducing(job, availableWorkes);
