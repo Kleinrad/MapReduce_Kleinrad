@@ -45,6 +45,8 @@ struct ActiveJobStruct {
     }
 
     bool contains(int worker) {
+        spdlog::debug("Contains {} = {}", worker
+        , workerData.find(worker) != workerData.end());
         return workerData.find(worker) != workerData.end();
     }
 

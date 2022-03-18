@@ -120,6 +120,8 @@ void WorkerManager::assignMapping(Job job, std::set<connection_ptr> &availableWo
         worker->is_available = false;
         mapreduce::TaskMap task = 
             MessageGenerator::TaskMap(job.type, data.back(), job.id);
+        std::lock_guard<std::mutex> lock(activeJobMtx);
+        activeJobs[job.id].addWorker(worker->id, data.back());
         data.pop_back();
         spdlog::debug("Assigning job {} to worker {}", job.id, worker->id);
         worker->sendMessage(task);
@@ -143,6 +145,7 @@ void WorkerManager::mapResult(int job_id, int worker_id
 
 void WorkerManager::reAssignTask(int worker_id){
     std::lock_guard<std::mutex> lock(activeJobMtx);
+    spdlog::info("Reassigning task from worker {}", worker_id);
     for(auto &pair : activeJobs){
         if(pair.second.contains(worker_id)){
             Job job{pair.second, worker_id};
@@ -155,6 +158,7 @@ void WorkerManager::reAssignTask(int worker_id){
 void WorkerManager::registerActiveJob(Job job){
     ActiveJob ajob{job};
     std::lock_guard<std::mutex> lock(activeJobMtx);
+    spdlog::info("Job {} registered", job.id);
     activeJobs.insert({job.id, ajob}); 
 }
 
@@ -171,12 +175,15 @@ void WorkerManager::checkConnections(){
                     has_available = true;
                 if(worker->last_active + std::chrono::seconds(25) < std::chrono::system_clock::now()){
                     spdlog::error("Worker {} unreachable", worker->id);
-                }else if(worker->last_active + std::chrono::seconds(15) < std::chrono::system_clock::now()){
+                }else if(worker->last_active + std::chrono::seconds(12) < std::chrono::system_clock::now()){
                     spdlog::info("Worker {} timeout", worker->id);
                     mapreduce::SignOff signOff = MessageGenerator::SignOff(0, mapreduce::ConnectionType::WORKER);
                     worker->sendMessage(signOff);
                     worker->closeConnection();
-                    reAssignTask(worker->id);
+                    if(!worker->is_available){
+                        workerMtx.unlock();
+                        reAssignTask(worker->id);
+                    }
                 }else if(worker->last_active + std::chrono::seconds(10) < std::chrono::system_clock::now()){
                     mapreduce::Ping ping = MessageGenerator::Ping();
                     worker->sendMessage(ping);
