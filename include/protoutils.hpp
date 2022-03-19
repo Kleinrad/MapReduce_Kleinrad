@@ -75,7 +75,7 @@ class MessageGenerator{
         }
 
         static mapreduce::ResultMap ResultMap(
-            std::set<std::pair<std::string, int>> result, int job_id){
+            std::vector<std::pair<std::string, int>> result, int job_id){
             mapreduce::ResultMap resultMap;
             resultMap.set_type(mapreduce::MessageType::RESULT_MAP);
             resultMap.set_job_id(job_id);
@@ -94,8 +94,9 @@ class MessageGenerator{
             taskReduce.set_type(mapreduce::MessageType::TASK_REDUCE);
             taskReduce.set_job_id(job_id);
             taskReduce.set_job_type(type);
+            mapreduce::TaskReduce::ReduceData* rd = taskReduce.mutable_data();
             for(auto& pair : data){
-                mapreduce::TaskReduce::ReduceData* v = taskReduce.add_data();
+                mapreduce::TaskReduce::ReduceData::Data* v = rd->add_values();
                 v->set_key(pair.first);
                 v->set_value(pair.second);
             }

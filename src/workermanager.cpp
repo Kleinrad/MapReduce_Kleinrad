@@ -127,7 +127,7 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
 }
 
 std::vector<std::set<std::pair<std::string, int>>> WorkerManager::shuffle
-        (std::set<std::pair<std::string, int>> &results, int workes){
+        (std::vector<std::pair<std::string, int>> &results, int workes){
     std::vector<std::set<std::pair<std::string, int>>> shuffled;
     std::map<std::string, int> map;
     for(auto &result: results){
@@ -188,7 +188,7 @@ void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes
 
 
 void WorkerManager::mapResult(int job_id, int worker_id
-            , std::set<std::pair<std::string, int>> &result){
+            , std::vector<std::pair<std::string, int>> &result){
     std::lock_guard<std::mutex> lock(activeJobMtx);
     activeJobs[job_id].addResults(result);
     activeJobs[job_id].removeWorker(worker_id);

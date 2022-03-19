@@ -24,7 +24,7 @@ class WorkerManager{
     void splitRawData(std::string rawData, std::vector<std::string> &data
         , int workes, bool cropWords);
     std::vector<std::set<std::pair<std::string, int>>> shuffle
-        (std::set<std::pair<std::string, int>> &results, int workes);
+        (std::vector<std::pair<std::string, int>> &results, int workes);
     void assignMap(Job job
         , std::set<connection_ptr> &availableWorkes);
     void assignReduce(Job job
@@ -40,7 +40,7 @@ class WorkerManager{
         void join(connection_ptr worker);
         void leave(connection_ptr worker);
         void mapResult(int job_id, int worker_id
-            , std::set<std::pair<std::string, int>> &result);
+            , std::vector<std::pair<std::string, int>> &result);
         bool assignJob(Job job);
         void reAssignTask(int worker_id);
         int generateID();

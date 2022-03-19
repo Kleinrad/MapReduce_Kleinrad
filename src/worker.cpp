@@ -1,7 +1,6 @@
 #include <thread>
 #include <chrono>
 #include <spdlog/spdlog.h>
-#include <set>
 #include "protoutils.hpp"
 #include "worker.h"
 
@@ -16,23 +15,23 @@ Worker::~Worker() {
 
 void Worker::handleMap(int type, std::string data, int job_id) {
     spdlog::info("Worker {}: handleMap type {}", worker_id, type);
-    std::set<std::pair<std::string, int>> result;
+    std::vector<std::pair<std::string, int>> result;
     for(int i = 0; i < (int)data.size(); i++){
-        result.insert(std::make_pair(data.substr(i, 1), 1));
+        result.push_back(std::make_pair(data.substr(i, 1), 1));
     }
     mapreduce::ResultMap resultMsg = 
         MessageGenerator::ResultMap(result, job_id);
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     pipe.sendMessage(resultMsg);
     is_busy = false;
 }
 
 
 void Worker::handleReduce(int type
-        , std::set<std::pair<std::string, int>> data, int job_id) {
+        , mapreduce::TaskReduce::ReduceData data, int job_id) {
     spdlog::info("Worker {}: handleReduce type {} {}", worker_id, type, job_id);
-    for(auto &pair : data){
-        spdlog::info("{} {}", pair.first, pair.second);
+    for(auto &pair : data.values()){
+        spdlog::info("{} {}", pair.key(), pair.value());
     }
     is_busy = false;
 }
@@ -51,12 +50,8 @@ void Worker::waitForTask(){
     }else if(type == mapreduce::MessageType::TASK_REDUCE && !is_busy){
         mapreduce::TaskReduce task;
         pipe >> task;
-        std::set<std::pair<std::string, int>> data;
-        for(auto &pair : task.data()){
-            data.insert({pair.key(), pair.value()});
-        }
-        std::thread t([&](){
-            handleReduce(task.type(), data, task.job_id());
+        std::thread t([this, task](){
+            handleReduce(task.type(), task.data(), task.job_id());
         });
         is_busy = true;
         t.detach();

@@ -2,6 +2,7 @@
 #define WORKER_H
 
 #include <asio.hpp>
+#include <list>
 #include "pipe.hpp"
 
 class Worker {
@@ -12,7 +13,7 @@ class Worker {
     void waitForTask();
     void handleMap(int type, std::string data, int job_id);
     void handleReduce(int type
-        , std::set<std::pair<std::string, int>> data, int job_id);
+        , mapreduce::TaskReduce::ReduceData data, int job_id);
     public:
         Worker(asio::ip::tcp::socket socket);
         ~Worker();

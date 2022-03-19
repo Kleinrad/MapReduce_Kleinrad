@@ -17,7 +17,7 @@ enum JobStatus {
 
 struct ActiveJobStruct {
     std::map<int, std::string> workerData;
-    std::set<std::pair<std::string, int>> results;
+    std::vector<std::pair<std::string, int>> results;
     int job_id;
     bool is_active{false};
     JobStatus status;
@@ -40,8 +40,8 @@ struct ActiveJobStruct {
         }
     }
 
-    void addResults(std::set<std::pair<std::string, int>> results) {
-        this->results.insert(results.begin(), results.end());
+    void addResults(std::vector<std::pair<std::string, int>> results) {
+        this->results.insert(this->results.end(), results.begin(), results.end());
     }
 
     bool contains(int worker) {
@@ -65,7 +65,7 @@ public:
     mapreduce::JobType type;
     std::string data;
     JobStatus status{JobStatus::job_new};
-    std::set<std::pair<std::string, int>> results;
+    std::vector<std::pair<std::string, int>> results;
     int mappers{-1};
     int reducers{-1};
     
