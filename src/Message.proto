@@ -75,10 +75,13 @@ message ResultMap{
 }
 
 message ResultReduce{
+    message ReduceValues{
+        string key = 1;
+        int32 value = 2;
+    }
     MessageType type = 1;
     int32 job_id = 2;
-    int32 key = 3;
-    string value = 4;
+    repeated ReduceValues values = 3;
 }
 
 message Confirm{

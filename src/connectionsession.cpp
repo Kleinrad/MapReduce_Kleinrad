@@ -52,8 +52,8 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultMap.values()){
                 result.push_back(std::make_pair(r.key(), r.value()));
             }
-            workerManager.mapResult(resultMap.job_id(), id, result);
             is_available = true;
+            workerManager.mapResult(resultMap.job_id(), id, result);
         }
         readMessage();
     }else{

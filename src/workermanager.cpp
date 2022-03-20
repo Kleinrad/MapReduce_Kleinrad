@@ -35,6 +35,7 @@ bool WorkerManager::assignJob(Job job)
     std::lock_guard<std::mutex> lock(workerMtx);
     std::set<connection_ptr> availableWorkes;
     for(auto &worker : workers){
+        spdlog::debug("Worker {} available {}", worker->id, worker->is_available);
         if(worker->is_available){
             availableWorkes.insert(worker);
         }
@@ -126,38 +127,35 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
     }
 }
 
-std::vector<std::set<std::pair<std::string, int>>> WorkerManager::shuffle
+std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
         (std::vector<std::pair<std::string, int>> &results, int workes){
-    std::vector<std::set<std::pair<std::string, int>>> shuffled;
-    std::map<std::string, int> map;
-    for(auto &result: results){
-        if(map.find(result.first) == map.end()){
-            map[result.first] = result.second;
-        }else{
-            map[result.first] += result.second;
+    std::vector<std::vector<std::pair<std::string, int>>> shuffled;
+
+    int chunk = results.size() / workes;
+    spdlog::debug("results size: {} / {}", results.size(), workes);
+    std::vector<std::pair<std::string, int>> chunkResult;
+    while (results.size() > 0) {
+        int chunkCounter{0};
+        while (chunkCounter < chunk && results.size() > 0) {
+            std::string key = results.back().first;
+            for(auto &r : results){
+                if(r.first == key){
+                    chunkResult.push_back(r);
+                    results.erase(std::find(results.begin(), results.end(), r));
+                    chunkCounter++;
+                }
+            }
         }
+        shuffled.push_back(chunkResult);
+        chunkResult.clear();
     }
-    int chunk = map.size() / workes;
-    int chunk_counter = 0;
-    std::set<std::pair<std::string, int>> chunkResult;
-    for(auto &result: map){
-        if(chunk_counter >= chunk){
-            chunkResult.insert(result);
-            shuffled.push_back(chunkResult);
-            chunk_counter = 0;
-            chunkResult.clear();
-        }
-        chunkResult.insert(result);
-        chunk_counter++;
-    }
-    shuffled.push_back(chunkResult);
     return shuffled;
 }
 
 
 void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWorkes)
 {
-    std::vector<std::set<std::pair<std::string, int>>> shuffled =
+    std::vector<std::vector<std::pair<std::string, int>>> shuffled =
             shuffle(job.results, availableWorkes.size());
     for(auto &worker : availableWorkes){
         if(worker->is_available){
