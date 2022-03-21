@@ -115,6 +115,19 @@ class MessageGenerator{
             }
             return resultReduce;
         }
+
+        static mapreduce::JobResult JobResult(int job_id
+            , std::map<std::string, int> &result){
+            mapreduce::JobResult jobResult;
+            jobResult.set_type(mapreduce::MessageType::JOB_RESULT);
+            jobResult.set_job_id(job_id);
+            for(auto& pair : result){
+                mapreduce::JobResult::ResultValues* v = jobResult.add_values();
+                v->set_key(pair.first);
+                v->set_value(pair.second);
+            }
+            return jobResult;
+        }
 };
 
 #endif

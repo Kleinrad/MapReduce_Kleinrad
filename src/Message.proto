@@ -99,9 +99,13 @@ message JobRequest{
 }
 
 message JobResult{
+    message ResultData{
+        string key = 1;
+        int32 value = 2;
+    }
     MessageType type = 1;
     int32 job_id = 2;
-    string data = 3;
+    repeated ResultData values = 3;
 }
 
 message Authentication{

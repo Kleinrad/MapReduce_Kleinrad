@@ -1,5 +1,6 @@
 #include "clientmanager.h"
 #include <spdlog/spdlog.h>
+#include "protoutils.hpp"
 
 int Job::job_counter = 0;
 
@@ -34,6 +35,19 @@ void ClientManager::leave(connection_ptr client)
     clients.erase(client);
 }
 
+void ClientManager::sendResult(int job_id, std::map<std::string, int> &result)
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    int client_id = job_client_map[job_id];
+    mapreduce::JobResult job_result = MessageGenerator::JobResult(job_id, result);
+    for(auto &client : clients){
+        if(client->id == client_id){
+            client->sendMessage(job_result);
+            break;
+        }
+    }
+    job_client_map.erase(job_id);
+}
 
 int ClientManager::generateID(){
     return totalConnections;

@@ -68,7 +68,7 @@ void Client::sendJob(Job job){
     mapreduce::JobRequest jobRequest = 
         MessageGenerator::JobRequest(job.type, job.data, -1, -1);
     pipe.sendMessage(jobRequest);
-    //waitForResponse();
+    waitForResponse();
 }
 
 
