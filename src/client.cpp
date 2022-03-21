@@ -3,6 +3,7 @@
 #include "protoutils.hpp"
 #include "job.hpp"
 #include "client.h"
+#include <fstream>
 
 int Job::job_counter = 0;
 
@@ -83,13 +84,16 @@ int main(){
     socket.connect(ep);
     Client client(std::move(socket));
     client.signOn();
-    while (true)
-    {
+    std::string filename;
+    std::cin >> filename;
+    std::ifstream file("/home/autumn/mr.txt");
+    if(file.good()){
+        std::stringstream buffer;
+        buffer << file.rdbuf();
         Job job(mapreduce::JobType::LETTER_COUNT
-            , "abcdefghijklmnopqrststuvwxyzabcdefghijklmnopqrstuvwxyz");
-            std::string d;
-        std::cin >> d;
+            , buffer.str());
         client.sendJob(job);
-    }
-    
+    }else{
+        spdlog::error("File {} not found", filename);
+    } 
 }
