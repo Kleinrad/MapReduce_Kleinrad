@@ -1,5 +1,12 @@
 * Changelog
 ** [Unreleased]
+** [1.0.0] - 2022-03-21
+*** Added
+- WorkerManager, added timeout detection
+- WorkerManager, added failed task handling
+- WorkerManager, added reduce functionality (shuffle, assign)
+- ActiveJob, stores information about current jobs in progress
+- Worker, added handleMap & handleReduce
 ** [0.2.1] - 2022-03-14
 *** Added
 - Client, sends jobs to master 
