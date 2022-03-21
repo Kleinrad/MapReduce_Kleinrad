@@ -201,7 +201,7 @@ void WorkerManager::mapResult(int job_id, int worker_id
     }
 }
 
-void WorkerManager::reduceResult(int job_id, int worker_id
+bool WorkerManager::reduceResult(int job_id, int worker_id
             , std::map<std::string, int> &result){
     std::lock_guard<std::mutex> lock(activeJobMtx);
     activeJobs[job_id].addReducedData(result);
@@ -209,13 +209,11 @@ void WorkerManager::reduceResult(int job_id, int worker_id
     spdlog::info("Job {} worker {} finished [Job active {}]"
     , job_id, worker_id, activeJobs[job_id].isActive());
     if(!activeJobs[job_id].isActive()){
-        std::map<std::string, int> data = activeJobs[job_id].reducedData;
+        result = activeJobs[job_id].reducedData;
         activeJobs.erase(job_id);
-        spdlog::debug("reduce result");
-        for(auto &pair : data){
-            spdlog::debug("{}: {}", pair.first, pair.second);
-        }
+        return true;
     }
+    return false;
 }
 
 void WorkerManager::reAssignTask(int worker_id){

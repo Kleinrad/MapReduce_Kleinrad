@@ -46,10 +46,13 @@ void Client::signOff() {
 
 void Client::waitForResponse(){
     mapreduce::MessageType type = pipe.reciveMessageType();
-    if(type == mapreduce::MessageType::JOB_REQUEST){
+    if(type == mapreduce::MessageType::JOB_RESULT){
         mapreduce::JobResult result;
         pipe >> result;
-        spdlog::info("Client {} received result {}", client_id, result.data());
+        spdlog::info("Client {} received result", client_id);
+        for(auto& r : result.values()){
+            spdlog::info("{} : {}", r.key(), r.value());
+        }
         waitForResponse();
     }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();

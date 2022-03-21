@@ -63,7 +63,9 @@ void ConnectionSession::readMessage(){
                 result[r.key()] = r.value();
             }
             is_available = true;
-            workerManager.reduceResult(resultReduce.job_id(), id, result);
+            if(workerManager.reduceResult(resultReduce.job_id(), id, result)){
+                clientManager.sendResult(resultReduce.job_id(), result);
+            }
         }
         readMessage();
     }else{

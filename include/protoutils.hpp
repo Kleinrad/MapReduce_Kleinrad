@@ -122,7 +122,7 @@ class MessageGenerator{
             jobResult.set_type(mapreduce::MessageType::JOB_RESULT);
             jobResult.set_job_id(job_id);
             for(auto& pair : result){
-                mapreduce::JobResult::ResultValues* v = jobResult.add_values();
+                mapreduce::JobResult::ResultData* v = jobResult.add_values();
                 v->set_key(pair.first);
                 v->set_value(pair.second);
             }
