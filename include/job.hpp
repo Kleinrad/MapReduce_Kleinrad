@@ -17,7 +17,9 @@ enum JobStatus {
 
 struct ActiveJobStruct {
     std::map<int, std::string> workerData;
+    std::map<int, std::vector<std::pair<std::string, int>>> workerReduceData;
     std::vector<std::pair<std::string, int>> results;
+    std::map<std::string, int> reducedData;
     int job_id;
     bool is_active{false};
     JobStatus status;
@@ -33,15 +35,37 @@ struct ActiveJobStruct {
         is_active = true;
     }
 
+    void addWorker(int worker, std::vector<std::pair<std::string, int>> data) {
+        workerReduceData.insert({worker, data});
+        is_active = true;
+    }
+
     void removeWorker(int worker) {
-        workerData.erase(worker);
-        if(workerData.size() == 0) {
-            is_active = false;
+        if(workerData.count(worker) > 0) {
+            workerData.erase(worker);
+            if(workerData.size() == 0) {
+                is_active = false;
+            }
+        } else if(workerReduceData.count(worker) > 0) {
+            workerReduceData.erase(worker);
+            if(workerReduceData.size() == 0) {
+                is_active = false;
+            }
         }
     }
 
     void addResults(std::vector<std::pair<std::string, int>> results) {
         this->results.insert(this->results.end(), results.begin(), results.end());
+    }
+
+    void addReducedData(std::map<std::string, int> data) {
+        for(auto &pair : data) {
+            if(reducedData.find(pair.first) == reducedData.end()) {
+                reducedData.insert({pair.first, pair.second});
+            } else {
+                spdlog::error("Duplicate reduce data key");
+            }
+        }
     }
 
     bool contains(int worker) {

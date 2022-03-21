@@ -35,7 +35,6 @@ bool WorkerManager::assignJob(Job job)
     std::lock_guard<std::mutex> lock(workerMtx);
     std::set<connection_ptr> availableWorkes;
     for(auto &worker : workers){
-        spdlog::debug("Worker {} available {}", worker->id, worker->is_available);
         if(worker->is_available){
             availableWorkes.insert(worker);
         }
@@ -132,7 +131,6 @@ std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
     std::vector<std::vector<std::pair<std::string, int>>> shuffled;
 
     int chunk = results.size() / workes;
-    spdlog::debug("results size: {} / {}", results.size(), workes);
     std::vector<std::pair<std::string, int>> chunkResult;
     while (results.size() > 0) {
         int chunkCounter{0};
@@ -162,6 +160,8 @@ void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWor
             worker->is_available = false;
             mapreduce::TaskReduce task = 
                 MessageGenerator::TaskReduce(job.type, shuffled.back(), job.id);
+            std::lock_guard<std::mutex> lock(activeJobMtx);
+            activeJobs[job.id].addWorker(worker->id, shuffled.back());
             worker->sendMessage(task);
             shuffled.pop_back();
         }
@@ -201,6 +201,22 @@ void WorkerManager::mapResult(int job_id, int worker_id
     }
 }
 
+void WorkerManager::reduceResult(int job_id, int worker_id
+            , std::map<std::string, int> &result){
+    std::lock_guard<std::mutex> lock(activeJobMtx);
+    activeJobs[job_id].addReducedData(result);
+    activeJobs[job_id].removeWorker(worker_id);
+    spdlog::info("Job {} worker {} finished [Job active {}]"
+    , job_id, worker_id, activeJobs[job_id].isActive());
+    if(!activeJobs[job_id].isActive()){
+        std::map<std::string, int> data = activeJobs[job_id].reducedData;
+        activeJobs.erase(job_id);
+        spdlog::debug("reduce result");
+        for(auto &pair : data){
+            spdlog::debug("{}: {}", pair.first, pair.second);
+        }
+    }
+}
 
 void WorkerManager::reAssignTask(int worker_id){
     std::lock_guard<std::mutex> lock(activeJobMtx);

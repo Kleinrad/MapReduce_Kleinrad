@@ -55,6 +55,16 @@ void ConnectionSession::readMessage(){
             is_available = true;
             workerManager.mapResult(resultMap.job_id(), id, result);
         }
+        if(type == mapreduce::MessageType::RESULT_REDUCE){
+            mapreduce::ResultReduce resultReduce;
+            pipe >> resultReduce;
+            std::map<std::string, int> result;
+            for(auto& r : resultReduce.values()){
+                result[r.key()] = r.value();
+            }
+            is_available = true;
+            workerManager.reduceResult(resultReduce.job_id(), id, result);
+        }
         readMessage();
     }else{
         if(this->type == mapreduce::ConnectionType::WORKER){

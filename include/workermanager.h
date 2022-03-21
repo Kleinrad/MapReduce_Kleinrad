@@ -41,6 +41,8 @@ class WorkerManager{
         void leave(connection_ptr worker);
         void mapResult(int job_id, int worker_id
             , std::vector<std::pair<std::string, int>> &result);
+        void reduceResult(int job_id, int worker_id
+            , std::map<std::string, int> &result);
         bool assignJob(Job job);
         void reAssignTask(int worker_id);
         int generateID();
