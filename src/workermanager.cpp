@@ -132,24 +132,19 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
 }
 
 std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
-        (std::vector<std::pair<std::string, int>> &results, int workes){
+        (std::vector<std::pair<std::string, int>> &results, int workers){
     std::vector<std::vector<std::pair<std::string, int>>> shuffled;
-    int chunk = results.size() / workes;
-    std::vector<std::pair<std::string, int>> chunkResult;
-    while (results.size() > 0) {
-        int chunkCounter{0};
-        while (chunkCounter < chunk && results.size() > 0) {
-            std::string key = results.back().first;
-            for(auto &r : results){
-                if(r.first == key){
-                    chunkResult.push_back(r);
-                    results.erase(std::find(results.begin(), results.end(), r));
-                    chunkCounter++;
-                }
-            }
+    int chunk = results.size() / workers;
+    for(int i=0; i<workers; i++){
+        std::vector<std::pair<std::string, int>> chunkResult;
+        if(i + 1 == workers){
+            chunkResult.insert(chunkResult.end(), results.begin(), results.end());
+            shuffled.push_back(chunkResult);
+            break;
         }
+        chunkResult.insert(chunkResult.end(), results.begin(), results.begin() + chunk);
         shuffled.push_back(chunkResult);
-        chunkResult.clear();
+        results.erase(results.begin(), results.begin() + chunk);
     }
     return shuffled;
 }
@@ -160,16 +155,20 @@ void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWor
     std::vector<std::vector<std::pair<std::string, int>>> shuffled =
             shuffle(job.results, availableWorkes.size());
     std::lock_guard<std::mutex> lock(activeJobMtx);
+    spdlog::debug("------locked activeJobMtx [worker {}, shuffeled {}]", availableWorkes.size(), shuffled.size());
     for(auto &worker : availableWorkes){
         if(worker->is_available){
             worker->is_available = false;
+            spdlog::debug("shuffled size {}", shuffled.size());
             mapreduce::TaskReduce task = 
                 MessageGenerator::TaskReduce(job.type, shuffled.back(), job.id);
             activeJobs[job.id].addWorker(worker->id, shuffled.back());
+            spdlog::debug("added worker {} to activeJobs {}", worker->id, job.id);
             worker->sendMessage(task);
             shuffled.pop_back();
         }
     }
+    spdlog::debug("------unlocked activeJobMtx");
 }
 
 
@@ -207,8 +206,11 @@ void WorkerManager::mapResult(int job_id, int worker_id
 
 bool WorkerManager::reduceResult(int job_id, int worker_id
             , std::map<std::string, int> &result){
+    spdlog::debug("trying to aquire lock reduce result");
     std::lock_guard<std::mutex> lock(activeJobMtx);
+    spdlog::debug("aquired reduce result lock");
     activeJobs[job_id].addReducedData(result);
+    spdlog::debug("reduce result added");
     activeJobs[job_id].removeWorker(worker_id);
     spdlog::info("Job {} worker {} finished [Job active {}]"
     , job_id, worker_id, activeJobs[job_id].isActive());

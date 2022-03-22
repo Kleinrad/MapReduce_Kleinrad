@@ -62,10 +62,12 @@ void ConnectionSession::readMessage(){
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             mapreduce::ResultReduce resultReduce;
             pipe >> resultReduce;
+            spdlog::debug("recieved reduce result");
             std::map<std::string, int> result;
             for(auto& r : resultReduce.values()){
                 result[r.key()] = r.value();
             }
+            spdlog::debug("converted to map");
             is_available = true;
             if(workerManager.reduceResult(resultReduce.job_id(), id, result)){
                 clientManager.sendResult(resultReduce.job_id(), result);
