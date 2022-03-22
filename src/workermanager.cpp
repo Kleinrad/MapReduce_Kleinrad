@@ -32,7 +32,7 @@ void WorkerManager::leave(connection_ptr worker)
 
 bool WorkerManager::assignJob(Job job)
 {
-    spdlog::debug("attempting to lock workerMtx");
+    spdlog::debug("attempting to lock workerMtx job id {}", job.id);
     std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::debug("locked workerMtx");
     std::set<connection_ptr> availableWorkes;
@@ -159,12 +159,12 @@ void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWor
 {
     std::vector<std::vector<std::pair<std::string, int>>> shuffled =
             shuffle(job.results, availableWorkes.size());
+    std::lock_guard<std::mutex> lock(activeJobMtx);
     for(auto &worker : availableWorkes){
         if(worker->is_available){
             worker->is_available = false;
             mapreduce::TaskReduce task = 
                 MessageGenerator::TaskReduce(job.type, shuffled.back(), job.id);
-            std::lock_guard<std::mutex> lock(activeJobMtx);
             activeJobs[job.id].addWorker(worker->id, shuffled.back());
             worker->sendMessage(task);
             shuffled.pop_back();
@@ -176,11 +176,11 @@ void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWor
 void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes){
     std::vector<std::string> data;
     splitRawData(job.data, data, availableWorkes.size(), true);
+    std::lock_guard<std::mutex> lock(activeJobMtx);
     for(auto &worker : availableWorkes){
         worker->is_available = false;
         mapreduce::TaskMap task = 
             MessageGenerator::TaskMap(job.type, data.back(), job.id);
-        std::lock_guard<std::mutex> lock(activeJobMtx);
         activeJobs[job.id].addWorker(worker->id, data.back());
         data.pop_back();
         worker->sendMessage(task);
@@ -236,7 +236,7 @@ void WorkerManager::reAssignTask(int worker_id){
 void WorkerManager::registerActiveJob(Job job){
     ActiveJob ajob{job};
     std::lock_guard<std::mutex> lock(activeJobMtx);
-    spdlog::info("Job {} registered", job.id);
+    spdlog::info("Job {} registered [active job id {}]", job.id, ajob.job_id);
     activeJobs.insert({job.id, ajob}); 
 }
 
