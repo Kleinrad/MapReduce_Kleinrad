@@ -11,6 +11,7 @@
 
 class Pipe {
     asio::ip::tcp::socket* socket{nullptr};
+    std::mutex mtx;
     bool is_closed{false};
 
     public:
@@ -39,6 +40,7 @@ class Pipe {
 
 
         void sendMessage(google::protobuf::Message &message){
+            std::lock_guard<std::mutex> lock(mtx);
             u_int8_t msgIndex = message.GetDescriptor()->index();
             u_int64_t msgSize{message.ByteSizeLong()};
             asio::write(*socket, asio::buffer(&msgIndex, sizeof(msgIndex)));

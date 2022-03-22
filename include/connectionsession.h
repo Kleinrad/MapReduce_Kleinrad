@@ -13,11 +13,11 @@ class ConnectionSession : public ConnectionObject,
     ClientManager &clientManager;
     std::thread* reciveThread;
     Pipe pipe;
-    std::mutex mtx;
+    static std::mutex mtx;
     mapreduce::ConnectionType type;
 
     void readMessage();
-    void sendMessage(google::protobuf::Message& message);
+    void sendMessage(google::protobuf::Message& messaged);
     bool isConnected();
     void closeConnection();
     bool assignID();

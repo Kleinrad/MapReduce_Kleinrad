@@ -2,6 +2,9 @@
 #include <chrono>
 
 
+std::mutex ConnectionSession::mtx;
+
+
 ConnectionSession::ConnectionSession(WorkerManager &workerManager, 
                                     ClientManager &clientManager,
                             asio::ip::tcp::socket socket) 
@@ -19,6 +22,7 @@ void ConnectionSession::sendMessage(
             google::protobuf::Message& message){
     std::lock_guard<std::mutex> lock(mtx);
     pipe.sendMessage(message);
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 

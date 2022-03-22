@@ -32,7 +32,9 @@ void WorkerManager::leave(connection_ptr worker)
 
 bool WorkerManager::assignJob(Job job)
 {
+    spdlog::debug("attempting to lock workerMtx");
     std::lock_guard<std::mutex> lock(workerMtx);
+    spdlog::debug("locked workerMtx");
     std::set<connection_ptr> availableWorkes;
     for(auto &worker : workers){
         if(worker->is_available){
@@ -114,11 +116,14 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
         int chunk = size / workes;
         int chunk_counter = 0;
         for(int j=1; j<size; j++){
-            if(chunk_counter >= chunk && (rawData[j] == ' ' || cropWords)){
+            if(chunk_counter >= chunk && (rawData[chunk_counter] == ' ' || cropWords)){
                 std::string dataChunk = rawData.substr(0, chunk_counter);
                 data.push_back(dataChunk);
                 rawData = rawData.substr(chunk_counter);
                 chunk_counter = 0;
+                if((int)data.size() + 1 == workes){
+                    break;
+                }
             }
             chunk_counter++;
         }
@@ -129,7 +134,6 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
 std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
         (std::vector<std::pair<std::string, int>> &results, int workes){
     std::vector<std::vector<std::pair<std::string, int>>> shuffled;
-
     int chunk = results.size() / workes;
     std::vector<std::pair<std::string, int>> chunkResult;
     while (results.size() > 0) {

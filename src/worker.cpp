@@ -15,6 +15,7 @@ Worker::~Worker() {
 
 void Worker::handleMap(int type, std::string data, int job_id) {
     spdlog::info("Worker {}: handleMap type {}", worker_id, type);
+    spdlog::debug("Data size {}", data.size());
     std::vector<std::pair<std::string, int>> result;
     for(int i = 0; i < (int)data.size(); i++){
         result.push_back(std::make_pair(data.substr(i, 1), 1));
@@ -29,6 +30,7 @@ void Worker::handleMap(int type, std::string data, int job_id) {
 void Worker::handleReduce(int type
         , mapreduce::TaskReduce::ReduceData data, int job_id) {
     spdlog::info("Worker {}: handleReduce type {} {}", worker_id, type, job_id);
+    spdlog::debug("Data size reduce {}", data.values().size());
     std::map<std::string, int> result;
     for(auto &pair : data.values()){
         if(result.find(pair.key()) == result.end()){
@@ -68,7 +70,7 @@ void Worker::waitForTask(){
     }else if(type == mapreduce::MessageType::PING){
         mapreduce::Ping ping;
         pipe >> ping;
-        spdlog::info("Worker {} received ping", worker_id);
+        //spdlog::info("Worker {} received ping", worker_id);
         pipe.sendMessage(ping);
     }else{
         spdlog::error("Worker {} received invalid message type ({})", worker_id, type);

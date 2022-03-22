@@ -63,7 +63,7 @@ struct ActiveJobStruct {
             if(reducedData.find(pair.first) == reducedData.end()) {
                 reducedData.insert({pair.first, pair.second});
             } else {
-                spdlog::error("Duplicate reduce data key");
+                reducedData[pair.first] += pair.second;
             }
         }
     }
