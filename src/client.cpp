@@ -86,7 +86,7 @@ int main(){
     client.signOn();
     std::string filename;
     std::cin >> filename;
-    std::ifstream file("/home/autumn/mr.txt");
+    std::ifstream file("/home/autumn/result.txt");
     if(file.good()){
         std::stringstream buffer;
         buffer << file.rdbuf();

@@ -51,7 +51,7 @@ message TaskMap{
 message TaskReduce{
     message ReduceData{
         message Data{
-            string key = 1;
+            bytes key = 1;
             int32 value = 2;
         }
         repeated Data values = 1;
@@ -65,7 +65,7 @@ message TaskReduce{
 
 message ResultMap{
     message MapValues{
-        string key = 1;
+        bytes key = 1;
         int32 value = 2;
     }
 
@@ -76,7 +76,7 @@ message ResultMap{
 
 message ResultReduce{
     message ReduceValues{
-        string key = 1;
+        bytes key = 1;
         int32 value = 2;
     }
     MessageType type = 1;
@@ -100,7 +100,7 @@ message JobRequest{
 
 message JobResult{
     message ResultData{
-        string key = 1;
+        bytes key = 1;
         int32 value = 2;
     }
     MessageType type = 1;
