@@ -32,7 +32,7 @@ void WorkerManager::leave(connection_ptr worker)
 
 bool WorkerManager::assignJob(Job job)
 {
-    spdlog::debug("attempting to lock workerMtx job id {}", job.id);
+    spdlog::debug("attempting to lock workerMtx job id {} type {}", job.id, job.status);
     std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::debug("locked workerMtx");
     std::set<connection_ptr> availableWorkes;

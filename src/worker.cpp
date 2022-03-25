@@ -20,6 +20,16 @@ void Worker::handleMap(int type, std::string data, int job_id) {
     for(int i = 0; i < (int)data.size(); i++){
         result.push_back(std::make_pair(data.substr(i, 1), 1));
     }
+    std::map<std::string, int> result_map;
+    for(auto &r: result){
+        result_map[r.first] += r.second;
+    }
+    int sum = 0;
+    result.clear();
+    for(auto &r: result_map){
+        sum += r.second;
+        result.push_back(std::make_pair(r.first, r.second));
+    }
     mapreduce::ResultMap resultMsg = 
         MessageGenerator::ResultMap(result, job_id);
     pipe.sendMessage(resultMsg);
@@ -114,7 +124,7 @@ void Worker::signOff() {
 }
 
 int main(){
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::info);
     asio::io_service ctx;
     asio::ip::tcp::endpoint ep{
         asio::ip::address::from_string("127.0.0.1"), 1500};

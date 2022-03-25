@@ -56,6 +56,7 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultMap.values()){
                 result.push_back(std::make_pair(r.key(), r.value()));
             }
+            spdlog::debug("done adding values");
             is_available = true;
             workerManager.mapResult(resultMap.job_id(), id, result);
         }
