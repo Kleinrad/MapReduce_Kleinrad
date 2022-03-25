@@ -13,6 +13,7 @@ class ConnectionSession : public ConnectionObject,
     WorkerManager &workerManager;
     ClientManager &clientManager;
     std::thread* reciveThread;
+    std::thread* queueThread;
     Pipe pipe;
     static std::mutex mtx;
     mapreduce::ConnectionType type;

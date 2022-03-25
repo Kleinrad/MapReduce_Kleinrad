@@ -45,7 +45,7 @@ message TaskMap{
     MessageType type = 1;
     int32 job_id = 2;
     JobType job_type = 3;
-    string data = 4;
+    bytes data = 4;
 }
 
 message TaskReduce{
@@ -93,7 +93,7 @@ message Confirm{
 message JobRequest{
     MessageType type = 1;
     JobType job_type = 3;
-    string data = 4;
+    bytes data = 4;
     int32 num_mappers = 5;
     int32 num_reducers = 6;
 }

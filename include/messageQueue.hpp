@@ -9,7 +9,14 @@
 
 struct QueueItem{
     mapreduce::MessageType type;
-    google::protobuf::Message* message;
+    mapreduce::JobType jobType;
+    int job_id;
+    std::string dataRaw;
+    std::vector<std::pair<std::string, int>> *dataReduce = new std::vector<std::pair<std::string, int>>();
+    std::map<std::string, int>* dataResult = new std::map<std::string, int>();
+
+    QueueItem(mapreduce::MessageType type)
+        : type(type) {}
 };
 
 
@@ -21,14 +28,10 @@ class MessageQueue
     std::condition_variable cv;
 
 public:
-    MessageQueue();
-    ~MessageQueue();
-    void push(google::protobuf::Message& message){
+
+    void push(QueueItem& item){
         std::lock_guard<std::mutex> lock(mtx);
-        QueueItem* item = new QueueItem();
-        item->type = static_cast<mapreduce::MessageType>(message.GetDescriptor()->index());
-        item->message = &message;
-        queue.push(item);
+        queue.push(&item);
         cv.notify_one();
     }
     

@@ -11,6 +11,8 @@ ConnectionSession::ConnectionSession(WorkerManager &workerManager,
     : ConnectionObject(), workerManager(workerManager), 
     clientManager(clientManager), pipe(Pipe(std::move(socket))) {
         last_active = std::chrono::system_clock::now();
+        queueThread = new std::thread(&ConnectionSession::checkMessageQueue, this);
+        queueThread->detach();
 }
 
 
@@ -20,9 +22,7 @@ ConnectionSession::~ConnectionSession(){
 
 void ConnectionSession::sendMessage(
             google::protobuf::Message& message){
-    std::lock_guard<std::mutex> lock(mtx);
     pipe.sendMessage(message);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 
@@ -41,9 +41,10 @@ void ConnectionSession::readMessage(){
         }if(type == mapreduce::MessageType::JOB_REQUEST){
             mapreduce::JobRequest jobRequest;
             pipe >> jobRequest;
-            Job job(jobRequest.job_type(), jobRequest.data());
-            clientManager.registerJob(job.id, id);
-            workerManager.assignJob(job);
+            QueueItem item{mapreduce::MessageType::JOB_REQUEST};
+            item.jobType = jobRequest.job_type();
+            item.dataRaw = jobRequest.data();
+            msgQueue.push(item);
         }
         if(type == mapreduce::MessageType::PING){
             mapreduce::Ping p;
@@ -52,27 +53,25 @@ void ConnectionSession::readMessage(){
         if(type == mapreduce::MessageType::RESULT_MAP){
             mapreduce::ResultMap resultMap;
             pipe >> resultMap;
-            std::vector<std::pair<std::string, int>> result;
+            QueueItem item{mapreduce::MessageType::RESULT_MAP};
+            item.dataReduce->reserve(resultMap.values().size());
             for(auto& r : resultMap.values()){
-                result.push_back(std::make_pair(r.key(), r.value()));
+                item.dataReduce->push_back(std::make_pair(r.key(), r.value()));
             }
-            spdlog::debug("done adding values");
-            is_available = true;
-            workerManager.mapResult(resultMap.job_id(), id, result);
+            spdlog::debug("done adding values {}", item.dataReduce->begin()->first);
+            item.job_id = resultMap.job_id();
+            msgQueue.push(item);
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             mapreduce::ResultReduce resultReduce;
             pipe >> resultReduce;
             spdlog::debug("recieved reduce result");
-            std::map<std::string, int> result;
+            QueueItem item{mapreduce::MessageType::RESULT_REDUCE};
             for(auto& r : resultReduce.values()){
-                result[r.key()] = r.value();
+                item.dataResult->insert(std::make_pair(r.key(), r.value()));
             }
-            spdlog::debug("converted to map");
-            is_available = true;
-            if(workerManager.reduceResult(resultReduce.job_id(), id, result)){
-                clientManager.sendResult(resultReduce.job_id(), result);
-            }
+            item.job_id = resultReduce.job_id();
+            msgQueue.push(item);
         }
         readMessage();
     }else{
@@ -105,40 +104,21 @@ void ConnectionSession::checkMessageQueue(){
                 return;
             }
         }if(type == mapreduce::MessageType::JOB_REQUEST){
-            mapreduce::JobRequest* jobRequest = static_cast<mapreduce::JobRequest*>(item->message);
-            Job job(jobRequest->job_type(), jobRequest->data());
+            Job job(item->jobType, item->dataRaw);
             clientManager.registerJob(job.id, id);
             workerManager.assignJob(job);
         }
-        if(type == mapreduce::MessageType::PING){
-            mapreduce::Ping p;
-            pipe >> p;
-        }
         if(type == mapreduce::MessageType::RESULT_MAP){
-            mapreduce::ResultMap* resultMap = static_cast<mapreduce::ResultMap*>(item->message);
-            std::vector<std::pair<std::string, int>> result;
-            for(auto& r : resultMap->values()){
-                result.push_back(std::make_pair(r.key(), r.value()));
-            }
-            spdlog::debug("done adding values");
             is_available = true;
-            workerManager.mapResult(resultMap->job_id(), id, result);
+            workerManager.mapResult(item->job_id, id, *(item->dataReduce));
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
-            mapreduce::ResultReduce* resultReduce = static_cast<mapreduce::ResultReduce*>(item->message);
-            spdlog::debug("recieved reduce result");
-            std::map<std::string, int> result;
-            for(auto& r : resultReduce->values()){
-                result[r.key()] = r.value();
-            }
-            spdlog::debug("converted to map");
             is_available = true;
-            if(workerManager.reduceResult(resultReduce->job_id(), id, result)){
-                clientManager.sendResult(resultReduce->job_id(), result);
+            if(workerManager.reduceResult(item->job_id, id, *(item->dataResult))){
+                clientManager.sendResult(item->job_id, *(item->dataResult));
             }
         }
     }
-    
 }
 
 
