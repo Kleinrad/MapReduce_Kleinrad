@@ -29,9 +29,9 @@ class MessageQueue
 
 public:
 
-    void push(QueueItem& item){
+    void push(QueueItem* item){
         std::lock_guard<std::mutex> lock(mtx);
-        queue.push(&item);
+        queue.push(item);
         cv.notify_one();
     }
     

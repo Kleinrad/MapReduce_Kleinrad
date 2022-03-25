@@ -44,7 +44,7 @@ void ConnectionSession::readMessage(){
             QueueItem item{mapreduce::MessageType::JOB_REQUEST};
             item.jobType = jobRequest.job_type();
             item.dataRaw = jobRequest.data();
-            msgQueue.push(item);
+            msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::PING){
             mapreduce::Ping p;
@@ -60,7 +60,7 @@ void ConnectionSession::readMessage(){
             }
             spdlog::debug("done adding values {}", item.dataReduce->begin()->first);
             item.job_id = resultMap.job_id();
-            msgQueue.push(item);
+            msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             mapreduce::ResultReduce resultReduce;
@@ -71,7 +71,7 @@ void ConnectionSession::readMessage(){
                 item.dataResult->insert(std::make_pair(r.key(), r.value()));
             }
             item.job_id = resultReduce.job_id();
-            msgQueue.push(item);
+            msgQueue.push(&item);
         }
         readMessage();
     }else{
