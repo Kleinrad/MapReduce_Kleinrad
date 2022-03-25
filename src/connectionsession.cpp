@@ -43,7 +43,8 @@ void ConnectionSession::readMessage(){
             pipe >> jobRequest;
             QueueItem item{mapreduce::MessageType::JOB_REQUEST};
             item.jobType = jobRequest.job_type();
-            item.dataRaw = jobRequest.data();
+            item.dataRaw = new char[jobRequest.data().size()];
+            std::strcpy(item.dataRaw, jobRequest.data().c_str());
             msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::PING){
@@ -92,9 +93,9 @@ void ConnectionSession::readMessage(){
 void ConnectionSession::checkMessageQueue(){
     while (true)
     {
-        QueueItem* item = msgQueue.pop();
+        QueueItem item = *(msgQueue.pop());
         std::lock_guard<std::mutex> lock(mtx);
-        mapreduce::MessageType type = item->type;
+        mapreduce::MessageType type = item.type;
         if(type == mapreduce::MessageType::SIGN_OFF){
             if(this->type == mapreduce::ConnectionType::WORKER){
                 workerManager.leave(shared_from_this());
@@ -104,18 +105,19 @@ void ConnectionSession::checkMessageQueue(){
                 return;
             }
         }if(type == mapreduce::MessageType::JOB_REQUEST){
-            Job job(item->jobType, item->dataRaw);
+            spdlog::info("DATA3 {}", item.dataRaw);
+            Job job(item.jobType, item.dataRaw);
             clientManager.registerJob(job.id, id);
             workerManager.assignJob(job);
         }
         if(type == mapreduce::MessageType::RESULT_MAP){
             is_available = true;
-            workerManager.mapResult(item->job_id, id, *(item->dataReduce));
+            workerManager.mapResult(item.job_id, id, *(item.dataReduce));
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             is_available = true;
-            if(workerManager.reduceResult(item->job_id, id, *(item->dataResult))){
-                clientManager.sendResult(item->job_id, *(item->dataResult));
+            if(workerManager.reduceResult(item.job_id, id, *(item.dataResult))){
+                clientManager.sendResult(item.job_id, *(item.dataResult));
             }
         }
     }
