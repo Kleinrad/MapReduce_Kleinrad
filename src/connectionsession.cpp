@@ -59,14 +59,12 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultMap.values()){
                 item.dataReduce->push_back(std::make_pair(r.key(), r.value()));
             }
-            spdlog::debug("done adding values {}", item.dataReduce->begin()->first);
             item.job_id = resultMap.job_id();
             msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             mapreduce::ResultReduce resultReduce;
             pipe >> resultReduce;
-            spdlog::debug("recieved reduce result");
             QueueItem item{mapreduce::MessageType::RESULT_REDUCE};
             for(auto& r : resultReduce.values()){
                 item.dataResult->insert(std::make_pair(r.key(), r.value()));
@@ -105,7 +103,6 @@ void ConnectionSession::checkMessageQueue(){
                 return;
             }
         }if(type == mapreduce::MessageType::JOB_REQUEST){
-            spdlog::info("DATA3 {}", item.dataRaw);
             Job job(item.jobType, item.dataRaw);
             clientManager.registerJob(job.id, id);
             workerManager.assignJob(job);
