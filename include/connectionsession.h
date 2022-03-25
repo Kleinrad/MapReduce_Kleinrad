@@ -5,6 +5,7 @@
 #include "clientmanager.h"
 #include "pipe.hpp"
 #include "protoutils.hpp"
+#include "messageQueue.hpp"
 #include <thread>
 
 class ConnectionSession : public ConnectionObject,
@@ -15,9 +16,11 @@ class ConnectionSession : public ConnectionObject,
     Pipe pipe;
     static std::mutex mtx;
     mapreduce::ConnectionType type;
+    MessageQueue msgQueue;
 
     void readMessage();
     void sendMessage(google::protobuf::Message& messaged);
+    void checkMessageQueue();
     bool isConnected();
     void closeConnection();
     bool assignID();

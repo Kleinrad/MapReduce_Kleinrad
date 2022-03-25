@@ -90,6 +90,58 @@ void ConnectionSession::readMessage(){
 }
 
 
+void ConnectionSession::checkMessageQueue(){
+    while (true)
+    {
+        QueueItem* item = msgQueue.pop();
+        std::lock_guard<std::mutex> lock(mtx);
+        mapreduce::MessageType type = item->type;
+        if(type == mapreduce::MessageType::SIGN_OFF){
+            if(this->type == mapreduce::ConnectionType::WORKER){
+                workerManager.leave(shared_from_this());
+                return;
+            }else if(this->type == mapreduce::ConnectionType::CLIENT){
+                clientManager.leave(shared_from_this());
+                return;
+            }
+        }if(type == mapreduce::MessageType::JOB_REQUEST){
+            mapreduce::JobRequest* jobRequest = static_cast<mapreduce::JobRequest*>(item->message);
+            Job job(jobRequest->job_type(), jobRequest->data());
+            clientManager.registerJob(job.id, id);
+            workerManager.assignJob(job);
+        }
+        if(type == mapreduce::MessageType::PING){
+            mapreduce::Ping p;
+            pipe >> p;
+        }
+        if(type == mapreduce::MessageType::RESULT_MAP){
+            mapreduce::ResultMap* resultMap = static_cast<mapreduce::ResultMap*>(item->message);
+            std::vector<std::pair<std::string, int>> result;
+            for(auto& r : resultMap->values()){
+                result.push_back(std::make_pair(r.key(), r.value()));
+            }
+            spdlog::debug("done adding values");
+            is_available = true;
+            workerManager.mapResult(resultMap->job_id(), id, result);
+        }
+        if(type == mapreduce::MessageType::RESULT_REDUCE){
+            mapreduce::ResultReduce* resultReduce = static_cast<mapreduce::ResultReduce*>(item->message);
+            spdlog::debug("recieved reduce result");
+            std::map<std::string, int> result;
+            for(auto& r : resultReduce->values()){
+                result[r.key()] = r.value();
+            }
+            spdlog::debug("converted to map");
+            is_available = true;
+            if(workerManager.reduceResult(resultReduce->job_id(), id, result)){
+                clientManager.sendResult(resultReduce->job_id(), result);
+            }
+        }
+    }
+    
+}
+
+
 bool ConnectionSession::assignID(){
     mapreduce::Assignment assignment = MessageGenerator::Assignment(id, type);
     std::lock_guard<std::mutex> lock(mtx);
