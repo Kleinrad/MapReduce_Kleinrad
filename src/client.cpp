@@ -4,6 +4,7 @@
 #include "job.hpp"
 #include "client.h"
 #include <fstream>
+#include "CLI11.hpp"
 
 int Job::job_counter = 0;
 
@@ -84,7 +85,7 @@ void Client::printResultsPlain(bool sorted){
         spdlog::error("No results to print");
         return;
     }
-    std::cout << "Last job results: " << std::endl;
+    std::cout << "\nLast job results: " << std::endl;
     std::cout << "Total characters: " << lastJobTotal << "\n" << std::endl;
     if(sorted){
         std::vector<std::pair<std::string, int>> sortedResult;
@@ -110,7 +111,7 @@ void Client::printResultsHistogram(bool sorted){
         spdlog::error("No results to print");
         return;
     }
-    std::cout << "Last job results: " << std::endl;
+    std::cout << "\nLast job results: " << std::endl;
     std::vector<std::pair<std::string, int>> sortedResult;
     std::copy(lastJobResult.begin(), lastJobResult.end(), std::back_inserter(sortedResult));
     std::sort(sortedResult.begin(), sortedResult.end(),
@@ -137,16 +138,38 @@ void Client::printResultsHistogram(bool sorted){
     }
 }
 
-int main(){
+int main(int argc, char* argv[]) {
+    CLI::App app{"MapReduce Client"};
+    
     std::string ipAddress{"127.0.0.1"};
     asio::ip::port_type port{1500};
+    app.add_option("<ip>", ipAddress, "server ip address");
+    app.add_option("<port>", port, "port for connection");
+
+    try {
+        app.parse(argc, argv);
+    } catch (const CLI::ParseError &e) {
+        return app.exit(e);
+    }
 
     asio::io_service ctx;
+    asio::ip::address addr;
+    try{
+        addr = asio::ip::address::from_string(ipAddress);
+    }catch(std::exception& e){
+        spdlog::error("Invalid ip address");
+        return 1;
+    }
     asio::ip::tcp::endpoint ep{
-        asio::ip::address::from_string(ipAddress), port};
+        addr, port};
     asio::ip::tcp::socket socket(ctx);
     spdlog::set_level(spdlog::level::debug);
-    socket.connect(ep);
+    try{
+        socket.connect(ep);
+    } catch(const std::exception& e){
+        spdlog::error("Connection failed");
+        return 1;
+    }
     Client client(std::move(socket));
     client.signOn();
     std::cout << "Connected to server [" << ipAddress << ":" << port << "]\n" << std::endl;
@@ -162,15 +185,14 @@ int main(){
             break;
         if (input == "help" || input == "h"){
             std::cout << "Available commands:" << std::endl;
-            std::cout << "quit, q" << std::endl;
-            std::cout << "help, h" << std::endl;
-            std::cout << "send <jobType> [-f] <data>" << std::endl;
-            std::cout << "print [-s] <printType>" << std::endl;
-            std::cout << std::endl;
-            std::cout << "Available jobTypes:" << std::endl;
+            std::cout << "# quit, q" << std::endl;
+            std::cout << "# help, h" << std::endl;
+            std::cout << "# send <jobType> [-f] <data>" << std::endl;
+            std::cout << "# print [-s] <printType>" << std::endl;
+            std::cout << "\nAvailable jobTypes:" << std::endl;
             std::cout << "(0) character counting" << std::endl;
             std::cout << "(1) word counting" << std::endl;
-            std::cout << "Available printTypes:" << std::endl;
+            std::cout << "\nAvailable printTypes:" << std::endl;
             std::cout << "(0) print last job result" << std::endl;
             std::cout << "(1) print last job result as histogram" << std::endl;
             continue;
@@ -255,7 +277,7 @@ int main(){
                 continue;
             }
         }
-        spdlog::error("Invalid command");
+        spdlog::error("Invalid command, type 'help' or 'h' for help");
     }
     std::cout << "\nDisconnected from server" << std::endl;
 }
