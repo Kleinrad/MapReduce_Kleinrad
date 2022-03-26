@@ -1,6 +1,7 @@
 #include <thread>
 #include <chrono>
 #include <spdlog/spdlog.h>
+#include <regex>
 #include "protoutils.hpp"
 #include "worker.h"
 
@@ -17,19 +18,44 @@ void Worker::handleMap(int type, std::string data, int job_id) {
     spdlog::info("Worker {}: handleMap type {}", worker_id, type);
     spdlog::debug("Data size {}", data.size());
     std::vector<std::pair<std::string, int>> result;
-    for(int i = 0; i < (int)data.size(); i++){
-        result.push_back(std::make_pair(data.substr(i, 1), 1));
-    }
-    spdlog::debug("map size {}", result.size());
-    std::map<std::string, int> result_map;
-    for(auto &r: result){
-        result_map[r.first] += r.second;
-    }
-    int sum = 0;
-    result.clear();
-    for(auto &r: result_map){
-        sum += r.second;
-        result.push_back(std::make_pair(r.first, r.second));
+    if(type == 0){
+        for(int i = 0; i < (int)data.size(); i++){
+            result.push_back(std::make_pair(data.substr(i, 1), 1));
+        }
+        spdlog::debug("map size {}", result.size());
+        std::map<std::string, int> result_map;
+        for(auto &r: result){
+            result_map[r.first] += r.second;
+        }
+        int sum = 0;
+        result.clear();
+        for(auto &r: result_map){
+            sum += r.second;
+            result.push_back(std::make_pair(r.first, r.second));
+        }
+    }else if(type == 1){
+        std::regex rgx("\\s+");
+        std::sregex_token_iterator iter(data.begin(),
+            data.end(),
+            rgx,
+            -1);
+        std::sregex_token_iterator end;
+        while(iter != end){
+            result.push_back(std::make_pair(*iter, 1));
+            iter++;
+        }
+        spdlog::debug("map size {}", result.size());
+        std::map<std::string, int> result_map;
+        for(auto &r: result){
+            result_map[r.first] += r.second;
+        }
+        int sum = 0;
+        result.clear();
+        for(auto &r: result_map){
+            sum += r.second;
+            result.push_back(std::make_pair(r.first, r.second));
+        }
+
     }
     mapreduce::ResultMap resultMsg = 
         MessageGenerator::ResultMap(result, job_id);
