@@ -226,6 +226,7 @@ void WorkerManager::reAssignTask(int worker_id){
     std::lock_guard<std::mutex> lock(activeJobMtx);
     spdlog::info("Reassigning task from worker {} {}", worker_id, activeJobs.size());
     for(auto &pair : activeJobs){
+        spdlog::debug("reassign worker");
         if(pair.second.contains(worker_id)){
             Job job{pair.second, worker_id};
             spdlog::info("Reassigning");
