@@ -95,12 +95,12 @@ void Client::printResultsPlain(bool sorted){
                 return a.second > b.second;
             });
         for(auto& r : sortedResult){
-            std::cout << r.first << ": " << r.second <<
+            std::cout << std::setw(15) << r.first << ": " << r.second <<
             " [" << (std::round(((double)r.second/lastJobTotal)*1000)/10) << "%]" << std::endl;
         }
     }else{
         for(auto& r : lastJobResult){
-            std::cout << r.first << ": " << r.second <<
+            std::cout << std::setw(15) << r.first << ": " << r.second <<
             " [" << (std::round(((double)r.second/lastJobTotal)*1000)/10) << "%]"  << std::endl;
         }
     }
@@ -121,7 +121,7 @@ void Client::printResultsHistogram(bool sorted){
     int max = sortedResult.begin()->second;
     if(sorted){
         for(auto& r : sortedResult){
-            std::cout << r.first << ": ";
+            std::cout << std::setw(15) << r.first << ": ";
             for(int i = 0; i < (std::round(((double)r.second/max)*50)); i++){
                 std::cout << "|";
             }
@@ -129,7 +129,7 @@ void Client::printResultsHistogram(bool sorted){
         }
     }else{
         for(auto& r : lastJobResult){
-            std::cout << r.first << ": ";
+            std::cout << std::setw(15) << r.first << ": ";
             for(int i = 0; i < (std::round(((double)r.second/max)*50)); i++){
                 std::cout << "|";
             }
