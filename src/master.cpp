@@ -1,5 +1,7 @@
 #include <spdlog/spdlog.h>
+#include <fstream>
 #include <thread>
+#include <json.hpp>
 #include "pipe.hpp"
 #include "protoutils.hpp"
 #include "connectionsession.h"
@@ -31,9 +33,13 @@ void Master::acceptConnection(){
 }
 
 int main(){
+    std::ifstream f("config.json");
+    nlohmann::json j = nlohmann::json::parse(f);
+
     asio::io_context ctx;
-    asio::ip::tcp::endpoint ep{asio::ip::address_v4(), 1500};
-    spdlog::set_level(spdlog::level::debug);
+    asio::ip::tcp::endpoint ep{asio::ip::address_v4()
+        , (asio::ip::port_type)j["port"]};
+    spdlog::set_level(spdlog::level::info);
     WorkerManager workerManager;
     ClientManager clientManager;
     Master master(workerManager, clientManager, ep, ctx);

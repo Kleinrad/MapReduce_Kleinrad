@@ -184,17 +184,20 @@ int main(int argc, char* argv[]) {
         if (input == "quit" || input == "q")
             break;
         if (input == "help" || input == "h"){
-            std::cout << "Available commands:" << std::endl;
-            std::cout << "# quit, q" << std::endl;
-            std::cout << "# help, h" << std::endl;
-            std::cout << "# send <jobType> [-f] <data>" << std::endl;
-            std::cout << "# print [-s] <printType>" << std::endl;
+            std::cout << "\nAvailable commands:" << std::endl;
+            std::cout << "- quit, q" << std::endl;
+            std::cout << "- help, h" << std::endl;
+            std::cout << "- send <jobType> [-f] <data>" << std::endl;
+            std::cout << "- print [-s] <printType>" << std::endl;
             std::cout << "\nAvailable jobTypes:" << std::endl;
             std::cout << "(0) character counting" << std::endl;
             std::cout << "(1) word counting" << std::endl;
             std::cout << "\nAvailable printTypes:" << std::endl;
             std::cout << "(0) print last job result" << std::endl;
             std::cout << "(1) print last job result as histogram" << std::endl;
+            std::cout << "\nOptional arguments:" << std::endl;
+            std::cout << "-f: read data from file" << std::endl;
+            std::cout << "-s: sort results\n" << std::endl;
             continue;
         }
         if (input.find("send") == 0){

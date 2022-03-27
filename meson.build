@@ -13,7 +13,8 @@ add_global_arguments('-I' + get_option('asio_include_dir'), language : 'cpp')
 # CLI11: https://github.com/CLIUtils/CLI11
 add_global_arguments('-I' + get_option('cli11_include_dir'), language : 'cpp')
 add_global_arguments('-I' + get_option('spdlog_include_dir'), language : 'cpp')
-add_global_arguments('-I' + get_option('asio_include_dir'), language : 'cpp')
+add_global_arguments('-I' + get_option('json_include_dir'), language : 'cpp')
+
 
 # add additional include global arguments appropriately!
 

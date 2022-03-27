@@ -1,7 +1,9 @@
 #include <thread>
+#include <fstream>
 #include <chrono>
 #include <spdlog/spdlog.h>
 #include <regex>
+#include <json.hpp>
 #include "protoutils.hpp"
 #include "worker.h"
 
@@ -151,10 +153,13 @@ void Worker::signOff() {
 }
 
 int main(){
-    spdlog::set_level(spdlog::level::debug);
+    std::ifstream f("config.json");
+    nlohmann::json j = nlohmann::json::parse(f);
+
+    spdlog::set_level(spdlog::level::info);
     asio::io_service ctx;
     asio::ip::tcp::endpoint ep{
-        asio::ip::address::from_string("127.0.0.1"), 1500};
+        asio::ip::address::from_string(j["master"]), (asio::ip::port_type)j["port"]};
     asio::ip::tcp::socket socket(ctx);
     socket.connect(ep);
     Worker worker(std::move(socket));
