@@ -85,6 +85,17 @@ bool WorkerManager::assignJob(Job job)
 }
 
 
+void WorkerManager::confirmRecive(int worker_id){
+    std::lock_guard<std::mutex> lock(activeJobMtx);
+    for(auto& j : activeJobs){
+        if(j.second.contains(worker_id)){
+            j.second.confirmWorker(worker_id);
+        }
+    }
+
+}
+
+
 void WorkerManager::queueJob(Job job)
 {
     spdlog::info("Job {} is queued: not enough workes available", job.id);
@@ -191,16 +202,19 @@ void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes
 void WorkerManager::mapResult(int job_id, int worker_id
             , std::vector<std::pair<std::string, int>> &result){
     std::lock_guard<std::mutex> lock(activeJobMtx);
-    activeJobs[job_id].addResults(result);
-    activeJobs[job_id].removeWorker(worker_id);
-    spdlog::info("Job {} worker {} finished [Job active {}]"
-    , job_id, worker_id, activeJobs[job_id].isActive());
-    if(!activeJobs[job_id].isActive()){
-        Job job{activeJobs[job_id]};
-        job.status = JobStatus::job_mapped;
-        activeJobs.erase(job_id);
-        activeJobMtx.unlock();
-        assignJob(job);
+    if(activeJobs.find(job_id) != activeJobs.end() &&
+    activeJobs[job_id].contains(worker_id) ){
+        activeJobs[job_id].addResults(result);
+        activeJobs[job_id].removeWorker(worker_id);
+        spdlog::info("Job {} worker {} finished [Job active {}]"
+        , job_id, worker_id, activeJobs[job_id].isActive());
+        if(!activeJobs[job_id].isActive()){
+            Job job{activeJobs[job_id]};
+            job.status = JobStatus::job_mapped;
+            activeJobs.erase(job_id);
+            activeJobMtx.unlock();
+            assignJob(job);
+        }
     }
 }
 
@@ -208,16 +222,19 @@ bool WorkerManager::reduceResult(int job_id, int worker_id
             , std::map<std::string, int> &result){
     spdlog::debug("trying to aquire lock reduce result");
     std::lock_guard<std::mutex> lock(activeJobMtx);
-    spdlog::debug("aquired reduce result lock");
-    activeJobs[job_id].addReducedData(result);
-    spdlog::debug("reduce result added");
-    activeJobs[job_id].removeWorker(worker_id);
-    spdlog::info("Job {} worker {} finished [Job active {}]"
-    , job_id, worker_id, activeJobs[job_id].isActive());
-    if(!activeJobs[job_id].isActive()){
-        result = activeJobs[job_id].reducedData;
-        activeJobs.erase(job_id);
-        return true;
+    if(activeJobs.find(job_id) != activeJobs.end() &&
+    activeJobs[job_id].contains(worker_id) ){
+        spdlog::debug("aquired reduce result lock");
+        activeJobs[job_id].addReducedData(result);
+        spdlog::debug("reduce result added");
+        activeJobs[job_id].removeWorker(worker_id);
+        spdlog::info("Job {} worker {} finished [Job active {}]"
+        , job_id, worker_id, activeJobs[job_id].isActive());
+        if(!activeJobs[job_id].isActive()){
+            result = activeJobs[job_id].reducedData;
+            activeJobs.erase(job_id);
+            return true;
+        }
     }
     return false;
 }

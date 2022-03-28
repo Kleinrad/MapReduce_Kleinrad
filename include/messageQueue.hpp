@@ -9,8 +9,9 @@
 
 struct QueueItem{
     mapreduce::MessageType type;
+    mapreduce::ConnectionType connectionType;
     mapreduce::JobType jobType;
-    int job_id;
+    int id;
     char* dataRaw;
     std::vector<std::pair<std::string, int>> *dataReduce = new std::vector<std::pair<std::string, int>>();
     std::map<std::string, int>* dataResult = new std::map<std::string, int>();
