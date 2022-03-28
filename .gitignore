@@ -40,3 +40,4 @@ build/*
 *.cls
 examples
 buildMr.bash
+*.toc
