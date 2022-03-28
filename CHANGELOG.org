@@ -1,5 +1,15 @@
 * Changelog
 ** [Unreleased]
+** [1.1.0] - 2022-03-28
+*** Added
+- MessageQueue, to allow for serial processing of messages
+- Client cli commands
+- json config, to configure port and ip of map reduce master
+*** Changed
+- splitRawData, fixed issue when using large amount of workers 
+- assignMap/assignReduce, made thread safe
+- Message data type from string to bytes
+- handleMap, to pre combine data to allow for large data computation
 ** [1.0.0] - 2022-03-21
 *** Added
 - WorkerManager, added timeout detection
