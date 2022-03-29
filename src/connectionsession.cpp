@@ -59,7 +59,7 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultMap.values()){
                 item.dataReduce->push_back(std::make_pair(r.key(), r.value()));
             }
-            item.id = resultMap.job_id();
+            item.job_id = resultMap.job_id();
             msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
@@ -69,15 +69,7 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultReduce.values()){
                 item.dataResult->insert(std::make_pair(r.key(), r.value()));
             }
-            item.id = resultReduce.job_id();
-            msgQueue.push(&item);
-        }
-        if(type == mapreduce::MessageType::CONFIRM){
-            mapreduce::Confirm confirm;
-            pipe >> confirm;
-            QueueItem item{mapreduce::MessageType::CONFIRM};
-            item.id = confirm.id();
-            item.connectionType = confirm.connection_type();
+            item.job_id = resultReduce.job_id();
             msgQueue.push(&item);
         }
         readMessage();
@@ -117,16 +109,12 @@ void ConnectionSession::checkMessageQueue(){
         }
         if(type == mapreduce::MessageType::RESULT_MAP){
             is_available = true;
-            workerManager.mapResult(item.id, id, *(item.dataReduce));
+            workerManager.mapResult(item.job_id, id, *(item.dataReduce));
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             is_available = true;
-            if(workerManager.reduceResult(item.id, id, *(item.dataResult))){
-                clientManager.sendResult(item.id, *(item.dataResult));
-            }
-        }
-        if(type == mapreduce::MessageType::CONFIRM){
-            if(item.connectionType == mapreduce::ConnectionType::WORKER){
+            if(workerManager.reduceResult(item.job_id, id, *(item.dataResult))){
+                clientManager.sendResult(item.job_id, *(item.dataResult));
             }
         }
     }

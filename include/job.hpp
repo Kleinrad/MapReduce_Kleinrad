@@ -17,7 +17,6 @@ enum JobStatus {
 
 struct ActiveJobStruct {
     std::map<int, std::string> workerData;
-    std::vector<int> unconfirmedWorkers;
     std::map<int, std::vector<std::pair<std::string, int>>> workerReduceData;
     std::vector<std::pair<std::string, int>> results;
     std::map<std::string, int> reducedData;
@@ -36,14 +35,8 @@ struct ActiveJobStruct {
         is_active = true;
     }
 
-    void confirmWorker(int worker) {
-        unconfirmedWorkers.erase(std::remove(unconfirmedWorkers.begin(),
-            unconfirmedWorkers.end(), worker), unconfirmedWorkers.end());
-    }
-
     void addWorker(int worker, std::vector<std::pair<std::string, int>> data) {
         workerReduceData.insert({worker, data});
-        unconfirmedWorkers.push_back(worker);
         is_active = true;
     }
 

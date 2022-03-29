@@ -45,7 +45,6 @@ class WorkerManager{
             , std::map<std::string, int> &result);
         bool assignJob(Job job);
         void reAssignTask(int worker_id);
-        void confirmRecive(int worker_id);
         int generateID();
 };
 
