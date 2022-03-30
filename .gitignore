@@ -41,3 +41,11 @@ build/*
 examples
 buildMr.bash
 *.toc
+*.bbl
+*.bbl
+*.bcf
+*.blg
+*.dvi
+doc/doc.run.xml
+doc/doc.blg
+doc/doc.blg

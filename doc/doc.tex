@@ -1,6 +1,6 @@
 \documentclass[12pt, letterpaper]{article}
 \usepackage[utf8]{inputenc}
-\usepackage{cite}
+\usepackage[backend=biber]{biblatex}
 \usepackage{float}
 \usepackage{tikz}
 \usepackage{hyperref}
@@ -11,6 +11,7 @@
 \emergencystretch=\maxdimen
 \hyphenpenalty=10000
 \hbadness=10000
+\addbibresource{references.bib}
 
 \newenvironment{code}{\captionsetup{type=listing}}{}
 \SetupFloatingEnvironment{listing}{name=Source Code}
@@ -31,6 +32,9 @@
 \newpage
 
 \section{Introduction}
+
+In this project the technology MapReduce is being simulated. Thereby a simple system has been developed to imitate a the functionality of an MapReduce application. All of the functionality in this project is written with C++17 and compiled with the help of the meson build system\footfullcite{meson}. The communication is based on the TCP protocol and realized using the C++ library asio\footfullcite{asio}. Furthermore to increase performance and usability protocol buffers\footfullcite{protobuf} are utilized.  
+\section{MapReduce}
 
 \section{Class-diagram}
 
@@ -56,6 +60,6 @@
 
 % .bib include & references
 \newpage
-\bibliography{references}
-\bibliographystyle{plain}
+
+\printbibliography
 \end{document}

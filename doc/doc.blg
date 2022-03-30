@@ -1,48 +1,17 @@
-This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
-Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
-The top-level auxiliary file: doc.aux
-The style file: plain.bst
-I found no \citation commands---while reading file doc.aux
-Database file #1: references.bib
-You've used 0 entries,
-            2118 wiz_defined-function locations,
-            497 strings with 3989 characters,
-and the built_in function-call counts, 18 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 2
-:= -- 7
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
-chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 1
-format.name$ -- 0
-if$ -- 1
-int.to.chr$ -- 0
-int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 3
-num.names$ -- 0
-pop$ -- 0
-preamble$ -- 1
-purify$ -- 0
-quote$ -- 0
-skip$ -- 1
-stack$ -- 0
-substring$ -- 0
-swap$ -- 0
-text.length$ -- 0
-text.prefix$ -- 0
-top$ -- 0
-type$ -- 0
-warning$ -- 0
-while$ -- 0
-width$ -- 0
-write$ -- 2
-(There was 1 error message)
+[0] Config.pm:304> INFO - This is Biber 2.14 (beta)
+[0] Config.pm:307> INFO - Logfile is 'doc.blg'
+[133] biber:322> INFO - === Wed Mar 30, 2022, 02:16:01
+[162] Biber.pm:415> INFO - Reading 'doc.bcf'
+[219] Biber.pm:943> INFO - Found 1 citekeys in bib section 0
+[229] Biber.pm:4256> INFO - Processing section 0
+[230] Utils.pm:75> INFO - Globbing data source 'references.bib'
+[230] Utils.pm:91> INFO - Globbed data source 'references.bib' to references.bib
+[249] Biber.pm:4455> INFO - Looking for bibtex format file 'references.bib' for section 0
+[250] bibtex.pm:1653> INFO - LaTeX decoding ...
+[253] bibtex.pm:1471> INFO - Found BibTeX data source 'references.bib'
+[297] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[297] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[297] Biber.pm:4084> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'en-US'
+[297] Biber.pm:4090> INFO - No sort tailoring available for locale 'en-US'
+[301] bbl.pm:652> INFO - Writing 'doc.bbl' with encoding 'UTF-8'
+[302] bbl.pm:755> INFO - Output to doc.bbl
