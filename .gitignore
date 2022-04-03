@@ -49,3 +49,5 @@ buildMr.bash
 doc/doc.run.xml
 doc/doc.blg
 doc/doc.blg
+*.bbl
+*.blg

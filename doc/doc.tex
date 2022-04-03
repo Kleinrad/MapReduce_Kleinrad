@@ -33,8 +33,17 @@
 
 \section{Introduction}
 
-In this project the technology MapReduce is being simulated. Thereby a simple system has been developed to imitate a the functionality of an MapReduce application. All of the functionality in this project is written with C++17 and compiled with the help of the meson build system\footfullcite{meson}. The communication is based on the TCP protocol and realized using the C++ library asio\footfullcite{asio}. Furthermore to increase performance and usability protocol buffers\footfullcite{protobuf} are utilized.  
+In this project the technology MapReduce is being simulated. Thereby a simple system has been developed to imitate a the functionality of an MapReduce application. All of the functionality in this project is written with C++17 and compiled with the help of the meson build system\footfullcite{meson}. The communication is based on the TCP protocol and realized using the C++ library asio\footfullcite{asio}.\newline
+Furthermore to increase performance and usability protocol buffers\footfullcite{protobuf} are utilized. Protocol Buffers enable the serialization of data structures in an efficient manner, which simplifies working with messages sent between parties in the MapReduce system.\newline
+To make use of the advantages of using a MapReduce architecture, a simple use-case consisting of counting the number of character occurrences in a plain text document. This kind of application was chosen due to its simplicity, which enables the focus of this project to stay on MapReduce rather than a test application. 
+
 \section{MapReduce}
+
+MapReduce is a programming model developed to decrease computation time of large data sets. It was invented by Google, the reason being the need to compute various kinds of derived data. Examples would be inverted indices or representations of the graph structure of web documents. These applications all have simplicity in common, there are no complex operations needed to accomplish said tasks. Furthermore are these kinds of processes characterized by accepting large amounts of input data and reducing it to fraction of itself. MapReduce presents a solution to parallelization, fault-tolerance, data distribution and load balancing. Thereby it is based on the principle of map and reduce, which are eponymous for the technology.\footfullcite{mapreducePaper}
+
+\subsection{Map}
+
+The map function accepts a set of key/value pairs, with the implementation being provided by the user. 
 
 \section{Class-diagram}
 

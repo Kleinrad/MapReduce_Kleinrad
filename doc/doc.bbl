@@ -19,6 +19,20 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
+    \entry{mapreducePaper}{misc}{}
+      \field{sortinit}{}
+      \field{sortinithash}{495dc9894017a8b12cafa9c619d10c0c}
+      \field{urlday}{3}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://static.googleusercontent.com/media/research.google.com/de//archive/mapreduce-osdi04.pdf
+      \endverb
+      \verb{url}
+      \verb https://static.googleusercontent.com/media/research.google.com/de//archive/mapreduce-osdi04.pdf
+      \endverb
+    \endentry
     \entry{asio}{misc}{}
       \field{sortinit}{a}
       \field{sortinithash}{a3dcedd53b04d1adfd5ac303ecd5e6fa}
@@ -33,6 +47,38 @@
       \endverb
       \verb{url}
       \verb https://think-async.com/Asio/
+      \endverb
+    \endentry
+    \entry{protobuf}{misc}{}
+      \field{sortinit}{P}
+      \field{sortinithash}{bb5b15f2db90f7aef79bb9e83defefcb}
+      \field{labeltitlesource}{title}
+      \field{title}{Protocol Buffers}
+      \field{urlday}{30}
+      \field{urlmonth}{3}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://developers.google.com/protocol-buffers
+      \endverb
+      \verb{url}
+      \verb https://developers.google.com/protocol-buffers
+      \endverb
+    \endentry
+    \entry{meson}{misc}{}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{labeltitlesource}{title}
+      \field{title}{The Meson Build system}
+      \field{urlday}{30}
+      \field{urlmonth}{3}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://mesonbuild.com
+      \endverb
+      \verb{url}
+      \verb https://mesonbuild.com
       \endverb
     \endentry
   \enddatalist
