@@ -41,9 +41,27 @@ To make use of the advantages of using a MapReduce architecture, a simple use-ca
 
 MapReduce is a programming model developed to decrease computation time of large data sets. It was invented by Google, the reason being the need to compute various kinds of derived data. Examples would be inverted indices or representations of the graph structure of web documents. These applications all have simplicity in common, there are no complex operations needed to accomplish said tasks. Furthermore are these kinds of processes characterized by accepting large amounts of input data and reducing it to fraction of itself. MapReduce presents a solution to parallelization, fault-tolerance, data distribution and load balancing. Thereby it is based on the principle of map and reduce, which are eponymous for the technology.\footfullcite{mapreducePaper}
 
+\subsection{Input Data}
+
+MapReduce processes unstructured or semi-structured data. The system is designed to accept large amounts of data in bulk. In the first step of the MapReduce process, this data is being split into subsets, to allow for data distribution. The way this data is being divided depends on the implementation and the type of input data present. The result of splitting the raw data is a set of key/value pairs.\footfullcite{uniLeibzigMapReduce}
+
 \subsection{Map}
 
-The map function accepts a set of key/value pairs, with the implementation being provided by the user. 
+The map function accepts a set of key/value pairs, with the implementation being provided by the user. Result of this phase is once more a set of key/value pairs. These result pairs represent the significant information contained in the input data. These significant data pairs directly influence the result and all unneeded information is being discarded. The name map stems form assigning a quantity attribute which represents the value of the resulting pairs, to an quality attribute.\footcite{uniLeibzigMapReduce}\footcite{mapreducePaper}
+
+\subsection{Reduce}
+
+Sorted key/value pairs get passed to the reduce function, which groups and thereby reduces the set of data points. The logic of this grouping functionality depends on the application MapReduce is used for. For that reason the reduce function is also implemented by the user.\footcite{uniLeibzigMapReduce}
+
+\pagebreak
+
+\subsection{Additional Phases}
+
+\subsubsection{Shuffle}
+In most implementations of a MapReduce model an shuffle phase is carried out, between the map and reduce phase. The shuffle phase is used to sort the resulting key/value pairs from the mapping phase. This is done in an effort to group similar keys into clusters which can than be reduced by a single worker.\footcite{uniLeibzigMapReduce}\newline
+
+\subsubsection{Combine}
+To reduce the network traffic an additional combine phase can be used after mapping. Thereby the large amount of key/value pairs resulting from the mapping phase get reduced before they get transferred over the network. However, because of this local aggregation of data it is possible to slow down the instead through shuffling optimized process of reducing data.\footfullcite{hadoop}
 
 \section{Class-diagram}
 

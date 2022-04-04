@@ -19,20 +19,6 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
-    \entry{mapreducePaper}{misc}{}
-      \field{sortinit}{}
-      \field{sortinithash}{495dc9894017a8b12cafa9c619d10c0c}
-      \field{urlday}{3}
-      \field{urlmonth}{4}
-      \field{urlyear}{2022}
-      \field{urldateera}{ce}
-      \verb{urlraw}
-      \verb https://static.googleusercontent.com/media/research.google.com/de//archive/mapreduce-osdi04.pdf
-      \endverb
-      \verb{url}
-      \verb https://static.googleusercontent.com/media/research.google.com/de//archive/mapreduce-osdi04.pdf
-      \endverb
-    \endentry
     \entry{asio}{misc}{}
       \field{sortinit}{a}
       \field{sortinithash}{a3dcedd53b04d1adfd5ac303ecd5e6fa}
@@ -47,6 +33,59 @@
       \endverb
       \verb{url}
       \verb https://think-async.com/Asio/
+      \endverb
+    \endentry
+    \entry{mapreducePaper}{misc}{}
+      \name{author}{2}{}{%
+        {{hash=4aecfb0cc2e1e3b7899129fa2a94e2b8}{%
+           family={Dean},
+           familyi={D\bibinitperiod},
+           given={Jeffrey},
+           giveni={J\bibinitperiod}}}%
+        {{hash=193bcec5240237591ad8fb697869f013}{%
+           family={Ghemawat},
+           familyi={G\bibinitperiod},
+           given={Sanjay},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{59b423e9fed33260f87a089f738c1beb}
+      \strng{fullhash}{59b423e9fed33260f87a089f738c1beb}
+      \strng{bibnamehash}{59b423e9fed33260f87a089f738c1beb}
+      \strng{authorbibnamehash}{59b423e9fed33260f87a089f738c1beb}
+      \strng{authornamehash}{59b423e9fed33260f87a089f738c1beb}
+      \strng{authorfullhash}{59b423e9fed33260f87a089f738c1beb}
+      \field{sortinit}{D}
+      \field{sortinithash}{c438b3d5d027251ba63f5ed538d98af5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{MapReduce: Simplified Data Processing on Large Clusters}
+      \field{urlday}{3}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://static.googleusercontent.com/media/research.google.com/de//archive/mapreduce-osdi04.pdf
+      \endverb
+      \verb{url}
+      \verb https://static.googleusercontent.com/media/research.google.com/de//archive/mapreduce-osdi04.pdf
+      \endverb
+    \endentry
+    \entry{hadoop}{misc}{}
+      \field{sortinit}{M}
+      \field{sortinithash}{2e5c2f51f7fa2d957f3206819bf86dc3}
+      \field{labeltitlesource}{title}
+      \field{title}{MapReduce Tutorial}
+      \field{urlday}{4}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \field{pages}{10}
+      \range{pages}{1}
+      \verb{urlraw}
+      \verb https://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.pdf
+      \endverb
+      \verb{url}
+      \verb https://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.pdf
       \endverb
     \endentry
     \entry{protobuf}{misc}{}
@@ -79,6 +118,38 @@
       \endverb
       \verb{url}
       \verb https://mesonbuild.com
+      \endverb
+    \endentry
+    \entry{uniLeibzigMapReduce}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=51860b9126424f337bf31284a4d5abd7}{%
+           family={Thomas\bibnamedelima Findling},
+           familyi={T\bibinitperiod\bibinitdelim F\bibinitperiod},
+           given={Thomas\bibnamedelima König},
+           giveni={T\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \strng{namehash}{51860b9126424f337bf31284a4d5abd7}
+      \strng{fullhash}{51860b9126424f337bf31284a4d5abd7}
+      \strng{bibnamehash}{51860b9126424f337bf31284a4d5abd7}
+      \strng{authorbibnamehash}{51860b9126424f337bf31284a4d5abd7}
+      \strng{authornamehash}{51860b9126424f337bf31284a4d5abd7}
+      \strng{authorfullhash}{51860b9126424f337bf31284a4d5abd7}
+      \field{sortinit}{T}
+      \field{sortinithash}{51f9faf24c60c62ca764a77f78cf5666}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{MapReduce - Konzept}
+      \field{urlday}{4}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \field{pages}{8\bibrangedash 16}
+      \range{pages}{9}
+      \verb{urlraw}
+      \verb https://dbs.uni-leipzig.de/file/seminar_0910_findling_König.pdf
+      \endverb
+      \verb{url}
+      \verb https://dbs.uni-leipzig.de/file/seminar_0910_findling_K%C3%B6nig.pdf
       \endverb
     \endentry
   \enddatalist
