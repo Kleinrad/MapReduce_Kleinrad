@@ -63,11 +63,94 @@ In most implementations of a MapReduce model an shuffle phase is carried out, be
 \subsubsection{Combine}
 To reduce the network traffic an additional combine phase can be used after mapping. Thereby the large amount of key/value pairs resulting from the mapping phase get reduced before they get transferred over the network. However, because of this local aggregation of data it is possible to slow down the instead through shuffling optimized process of reducing data.\footfullcite{hadoop}
 
+\section{Classes}
+
+The class structure in this project is oriented in the MapReduce solution Disco\footfullcite{discoDoc}. In contrast to the realization disco provides, only three parties are present in this project. Disco uses a central master to act as an interface between the client and the workers, which in disco are referred to as slaves. Additionally disco has a server role. This server manages a number of workers and acts as an intermediary between the worker and master. However the role of the server has not been realized in this implementation to steer away from high complexity and enable the realization of a reliably working model in the time-span of this project.
+
+\subsection{Master}
+
+The master acts as an interface connecting the clients to workers. Additionally the master acts as the central server accepting and managing all connections. To simplify handling these tasks, the master is supported by the ClientManager and WorkerManager. These run as independent threads and allow for a delimited program structure.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/Master}
+	\caption{Structure of the Master class.}
+	\label{fig:classes_Master}
+\end{figure}
+
+Figure \ref{fig:classes_Master} depicts the structure of the Master class. The Master contains instances of ClientManager and WorkerManager, which run in separately and take care of the tasks the master needs to handle. This leaves the core master class with an acceptConnection method, which asynchronously accepts asio clients, which are then delegated to either the WorkerManager or ClientManager.    
+
+
+\subsubsection{ClientManager}
+
+The ClientManager handels MapReduce client connections. Client refers to an human user of the MapReduce system. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{img/ClientManager}
+	\caption{Structure of the ClientManager class.}
+	\label{fig:classes_ClientManager}
+\end{figure}
+
+In order for the master to be able to add connections, the ClientManager provides a $join$ function. To support disconnecting clients, a $leave$ function is available. Both of these functions take an instance of a connection represented by a shared pointer on a ConnectionObject. By this means the ClientManager can keep track of ongoing client-master connections and acts as an communication interface between them.\newline 
+Additionally the $registerJob$ and $sendResult$ function are depicted in figure \ref{fig:classes_ClientManager}. These two functions handle job management on the client side of the master. Thereby ongoing jobs are being tracked and upon finishing the client gets sent the resulting data. Lastly the class contains a $generateID$ function, which is used to generate unique ids to identify clients.
+
+\subsubsection{WorkerManager}
+
+The WorkerManager works analogously to the ClientManager, whereas the WorkerManager handles the master-worker communication. The WorkerManager also provides $join$ and $leave$, which are used by the master to delegate connections. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.8\linewidth]{img/WorkerManager}
+	\caption{Structure of the WorkerManager class.}
+	\label{fig:classes_WorkerManager}
+\end{figure}
+
+Similarly to the ClientManager, the WorkerManager provides a $assignJob$ function. This function acts as the interface between the ClientManager and WorkerManger. The functionality of distributing a job received from a client is thereby realized. To allow for results to be forwarded to the WorkerManager, the functions $mapResult$ and $reduceResult$ exist. These methods are used by the ConnectionSession were communication takes place.\newline
+To increase fault-tolerance, WorkerManager provides a $reAssignTask$ function, which is used when a worker fails to properly perform its task. The $generateID$ function works the same as in the ClientManager and is used to uniquely identify workers.  
+
+\subsection{Client}
+
+The Client class represents the link between the user and the MapReduce system. It implements a user interface to enable the user to communicate with the system and place job requests. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/Client}
+	\caption{Structure of the Client class.}
+	\label{fig:classes_Client}
+\end{figure}
+
+In order to initiate the connection to the master server, the ClientManager implements a $signOn$ function. Similarly the class also provides a $signOff$ function to terminate the connection. The function $sendJob$, which is depicted in figure \ref{fig:classes_Client} is used to place job request. To enable visualization of job results, the functions $printResultsPlain$ as well as $printResultsHistogram$ are implemented by the ClientManager.
+
+\subsection{Worker}
+
+The Worker is the powerhouse of the MapReduce system. It handles the computation of tasks that are assigned by the master. For this purpose the Worker implements the functions $handleMap$ and $handleReduce$, which can theoretically be replaced by any kind of logic accepting and returning the same data types as MapReduce intends. 
+
+\begin{figure}[h]
+ 	\centering
+ 	\includegraphics[width=0.8\linewidth]{img/Worker}
+ 	\caption{Structure of the Worker class.}
+ 	\label{fig:classes_Worker}
+\end{figure}
+
+The $handleMap$ and $handleReduce$ functions take the type of job, data and job id as parameters. Whereas the $handleMap$ function accepts the raw data in the shape of a string, the $handleReduce$ function is provided with a set of key/value pairs.\newline
+To control the connection to the master, the functions $signOn$ and $signOff$ are provided which work analogously to the functions in the ClientManager.
+
+\section{Helper Classes}
+
+\subsection{ConnectionObject}
+
+\subsection{ConnectionSession}
+
+\subsection{Job}
+
+\subsubsection{ActiveJob}
+
+\subsection{MessageQueue}
+
+\subsubsection{QueueItem}
+
 \section{Class-diagram}
-
-
-\subsection{Classes}
-
 
 \section{Implementation}
 
