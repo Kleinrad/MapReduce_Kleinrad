@@ -33,35 +33,35 @@
 
 \section{Introduction}
 
-In this project the technology MapReduce is being simulated. Thereby a simple system has been developed to imitate a the functionality of an MapReduce application. All of the functionality in this project is written with C++17 and compiled with the help of the meson build system\footfullcite{meson}. The communication is based on the TCP protocol and realized using the C++ library asio\footfullcite{asio}.\newline
-Furthermore to increase performance and usability protocol buffers\footfullcite{protobuf} are utilized. Protocol Buffers enable the serialization of data structures in an efficient manner, which simplifies working with messages sent between parties in the MapReduce system.\newline
-To make use of the advantages of using a MapReduce architecture, a simple use-case consisting of counting the number of character occurrences in a plain text document. This kind of application was chosen due to its simplicity, which enables the focus of this project to stay on MapReduce rather than a test application. 
+In this project, the technology MapReduce is being simulated. Thereby a simple system has been developed to imitate the functionality of a MapReduce application. All of the functionality in this project is written with C++17 and compiled with the help of the meson build system\footfullcite{meson}. The communication is based on the TCP protocol and realized using the C++ library asio\footfullcite{asio}.\newline
+Furthermore, to increase performance and usability, protocol buffers\footfullcite{protobuf} are utilized. Protocol Buffers enable the serialization of data structures in an efficient manner, which simplifies working with messages sent between parties in the MapReduce system.\newline
+To make use of the advantages of a MapReduce architecture, a simple use-case consisting of counting the number of character occurrences in a plain text document has been implemented. This kind of application was chosen due to its simplicity, which enables the focus of this project to stay on MapReduce rather than a test application. 
 
 \section{MapReduce}
 
-MapReduce is a programming model developed to decrease computation time of large data sets. It was invented by Google, the reason being the need to compute various kinds of derived data. Examples would be inverted indices or representations of the graph structure of web documents. These applications all have simplicity in common, there are no complex operations needed to accomplish said tasks. Furthermore are these kinds of processes characterized by accepting large amounts of input data and reducing it to fraction of itself. MapReduce presents a solution to parallelization, fault-tolerance, data distribution and load balancing. Thereby it is based on the principle of map and reduce, which are eponymous for the technology.\footfullcite{mapreducePaper}
+MapReduce is a programming model developed to decrease the computation time of large data sets. It was invented by Google, the reason being the need to compute various kinds of derived data. Examples would be inverted indices or representations of the graph structure of web documents. These applications all have simplicity in common. There are no complex operations needed to accomplish said tasks. Furthermore are, these kinds of processes characterized by accepting large amounts of input data and reducing it to a fraction of itself. MapReduce presents a solution to parallelization, fault-tolerance, data distribution, and load balancing. It is based on the principle of map and reduce, which is eponymous for the technology.\footfullcite{mapreducePaper}
 
 \subsection{Input Data}
 
-MapReduce processes unstructured or semi-structured data. The system is designed to accept large amounts of data in bulk. In the first step of the MapReduce process, this data is being split into subsets, to allow for data distribution. The way this data is being divided depends on the implementation and the type of input data present. The result of splitting the raw data is a set of key/value pairs.\footfullcite{uniLeibzigMapReduce}
+MapReduce processes unstructured or semi-structured data. The system is designed to accept large amounts of data in bulk. In the first step of the MapReduce process, this data is split into subsets to allow for data distribution. The way this data is divided depends on the implementation and the type of input data present. The result of splitting the raw data is a set of key/value pairs.\footfullcite{uniLeibzigMapReduce}
 
 \subsection{Map}
 
-The map function accepts a set of key/value pairs, with the implementation being provided by the user. Result of this phase is once more a set of key/value pairs. These result pairs represent the significant information contained in the input data. These significant data pairs directly influence the result and all unneeded information is being discarded. The name map stems form assigning a quantity attribute which represents the value of the resulting pairs, to an quality attribute.\footcite{uniLeibzigMapReduce}\footcite{mapreducePaper}
+The map function accepts a set of key/value pairs, with the implementation being provided by the user. The result of this phase is once more a set of key/value pairs. These result pairs represent the significant information contained in the input data. These significant data pairs directly influence the result, and all unneeded information is discarded. The name map stems from assigning a quantity attribute representing the value of the resulting pairs to a quality attribute.\footcite{uniLeibzigMapReduce}\footcite{mapreducePaper}
 
 \subsection{Reduce}
 
-Sorted key/value pairs get passed to the reduce function, which groups and thereby reduces the set of data points. The logic of this grouping functionality depends on the application MapReduce is used for. For that reason the reduce function is also implemented by the user.\footcite{uniLeibzigMapReduce}
+Sorted key/value pairs get passed to the reduce function, which groups and reduces the set of data points. The logic of this grouping functionality depends on the application of MapReduce. For that reason, the reduce function is also implemented by the user.\footcite{uniLeibzigMapReduce}
 
 \pagebreak
 
 \subsection{Additional Phases}
 
 \subsubsection{Shuffle}
-In most implementations of a MapReduce model an shuffle phase is carried out, between the map and reduce phase. The shuffle phase is used to sort the resulting key/value pairs from the mapping phase. This is done in an effort to group similar keys into clusters which can than be reduced by a single worker.\footcite{uniLeibzigMapReduce}\newline
+In most implementations of a MapReduce model, a shuffle phase is carried out between the map and reduce phase. The shuffle phase sorts the resulting key/value pairs from the mapping phase. This is done to group similar keys into a cluster that can then be reduced by a single worker.\footcite{uniLeibzigMapReduce}\newline
 
 \subsubsection{Combine}
-To reduce the network traffic an additional combine phase can be used after mapping. Thereby the large amount of key/value pairs resulting from the mapping phase get reduced before they get transferred over the network. However, because of this local aggregation of data it is possible to slow down the instead through shuffling optimized process of reducing data.\footfullcite{hadoop}
+An additional combine phase can be used after mapping to reduce the network traffic. Thereby, the large number of key/value pairs resulting from the mapping phase are reduced before they are transferred over the network. However, because of this local aggregation of data, it is possible to slow down the instead through shuffling optimized process of reducing data.\footfullcite{hadoop}
 
 \section{Classes}
 
@@ -166,6 +166,7 @@ In an effort to increase fault-tolerance and detect broken connections the Conne
 \subsection{ConnectionSession}
 
 The ConnectionSession handles the communication between the master and workers as well as clients.
+The basic structure of implementing asio, multi-user communication this way, has been inspired by the asio-documentation
 
 \begin{figure}[h]
 	\centering
@@ -265,9 +266,40 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 	\label{fig:classDiagram}
 \end{figure}
 
+\section{Network communication}
 
-\section{Implementation}
+\subsection{asio}
 
+\subsection{protobuf}
+
+\subsection{Messages}
+
+\subsubsection{SignOn}
+
+
+\subsubsection{SignOff}
+
+\subsubsection{Confirm}
+
+\subsubsection{Authentication}
+
+\subsubsection{Assignment}
+
+\subsubsection{JobRequest}
+
+\subsubsection{TaskMap}
+
+\subsubsection{Ping}
+
+\subsubsection{ResultMap}
+
+\subsubsection{TaskReduce}
+
+\subsubsection{ResultReduce}
+
+\subsubsection{JobResult}
+
+\subsection{Implementation}
 
 \section{Usage}
 \label{usage}
