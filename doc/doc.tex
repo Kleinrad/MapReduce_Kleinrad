@@ -138,19 +138,133 @@ To control the connection to the master, the functions $signOn$ and $signOff$ ar
 
 \section{Helper Classes}
 
+\subsection{Pipe}
+
+To centralize the asio network connection the pipe class is used. It provides an network interface to simplify sending and receiving messages. Pipe uses a asio socket to transfer messages. Additionally the class ensures the thread safe usage of the socket. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.55\linewidth]{img/Pipe}
+	\caption{Structure of the Pipe class.}
+	\label{fig:classes_Pipe}
+\end{figure}
+
 \subsection{ConnectionObject}
+
+To represent client and worker connections the ConnectionObject is used. It provides structure for connections and stores important information to handle ongoing connections. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/ConnectionObject}
+	\caption{Structure of the ConnectionObject class.}
+	\label{fig:classes_ConnectionObject}
+\end{figure}
+
+To identify a ConnectionObject, it contains an id, as depicted in figure \ref{fig:classes_ConnectionObject}. This id is not unique across all ConnectionObjects, due to the distinction made between worker an client connection. Additionally the ConnectionObject stores information about the state of availability. However this attribute is only used in worker connections.\newline
+In an effort to increase fault-tolerance and detect broken connections the ConnectionObject stores the time, when the last message was received. Thereby it enables the server to periodically check connections and end them if no response has been received.
 
 \subsection{ConnectionSession}
 
+The ConnectionSession handles the communication between the master and workers as well as clients.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/ConnectionSession}
+	\caption{Structure of the ConnectionSession class.}
+	\label{fig:classes_ConnectionSession}
+\end{figure}
+
+To start the process of receiving and sending messages the ConnectionSession provides a $start$ function. Additionally the ConnectionSession implements the functions $sendMessage$, $isConnected$ and $closeConnection$ from the ConnectionObject class.  
+
+\pagebreak
 \subsection{Job}
+
+The Job class allows for uniform structure when processing jobs.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/Job}
+	\caption{Structure of the Job class.}
+	\label{fig:classes_Job}
+\end{figure}
+
+Job provides a variety of constructors to simplify using the Job class in all phases of the MapReduce process. To identify jobs it contains an id that is unique across all jobs. Furthermore a job stores information about the type of job and current status. The different states of a job are defined in the $JobStatus$ enum, depicted in figure \ref{fig:classes_JobStatus}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.3\linewidth]{img/JobStatus}
+	\caption{Enum containing job states.}
+	\label{fig:classes_JobStatus}
+\end{figure}
 
 \subsubsection{ActiveJob}
 
+To allow for tasks to be reassigned upon failure, the ActiveJob class provides all information to do so.
+Due to the reciprocally relationship between ActiveJob and Job, it is necessary to split the ActiveJob into two classes. The class ActiveJob, depicted in figure \ref{fig:classes_ActiveJob} is the derived from the class ActiveJobStruct, depicted in figure \ref{fig:classes_ActiveJobStruct}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.28\linewidth]{img/ActiveJob}
+	\caption{Structure of the ActiveJob class.}
+	\label{fig:classes_ActiveJob}
+\end{figure}
+
+The class ActiveJobStruct provides the structure of an active job. Thereby information of all phases of the MapReduce process are stored in an ActiveJob. Additionally to the attributes contained in the Job class, it also provides the possibility to store the data each worker is currently processing.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\linewidth]{img/ActiveJobStruct}
+	\caption{Structure of the ActiveJobStruct class.}
+	\label{fig:classes_ActiveJobStruct}
+\end{figure}
+\pagebreak
+
 \subsection{MessageQueue}
+
+Due to communication taking place between multiple parties, it is important to serialize the processing of messages. This concept can be realized by using a queue, in this project realized through the MessageQueue class, depicted in figure \ref{fig:classes_MessageQueue}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\linewidth]{img/MessageQueue}
+	\caption{Structure of the MessageQueue class.}
+	\label{fig:classes_MessageQueue}
+\end{figure}
+
+To implement the functionality of a queue, MessageQueue uses the queue datatype provided by c++. Additionally the MessageQueue ensures that access to the queue happens in a thread save manner. 
 
 \subsubsection{QueueItem}
 
+To store the data of an item in the queue, the QueueItem class provides the needed structure. 
+The QueueItem stores data that can be received by the master from workers.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.55\linewidth]{img/QueueItem}
+	\caption{Structure of the QueueItem class.}
+	\label{fig:classes_QueueItem}
+\end{figure}
+
+\subsection{MessageGenerator}
+
+In an effort to simplify working with protobuf messages, the MessageGenerator provides a variety of functions that return the respective message. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.95\linewidth]{img/MessageGenerator}
+	\caption{Structure of the MessageGenerator class.}
+	\label{fig:classes_MessageGenerator}
+\end{figure}
+
+\pagebreak
 \section{Class-diagram}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{img/ClassDiagram}
+	\caption{UML class diagram, representing the structure of this project.}
+	\label{fig:classDiagram}
+\end{figure}
+
 
 \section{Implementation}
 
