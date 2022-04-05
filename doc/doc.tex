@@ -251,7 +251,7 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=0.95\linewidth]{img/MessageGenerator}
+	\includegraphics[width=0.90\linewidth]{img/MessageGenerator}
 	\caption{Structure of the MessageGenerator class.}
 	\label{fig:classes_MessageGenerator}
 \end{figure}
@@ -259,7 +259,7 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 \pagebreak
 \section{Class-diagram}
 
-\begin{figure}[h]
+\begin{figure}[hp]
 	\centering
 	\includegraphics[width=0.9\linewidth]{img/ClassDiagram}
 	\caption{UML class diagram, representing the structure of this project.}
@@ -268,11 +268,14 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 
 \section{Network communication}
 
-\subsection{asio}
-
 \subsection{protobuf}
 
+Protobuf is used to send structured data over a asio TCP connection. In this project the version proto3 is being used. Protocol Buffers allow you to define a the structure of the message. This happens in a '.proto' file, which is than compiled with the help of protoc. Protobuf supports a variaty of different programming languages, in case of C++ protobuf generates header files. These contain the code necessary to instantiate predefined message objects and serialize or parse them.  
+
 \subsection{Messages}
+
+\subsubsection{Authentication}
+An Authentication message is used to identify the type of connection. In this project there are two possible types, client or worker. Upon successfully connecting to the master an Authentication with the respective connection type is being sent. 
 
 \subsubsection{Assignment}
 The Assignment message is used to assign ids to worker and clients. An Assignment is sent in the ConnectionSession after a new connection gets accepted by the master. It contains the id that the connection partner gets assigned and the type of connection, either client or worker.
@@ -304,7 +307,21 @@ The JobResult is the reply to the client from the master after finishing the job
 \subsubsection{Ping}
 The Ping message is used for checking connections. After the master detects a worker being inactive for an extended period of time it sends pings in one second intervals until a reply is received or five pings are sent. If a worker receives a Ping it replies with a Ping message.
 
-\subsection{Implementation}
+\subsection{Sequence Diagram}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{img/SequenceDiagramPart1}
+	\caption{Sequence diagram depicting the network traffic of the MapReduce system. Continued in figure \ref{fig:sequenceDiagramPart2}}
+	\label{fig:sequenceDiagramPart1}
+\end{figure}
+
+\begin{figure}[hp]
+	\centering
+	\includegraphics[width=0.75\linewidth]{img/SequenceDiagramPart2}
+	\caption{Sequence diagram}
+	\label{fig:sequenceDiagramPart2}
+\end{figure}
 
 \section{Usage}
 \label{usage}
@@ -317,7 +334,41 @@ The Ping message is used for checking connections. After the master detects a wo
 \newpage
 
 \section{Project Structure}
-
+\dirtree{%
+	.1 /.
+	.2 LICENSE.
+	.2 meson\_options.txt.
+	.2 meson.build.
+	.2 README.md.
+	.2 CHANGELOG.org.
+	.2 config.json.
+	.2 include.
+	.3 client.h.
+	.3 clientmanager.h.
+	.3 connectionobject.hpp.
+	.3 connectionsession.h.
+	.3 job.hpp.
+	.3 master.h.
+	.3 messageQueue.hpp.
+	.3 pipe.hpp.
+	.3 protoutils.hpp.
+	.3 worker.h.
+	.3 workermanager.h.
+	.2 src.
+	.3 Message.proto.
+	.3 client.hpp.
+	.3 clientmanager.hpp.
+	.3 connectionsession.cpp.
+	.3 master.cpp.
+	.3 worker.cpp.
+	.3 workermanager.cpp.
+	.2 doc.
+	.3 doc.pdf.
+	.3 doc.tex.
+	.3 references.bib.
+	.3 meson.build.
+	.2 build.
+}\hfill
 
 % .bib include & references
 \newpage
