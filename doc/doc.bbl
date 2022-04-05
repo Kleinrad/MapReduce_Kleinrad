@@ -102,6 +102,38 @@
       \verb https://disco.readthedocs.io/en/develop/index.html
       \endverb
     \endentry
+    \entry{nlohmannJson}{misc}{}
+      \field{sortinit}{J}
+      \field{sortinithash}{c45040a764d616897e7f5b30174d7b92}
+      \field{labeltitlesource}{title}
+      \field{title}{JSON for Modern C++}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://github.com/nlohmann/json
+      \endverb
+      \verb{url}
+      \verb https://github.com/nlohmann/json
+      \endverb
+    \endentry
+    \entry{mapreduceRepo}{misc}{}
+      \field{sortinit}{k}
+      \field{sortinithash}{d3edc18d54b9438a72c24c925bfb38f4}
+      \field{labeltitlesource}{title}
+      \field{title}{kleinrad_project}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://github.com/Kleinrad/kleinrad_project
+      \endverb
+      \verb{url}
+      \verb https://github.com/Kleinrad/kleinrad_project
+      \endverb
+    \endentry
     \entry{hadoop}{misc}{}
       \field{sortinit}{M}
       \field{sortinithash}{2e5c2f51f7fa2d957f3206819bf86dc3}

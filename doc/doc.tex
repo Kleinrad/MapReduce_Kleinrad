@@ -65,11 +65,11 @@ An additional combine phase can be used after mapping to reduce the network traf
 
 \section{Classes}
 
-The class structure in this project is oriented in the MapReduce solution Disco\footfullcite{discoDoc}. In contrast to the realization disco provides, only three parties are present in this project. Disco uses a central master to act as an interface between the client and the workers, which in disco are referred to as slaves. Additionally disco has a server role. This server manages a number of workers and acts as an intermediary between the worker and master. However the role of the server has not been realized in this implementation to steer away from high complexity and enable the realization of a reliably working model in the time-span of this project.
+The class structure in this project is oriented in the MapReduce solution Disco\footfullcite{discoDoc}. In contrast to the realization, disco provides, only three parties are present in this project. Disco uses a central master to act as an interface between the client and the workers, which are referred to as slaves in disco. Additionally, disco has a server role. This server manages several workers and acts as an intermediary between the worker and master. However, the role of the server has not been realized in this implementation to steer away from high complexity and enable the realization of a reliably working model in the time span of this project.
 
 \subsection{Master}
 
-The master acts as an interface connecting the clients to workers. Additionally the master acts as the central server accepting and managing all connections. To simplify handling these tasks, the master is supported by the ClientManager and WorkerManager. These run as independent threads and allow for a delimited program structure.
+The master acts as an interface connecting the clients to workers. Additionally, the master acts as the central server accepting and managing all connections. To simplify handling these tasks, the master is supported by the ClientManager and WorkerManager. These run as independent threads and allow for a delimited program structure.
 
 \begin{figure}[h]
 	\centering
@@ -78,12 +78,12 @@ The master acts as an interface connecting the clients to workers. Additionally 
 	\label{fig:classes_Master}
 \end{figure}
 
-Figure \ref{fig:classes_Master} depicts the structure of the Master class. The Master contains instances of ClientManager and WorkerManager, which run in separately and take care of the tasks the master needs to handle. This leaves the core master class with an acceptConnection method, which asynchronously accepts asio clients, which are then delegated to either the WorkerManager or ClientManager.    
+Figure \ref{fig:classes_Master} depicts the structure of the Master class. The master contains instances of ClientManager and WorkerManager, which run separately and take care of the tasks the master needs to handle. This leaves the core master class with an acceptConnection method, which asynchronously accepts asio clients, which are then delegated to either the WorkerManager or ClientManager.    
 
 
 \subsubsection{ClientManager}
 
-The ClientManager handels MapReduce client connections. Client refers to an human user of the MapReduce system. 
+The ClientManager handels MapReduce client connections. The client refers to a human user of the MapReduce system. 
 
 \begin{figure}[h]
 	\centering
@@ -92,12 +92,12 @@ The ClientManager handels MapReduce client connections. Client refers to an huma
 	\label{fig:classes_ClientManager}
 \end{figure}
 
-In order for the master to be able to add connections, the ClientManager provides a $join$ function. To support disconnecting clients, a $leave$ function is available. Both of these functions take an instance of a connection represented by a shared pointer on a ConnectionObject. By this means the ClientManager can keep track of ongoing client-master connections and acts as an communication interface between them.\newline 
-Additionally the $registerJob$ and $sendResult$ function are depicted in figure \ref{fig:classes_ClientManager}. These two functions handle job management on the client side of the master. Thereby ongoing jobs are being tracked and upon finishing the client gets sent the resulting data. Lastly the class contains a $generateID$ function, which is used to generate unique ids to identify clients.
+For the master to be able to add connections, the ClientManager provides a $join$ function. To support disconnecting clients, a $leave$ function is available. These functions take an instance of a connection represented by a shared pointer on a connection object. This means the ClientManager can keep track of ongoing client-master connections and act as a communication interface between them.\newline 
+Additionally the $registerJob$ and $sendResult$ function are depicted in figure \ref{fig:classes_ClientManager}. These two functions handle job management on the client-side of the master. Thereby ongoing jobs are being tracked, and upon finishing, the client gets sent the resulting data. Lastly, the class contains a $generateID$ function, which generates unique ids to identify clients.
 
 \subsubsection{WorkerManager}
 
-The WorkerManager works analogously to the ClientManager, whereas the WorkerManager handles the master-worker communication. The WorkerManager also provides $join$ and $leave$, which are used by the master to delegate connections. 
+The WorkerManager works analogously to the ClientManager, whereas the WorkerManager handles the master-worker communication. The WorkerManager also provides $join$ and $leave$, which are used by the master to delegate connections.  
 
 \begin{figure}[h]
 	\centering
@@ -106,8 +106,8 @@ The WorkerManager works analogously to the ClientManager, whereas the WorkerMana
 	\label{fig:classes_WorkerManager}
 \end{figure}
 
-Similarly to the ClientManager, the WorkerManager provides a $assignJob$ function. This function acts as the interface between the ClientManager and WorkerManger. The functionality of distributing a job received from a client is thereby realized. To allow for results to be forwarded to the WorkerManager, the functions $mapResult$ and $reduceResult$ exist. These methods are used by the ConnectionSession were communication takes place.\newline
-To increase fault-tolerance, WorkerManager provides a $reAssignTask$ function, which is used when a worker fails to properly perform its task. The $generateID$ function works the same as in the ClientManager and is used to uniquely identify workers.  
+Similar to the ClientManager, the WorkerManager provides a $assignJob$ function. This function acts as the interface between the ClientManager and WorkerManger. The functionality of distributing a job received from a client is thereby realized. To allow for results to be forwarded to the WorkerManager, the functions $mapResult$ and $reduceResult$ exist. These methods are used by the ConnectionSession, where communication takes place.\newline
+To increase fault-tolerance, WorkerManager provides a $reAssignTask$ function, which is used when a worker fails to perform its task correctly. The $generateID$ function works the same as in the ClientManager and is used to identify workers uniquely.  
 
 \subsection{Client}
 
@@ -120,11 +120,11 @@ The Client class represents the link between the user and the MapReduce system. 
 	\label{fig:classes_Client}
 \end{figure}
 
-In order to initiate the connection to the master server, the ClientManager implements a $signOn$ function. Similarly the class also provides a $signOff$ function to terminate the connection. The function $sendJob$, which is depicted in figure \ref{fig:classes_Client} is used to place job request. To enable visualization of job results, the functions $printResultsPlain$ as well as $printResultsHistogram$ are implemented by the ClientManager.
+In order to initiate the connection to the master server, the ClientManager implements a $signOn$ function. Similarly, the class also provides a $signOff$ function to terminate the connection. The function $sendJob$, which is depicted in figure \ref{fig:classes_Client} is used to place job request. To enable visualization of job results, the functions $printResultsPlain$ as well as $printResultsHistogram$ are implemented by the ClientManager.The Client class represents the link between the user and the MapReduce system. It implements a user interface to enable the user to communicate with the system and place job requests. 
 
 \subsection{Worker}
 
-The Worker is the powerhouse of the MapReduce system. It handles the computation of tasks that are assigned by the master. For this purpose the Worker implements the functions $handleMap$ and $handleReduce$, which can theoretically be replaced by any kind of logic accepting and returning the same data types as MapReduce intends. 
+The Worker is the powerhouse of the MapReduce system. It handles the computation of tasks that are assigned by the master. For this purpose, the Worker implements the functions $handleMap$ and $handleReduce$, which can theoretically be replaced by any logic accepting and returning the same data types as MapReduce intends. 
 
 \begin{figure}[h]
  	\centering
@@ -133,14 +133,14 @@ The Worker is the powerhouse of the MapReduce system. It handles the computation
  	\label{fig:classes_Worker}
 \end{figure}
 
-The $handleMap$ and $handleReduce$ functions take the type of job, data and job id as parameters. Whereas the $handleMap$ function accepts the raw data in the shape of a string, the $handleReduce$ function is provided with a set of key/value pairs.\newline
-To control the connection to the master, the functions $signOn$ and $signOff$ are provided which work analogously to the functions in the ClientManager.
+The $handleMap$ and $handleReduce$ functions take the type of job, data, and job id as parameters. Whereas the $handleMap$ function accepts the raw data in the shape of a string, the $handleReduce$ function is provided with a set of key/value pairs.\newline
+To control the connection to the master, the functions $signOn$ and $signOff$ are provided, which work analogously to the functions in the ClientManager.
 
 \section{Helper Classes}
 
 \subsection{Pipe}
 
-To centralize the asio network connection the pipe class is used. It provides an network interface to simplify sending and receiving messages. Pipe uses a asio socket to transfer messages. Additionally the class ensures the thread safe usage of the socket. 
+To centralize the asio network connection, the pipe class is used. It provides a network interface to simplify sending and receiving messages. The pipe uses an asio socket to transfer messages. Additionally, the class ensures the thread-safe access to the socket. 
 
 \begin{figure}[h]
 	\centering
@@ -151,7 +151,7 @@ To centralize the asio network connection the pipe class is used. It provides an
 
 \subsection{ConnectionObject}
 
-To represent client and worker connections the ConnectionObject is used. It provides structure for connections and stores important information to handle ongoing connections. 
+To represent the client and worker connections, the ConnectionObject is used. It provides structure for connections and stores vital information used for handling ongoing connections. 
 
 \begin{figure}[h]
 	\centering
@@ -160,8 +160,8 @@ To represent client and worker connections the ConnectionObject is used. It prov
 	\label{fig:classes_ConnectionObject}
 \end{figure}
 
-To identify a ConnectionObject, it contains an id, as depicted in figure \ref{fig:classes_ConnectionObject}. This id is not unique across all ConnectionObjects, due to the distinction made between worker an client connection. Additionally the ConnectionObject stores information about the state of availability. However this attribute is only used in worker connections.\newline
-In an effort to increase fault-tolerance and detect broken connections the ConnectionObject stores the time, when the last message was received. Thereby it enables the server to periodically check connections and end them if no response has been received.
+To identify a ConnectionObject, it contains an id, as depicted in figure \ref{fig:classes_ConnectionObject}. This id is not unique across all ConnectionObjects due to the distinction between worker and client connections. Additionally, the ConnectionObject stores information about the state of availability. However, this attribute is only used in worker connections.\newline
+In an effort to increase fault-tolerance and detect broken connections the ConnectionObject stores the time, when the last message was received. It enables the server to periodically check connections and end them if no response has been received.
 
 \subsection{ConnectionSession}
 
@@ -189,7 +189,7 @@ The Job class allows for uniform structure when processing jobs.
 	\label{fig:classes_Job}
 \end{figure}
 
-Job provides a variety of constructors to simplify using the Job class in all phases of the MapReduce process. To identify jobs it contains an id that is unique across all jobs. Furthermore a job stores information about the type of job and current status. The different states of a job are defined in the $JobStatus$ enum, depicted in figure \ref{fig:classes_JobStatus}.
+Job provides a variety of constructors to simplify using the Job class in all phases of the MapReduce process. It contains an id that is unique across all jobs to identify jobs. Furthermore, a job stores information about the type of job and current status. The different states of a job are defined in the $JobStatus$ enum, depicted in figure \ref{fig:classes_JobStatus}.
 
 \begin{figure}[h]
 	\centering
@@ -200,8 +200,8 @@ Job provides a variety of constructors to simplify using the Job class in all ph
 
 \subsubsection{ActiveJob}
 
-To allow for tasks to be reassigned upon failure, the ActiveJob class provides all information to do so.
-Due to the reciprocally relationship between ActiveJob and Job, it is necessary to split the ActiveJob into two classes. The class ActiveJob, depicted in figure \ref{fig:classes_ActiveJob} is the derived from the class ActiveJobStruct, depicted in figure \ref{fig:classes_ActiveJobStruct}.
+To allow for tasks to be reassigned upon failure, the ActiveJob class provides all information.
+Due to the reciprocal relationship between ActiveJob and Job, it is necessary to split the ActiveJob into two classes. The class ActiveJob, depicted in figure \ref{fig:classes_ActiveJob} is the derived from the class ActiveJobStruct, depicted in figure \ref{fig:classes_ActiveJobStruct}.
 
 \begin{figure}[h]
 	\centering
@@ -210,7 +210,7 @@ Due to the reciprocally relationship between ActiveJob and Job, it is necessary 
 	\label{fig:classes_ActiveJob}
 \end{figure}
 
-The class ActiveJobStruct provides the structure of an active job. Thereby information of all phases of the MapReduce process are stored in an ActiveJob. Additionally to the attributes contained in the Job class, it also provides the possibility to store the data each worker is currently processing.
+The class ActiveJobStruct provides the structure of an active job. Thereby information on all phases of the MapReduce process is stored in an ActiveJob. Additionally, to the attributes contained in the Job class, it also allows storing the data each worker is currently processing.
 
 \begin{figure}[h]
 	\centering
@@ -222,7 +222,7 @@ The class ActiveJobStruct provides the structure of an active job. Thereby infor
 
 \subsection{MessageQueue}
 
-Due to communication taking place between multiple parties, it is important to serialize the processing of messages. This concept can be realized by using a queue, in this project realized through the MessageQueue class, depicted in figure \ref{fig:classes_MessageQueue}.
+Due to communication taking place between multiple parties, it is crucial to serialize the processing of messages. This concept can be realized by using a queue, in this project realized through the MessageQueue class, depicted in figure \ref{fig:classes_MessageQueue}.
 
 \begin{figure}[h]
 	\centering
@@ -231,7 +231,7 @@ Due to communication taking place between multiple parties, it is important to s
 	\label{fig:classes_MessageQueue}
 \end{figure}
 
-To implement the functionality of a queue, MessageQueue uses the queue datatype provided by c++. Additionally the MessageQueue ensures that access to the queue happens in a thread save manner. 
+To implement the functionality of a queue, MessageQueue uses the queue data type provided by c++. Additionally, MessageQueue ensures that access to the queue happens in a thread save manner. 
 
 \subsubsection{QueueItem}
 
@@ -247,7 +247,7 @@ The QueueItem stores data that can be received by the master from workers.
 
 \subsection{MessageGenerator}
 
-In an effort to simplify working with protobuf messages, the MessageGenerator provides a variety of functions that return the respective message. 
+To simplify working with protobuf messages, the MessageGenerator provides various functions that return the respective message. 
 
 \begin{figure}[h]
 	\centering
@@ -262,7 +262,7 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 \begin{figure}[hp]
 	\centering
 	\includegraphics[width=0.9\linewidth]{img/ClassDiagram}
-	\caption{UML class diagram, representing the structure of this project.}
+	\caption{UML class diagram representing the structure of this project.}
 	\label{fig:classDiagram}
 \end{figure}
 
@@ -270,42 +270,42 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 
 \subsection{protobuf}
 
-Protobuf is used to send structured data over a asio TCP connection. In this project the version proto3 is being used. Protocol Buffers allow you to define a the structure of the message. This happens in a '.proto' file, which is than compiled with the help of protoc. Protobuf supports a variaty of different programming languages, in case of C++ protobuf generates header files. These contain the code necessary to instantiate predefined message objects and serialize or parse them.  
+Protobuf is used to send structured data over an asio TCP connection. In this project, the version proto3 is being used. Protocol Buffers allow for defining the structure of a message. This happens in a '.proto' file, which is then compiled with the help of protoc. Protobuf supports a variety of different programming languages. In the case of C++, protobuf generates header files. These contain the code necessary to instantiate predefined message objects and serialize or parse them.  
 
 \subsection{Messages}
 
 \subsubsection{Authentication}
-An Authentication message is used to identify the type of connection. In this project there are two possible types, client or worker. Upon successfully connecting to the master an Authentication with the respective connection type is being sent. 
+An Authentication message is used to identify the type of connection. In this project, there are two possible types, client or worker. Upon successfully connecting to the master, an Authentication with the respective connection type is sent. 
 
 \subsubsection{Assignment}
-The Assignment message is used to assign ids to worker and clients. An Assignment is sent in the ConnectionSession after a new connection gets accepted by the master. It contains the id that the connection partner gets assigned and the type of connection, either client or worker.
+The Assignment message is used to assign ids to workers and clients. An Assignment is sent in the ConnectionSession after a new connection gets accepted by the master. It contains the id that the connection partner gets assigned and the type of connection, either client or worker.
 
 \subsubsection{SignOff}
-A SignOff message is either sent from a worker or client upon encountering an error which results in the termination of the program. This is performed to let the master know when a client or worker is no longer available. The SignOff message can also be sent from master to client or worker to force them to stop. This behavior can be observed when the master program terminates. A SignOff contains the id of client or worker that is about to disconnect and the respective connection type.
+A SignOff message is either sent from a worker or client upon encountering an error that results in the program's termination. This is performed to let the master know when a client or worker is no longer available. The SignOff message can also be sent from master to client or worker to force them to stop. This behavior can be observed when the master program terminates. A SignOff contains the id of client or worker that is about to disconnect and the respective connection type.
 
 \subsubsection{Confirm}
-A Confirm is used the ensure that important messages have been delivered. An example of its application is to confirm that an Assignment has been delivered. This is especially important, because all later communication is based on ids. If a client or worker hasn't been assigned an id, it would not be possible for future messages to be accepted by the master, due to the lack of identification of the sender. 
+A Confirm is used the ensure that important messages have been delivered. An example of its application is to confirm that an Assignment has been delivered. This is especially important because all later communication is based on ids. If a client or worker has not been assigned an id, it would not be possible for future messages to be accepted by the master due to the lack of identification of the sender. 
 
 \subsubsection{TaskMap}
-The TaskMap message gets sent from master to worker to assign a task to the respective worker along with the needed information to perform it. The message contains the job id which uniquely identifies the job. This is important information to match the result sent by the worker to the original job. Furthermore the type of job and data is being transferred.
+The TaskMap message gets sent from master to worker to assign a task to the respective worker along with the needed information to perform it. The message contains the job id, which uniquely identifies the job. This represents essential information to match the result sent by the worker to the original job. Furthermore, the type of job and data is being transferred.
 
 \subsubsection{TaskReduce}
-The TaskReduce message works analogously to the TaskMap message. Instead of the data consisting of a string, that being the case with TaskMap, in TaskReduce the data gets transferred in the shape of key/value pairs. 
+The TaskReduce message works analogously to the TaskMap message. However, instead of the data consisting of a string, that being the case with TaskMap, in TaskReduce, the data gets transferred in the shape of key/value pairs. 
 
 \subsubsection{ResultMap}
-ResultMap is a message that is sent by the worker upon finishing the mapping task. It contains the result of the mapping in the form of key/value pairs. Furthermore it contains the job id, to enable the master to match tasks to jobs.
+ResultMap is a message that is sent by the worker upon finishing the mapping task. It contains the mapping result in the form of key/value pairs. Furthermore, it contains the job id to enable the master to match tasks to jobs.
 
 \subsubsection{ResultReduce}
-ResultReduce gets sent by the worker upon finishing the reduce task. The result is transferred in the shape of key/value pairs. Additionally it contains the id of the job. 
+ResultReduce gets sent by the worker upon finishing the reduce task. The result is transferred in the shape of key/value pairs. Additionally, it contains the id of the job. 
 
 \subsubsection{JobRequest}
-A JobRequest is sent from client to master. It contains information on the job that is to be performed, along with the data to be processed. Furthermore the client can specify the amount of mapping workers and reducing worker it desires. 
+A JobRequest is sent from client to master. It contains information on the job to be performed and the data to be processed. Furthermore, the client can specify the number of mapping workers and reducing worker it desires. 
 
 \subsubsection{JobResult}
 The JobResult is the reply to the client from the master after finishing the job. It contains the result of the MapReduce operation in the form of key/value pairs.  
 
 \subsubsection{Ping}
-The Ping message is used for checking connections. After the master detects a worker being inactive for an extended period of time it sends pings in one second intervals until a reply is received or five pings are sent. If a worker receives a Ping it replies with a Ping message.
+The Ping message is used for checking connections. After the master detects a worker being inactive for an extended period of time it sends pings in one-second intervals until a reply is received or five pings have been sent. If a worker receives a Ping, it replies with a Ping message.
 
 \subsection{Sequence Diagram}
 
@@ -323,13 +323,72 @@ The Ping message is used for checking connections. After the master detects a wo
 	\label{fig:sequenceDiagramPart2}
 \end{figure}
 
+\section{Parallelization and fault-tolerance}
+
+The characteristic of a MapReduce system is its ability of parallel and fault-tolerant processing. This is also, to an extent, realized in this project.\newline
+Upon starting a MapReduce master it accepts a variable amount of workers and clients. If a client places a job request while no workers are available, then the job gets queued by the WorkerManager and assigned to workers when available. This allows multiple clients to place jobs simultaneously without discarding jobs unable to process at the current time.\newline
+The premise of MapReduce being distributed computation of one whole operation is vulnerable to failing at the weakest link in the chain. To prevent this from happening, the master can reassign failed tasks. These failed tasks behave the same as jobs. If no workers are currently available, they get queued. In the case of multiple tasks failing from the same job, they get merged into one job and distributed to workers once available.\newline
+There are different reasons why a worker fails his task. The easiest for the master to detect is if a SignOff message is received from a worker that is currently assigned a task. If the worker is unable to communicate over the network, the master will timeout the connection after 15 seconds since the last response and reassign the task. 
+
 \section{Usage}
 \label{usage}
 
-\subsection{Command Line Arguments}
+To use MapReduce, clone the repository Kleinrad/kleinrad\_project\footfullcite{mapreduceRepo}. After all dependencies listed in section \ref{libraries} are satisfied, compile the project via meson. To ensure a successful build use meson 0.59.1+. Once compiled the three executables have been generated: $mr\_worker$, $mr\_master$, and $mr\_client$.\newline
+Start the $mr\_master$, which then will wait for incoming connections. After that, it is possible to start as many $mr\_worker$s and $mr\_client$s as needed. To place a request, use the command line interface provided by the client.
+
+\subsection{Command Line}
+The Client supports a variety of command-line arguments and commands.
+
+\subsubsection{Arguments} 
+\begin{itemize}
+	\item [\textbf{ip}] - specify ip-address of MapReduce master 
+	\item [\textbf{port}] - specify MapReduce port
+\end{itemize} 
+
+\subsubsection{Commands}
+Furthermore, the client provides a command-line interface to place job requests and display job results. The available commands consist of:
+
+\begin{itemize}
+	\item [\textbf{help}] - print available commands, along with parameters
+	\item [\textbf{quit}] - end client session
+	\item [\textbf{send}] - send a job request
+	\item [\textbf{print}] - print last job results
+\end{itemize}
+
+The $send$ and $print$ commands accept parameters to specify the request further.
+
+\begin{itemize}
+	\item [\textbf{send}] $<jobType>\ [-f]\ <data>$
+\end{itemize} 
+
+The job type can either be 0 or 1. These represent different reduce operations.
+Job type 0 counts the number of character occurrences, whereas job type 1 counts the number of word occurrences. The optional parameter $-f$ can be used to provide a txt file as the input data. If the parameter $-f$ is non-existent, the $data$ can be a string of variable length.\newline
+To display the results returned to the client, the $print$ command can be used.
+\begin{itemize}
+	\item [\textbf{print}] $[-s]\ <printType>$
+\end{itemize}  
+The print command has the optional parameter $-s$. Thru the use of this parameter, the output will be sorted by the value of the results. Furthermore, the print command requires a $printType$ to be specified. This can either be 0 or 1. Print type 0 returns a list containing the results of the last job, along with the percentage share per occurrence relative to the whole input text. Print type 1 prints the results as a Histogram. 
+
 
 \subsubsection{Configuration}
+The configuration is performed via json. To use json in c++ the nlohmann json library\footfullcite{nlohmannJson} is used. With this json file, the port of the master and the ip and port a worker connects to are specified.
 
+\section{Libraries}
+\label{libraries}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{l|l}
+		Purpose                       & Technology \\ \hline
+		Build Tool				 	  & Meson 	   \\
+		Command line interface	      & CLI11      \\
+		Configuration files           & json       \\
+		Data serialization            & protobuf   \\
+		Logging                       & spdlog     \\
+		Network Communication         & asio       \\
+		Programming Language		  & C++ 17 \\
+	\end{tabular}
+	\caption{In this table used external technologies are listed.}
+\end{table}
 
 \newpage
 
@@ -366,7 +425,6 @@ The Ping message is used for checking connections. After the master detects a wo
 	.3 doc.pdf.
 	.3 doc.tex.
 	.3 references.bib.
-	.3 meson.build.
 	.2 build.
 }\hfill
 
