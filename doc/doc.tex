@@ -166,7 +166,7 @@ In an effort to increase fault-tolerance and detect broken connections the Conne
 \subsection{ConnectionSession}
 
 The ConnectionSession handles the communication between the master and workers as well as clients.
-The basic structure of implementing asio, multi-user communication this way, has been inspired by the asio-documentation
+The basic structure of implementing asio, multi-user communication this way, has been inspired by the asio-documentation\footfullcite{asioMultiuser}.
 
 \begin{figure}[h]
 	\centering
@@ -274,30 +274,35 @@ In an effort to simplify working with protobuf messages, the MessageGenerator pr
 
 \subsection{Messages}
 
-\subsubsection{SignOn}
-
+\subsubsection{Assignment}
+The Assignment message is used to assign ids to worker and clients. An Assignment is sent in the ConnectionSession after a new connection gets accepted by the master. It contains the id that the connection partner gets assigned and the type of connection, either client or worker.
 
 \subsubsection{SignOff}
+A SignOff message is either sent from a worker or client upon encountering an error which results in the termination of the program. This is performed to let the master know when a client or worker is no longer available. The SignOff message can also be sent from master to client or worker to force them to stop. This behavior can be observed when the master program terminates. A SignOff contains the id of client or worker that is about to disconnect and the respective connection type.
 
 \subsubsection{Confirm}
-
-\subsubsection{Authentication}
-
-\subsubsection{Assignment}
-
-\subsubsection{JobRequest}
+A Confirm is used the ensure that important messages have been delivered. An example of its application is to confirm that an Assignment has been delivered. This is especially important, because all later communication is based on ids. If a client or worker hasn't been assigned an id, it would not be possible for future messages to be accepted by the master, due to the lack of identification of the sender. 
 
 \subsubsection{TaskMap}
-
-\subsubsection{Ping}
-
-\subsubsection{ResultMap}
+The TaskMap message gets sent from master to worker to assign a task to the respective worker along with the needed information to perform it. The message contains the job id which uniquely identifies the job. This is important information to match the result sent by the worker to the original job. Furthermore the type of job and data is being transferred.
 
 \subsubsection{TaskReduce}
+The TaskReduce message works analogously to the TaskMap message. Instead of the data consisting of a string, that being the case with TaskMap, in TaskReduce the data gets transferred in the shape of key/value pairs. 
+
+\subsubsection{ResultMap}
+ResultMap is a message that is sent by the worker upon finishing the mapping task. It contains the result of the mapping in the form of key/value pairs. Furthermore it contains the job id, to enable the master to match tasks to jobs.
 
 \subsubsection{ResultReduce}
+ResultReduce gets sent by the worker upon finishing the reduce task. The result is transferred in the shape of key/value pairs. Additionally it contains the id of the job. 
+
+\subsubsection{JobRequest}
+A JobRequest is sent from client to master. It contains information on the job that is to be performed, along with the data to be processed. Furthermore the client can specify the amount of mapping workers and reducing worker it desires. 
 
 \subsubsection{JobResult}
+The JobResult is the reply to the client from the master after finishing the job. It contains the result of the MapReduce operation in the form of key/value pairs.  
+
+\subsubsection{Ping}
+The Ping message is used for checking connections. After the master detects a worker being inactive for an extended period of time it sends pings in one second intervals until a reply is received or five pings are sent. If a worker receives a Ping it replies with a Ping message.
 
 \subsection{Implementation}
 

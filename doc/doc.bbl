@@ -35,6 +35,22 @@
       \verb https://think-async.com/Asio/
       \endverb
     \endentry
+    \entry{asioMultiuser}{misc}{}
+      \field{sortinit}{c}
+      \field{sortinithash}{4c244ceae61406cdc0cc2ce1cb1ff703}
+      \field{labeltitlesource}{title}
+      \field{title}{chat_server.cpp}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/example/cpp11/chat/chat_server.cpp
+      \endverb
+      \verb{url}
+      \verb https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/example/cpp11/chat/chat_server.cpp
+      \endverb
+    \endentry
     \entry{mapreducePaper}{misc}{}
       \name{author}{2}{}{%
         {{hash=4aecfb0cc2e1e3b7899129fa2a94e2b8}{%
