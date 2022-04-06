@@ -17,7 +17,7 @@ ConnectionSession::ConnectionSession(WorkerManager &workerManager,
                             asio::ip::tcp::socket socket) 
     : ConnectionObject(), workerManager(workerManager), 
     clientManager(clientManager), pipe(Pipe(std::move(socket))) {
-        last_active = std::chrono::system_clock::now();
+        lastActive = std::chrono::system_clock::now();
         queueThread = new std::thread(&ConnectionSession::checkMessageQueue, this);
         queueThread->detach();
 }
@@ -36,7 +36,7 @@ void ConnectionSession::sendMessage(
 void ConnectionSession::readMessage(){
     if(pipe){
         mapreduce::MessageType type = pipe.reciveMessageType();
-        last_active = std::chrono::system_clock::now();
+        lastActive = std::chrono::system_clock::now();
         if(type == mapreduce::MessageType::SIGN_OFF){
             if(this->type == mapreduce::ConnectionType::WORKER){
                 workerManager.leave(shared_from_this());
@@ -82,7 +82,7 @@ void ConnectionSession::readMessage(){
         readMessage();
     }else{
         if(this->type == mapreduce::ConnectionType::WORKER){
-            if(!is_available){
+            if(!isAvailable){
                 workerManager.reAssignTask(id);
             }
             workerManager.leave(shared_from_this());
@@ -115,11 +115,11 @@ void ConnectionSession::checkMessageQueue(){
             workerManager.assignJob(job);
         }
         if(type == mapreduce::MessageType::RESULT_MAP){
-            is_available = true;
+            isAvailable = true;
             workerManager.mapResult(item.job_id, id, *(item.dataReduce));
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
-            is_available = true;
+            isAvailable = true;
             if(workerManager.reduceResult(item.job_id, id, *(item.dataResult))){
                 clientManager.sendResult(item.job_id, *(item.dataResult));
             }

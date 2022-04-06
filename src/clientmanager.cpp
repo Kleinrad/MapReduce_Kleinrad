@@ -27,7 +27,7 @@ void ClientManager::registerJob(int job_id, int clientId)
 }
 
 
-void ClientManager::join(connection_ptr client)
+void ClientManager::join(connectionPtr client)
 {
     totalConnections++;
     spdlog::info("Client {} connected", client->id);
@@ -36,7 +36,7 @@ void ClientManager::join(connection_ptr client)
 }
 
 
-void ClientManager::leave(connection_ptr client)
+void ClientManager::leave(connectionPtr client)
 {
     spdlog::info("Client {} sign off", client->id);
     std::lock_guard<std::mutex> lock(mtx);

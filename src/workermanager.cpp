@@ -21,7 +21,7 @@ WorkerManager::~WorkerManager()
     timeout_thread.join();
 }
 
-void WorkerManager::join(connection_ptr worker)
+void WorkerManager::join(connectionPtr worker)
 {
     totalConnections++;
     spdlog::info("Worker {} connected", worker->id);
@@ -30,7 +30,7 @@ void WorkerManager::join(connection_ptr worker)
 }
 
 
-void WorkerManager::leave(connection_ptr worker)
+void WorkerManager::leave(connectionPtr worker)
 {
     std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::info("Worker {} sign off", worker->id);
@@ -43,9 +43,9 @@ bool WorkerManager::assignJob(Job job)
     spdlog::debug("attempting to lock workerMtx job id {} type {}", job.id, job.status);
     std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::debug("locked workerMtx");
-    std::set<connection_ptr> availableWorkes;
+    std::set<connectionPtr> availableWorkes;
     for(auto &worker : workers){
-        if(worker->is_available){
+        if(worker->isAvailable){
             availableWorkes.insert(worker);
         }
     }
@@ -158,15 +158,15 @@ std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
 }
 
 
-void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWorkes)
+void WorkerManager::assignReduce(Job job, std::set<connectionPtr> &availableWorkes)
 {
     std::vector<std::vector<std::pair<std::string, int>>> shuffled =
             shuffle(job.results, availableWorkes.size());
     std::lock_guard<std::mutex> lock(activeJobMtx);
     spdlog::debug("------locked activeJobMtx [worker {}, shuffeled {}]", availableWorkes.size(), shuffled.size());
     for(auto &worker : availableWorkes){
-        if(worker->is_available){
-            worker->is_available = false;
+        if(worker->isAvailable){
+            worker->isAvailable = false;
             spdlog::debug("shuffled size {}", shuffled.size());
             mapreduce::TaskReduce task = 
                 MessageGenerator::TaskReduce(job.type, shuffled.back(), job.id);
@@ -180,12 +180,12 @@ void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWor
 }
 
 
-void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes){
+void WorkerManager::assignMap(Job job, std::set<connectionPtr> &availableWorkes){
     std::vector<std::string> data;
     splitRawData(job.data, data, availableWorkes.size(), true);
     std::lock_guard<std::mutex> lock(activeJobMtx);
     for(auto &worker : availableWorkes){
-        worker->is_available = false;
+        worker->isAvailable = false;
         mapreduce::TaskMap task = 
             MessageGenerator::TaskMap(job.type, data.back(), job.id);
         activeJobs[job.id].addWorker(worker->id, data.back());
@@ -261,20 +261,20 @@ void WorkerManager::checkConnections(){
         bool has_available = false;
         for(auto &worker : workers){
             if(worker->isConnected()){
-                if(worker->is_available)
+                if(worker->isAvailable)
                     has_available = true;
-                if(worker->last_active + std::chrono::seconds(25) < std::chrono::system_clock::now()){
+                if(worker->lastActive + std::chrono::seconds(25) < std::chrono::system_clock::now()){
                     spdlog::error("Worker {} unreachable", worker->id);
-                }else if(worker->last_active + std::chrono::seconds(12) < std::chrono::system_clock::now()){
+                }else if(worker->lastActive + std::chrono::seconds(12) < std::chrono::system_clock::now()){
                     spdlog::info("Worker {} timeout", worker->id);
                     mapreduce::SignOff signOff = MessageGenerator::SignOff(0, mapreduce::ConnectionType::WORKER);
                     worker->sendMessage(signOff);
                     worker->closeConnection();
-                    if(!worker->is_available){
+                    if(!worker->isAvailable){
                         workerMtx.unlock();
                         reAssignTask(worker->id);
                     }
-                }else if(worker->last_active + std::chrono::seconds(10) < std::chrono::system_clock::now()){
+                }else if(worker->lastActive + std::chrono::seconds(10) < std::chrono::system_clock::now()){
                     mapreduce::Ping ping = MessageGenerator::Ping();
                     worker->sendMessage(ping);
                 }

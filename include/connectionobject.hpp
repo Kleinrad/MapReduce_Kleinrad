@@ -14,8 +14,8 @@ catnr: 07
 class ConnectionObject {
     public:
         int id{-1};
-        bool is_available{true};
-        std::chrono::time_point<std::chrono::system_clock> last_active;
+        bool isAvailable{true};
+        std::chrono::time_point<std::chrono::system_clock> lastActive;
 
         virtual ~ConnectionObject() {}
         virtual void sendMessage(
@@ -25,6 +25,6 @@ class ConnectionObject {
 
 };
 
-typedef std::shared_ptr<ConnectionObject> connection_ptr;
+typedef std::shared_ptr<ConnectionObject> connectionPtr;
 
 #endif

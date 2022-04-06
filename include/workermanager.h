@@ -19,7 +19,7 @@ catnr: 07
 #include "connectionobject.hpp"
 
 class WorkerManager{
-    std::set<connection_ptr> workers;
+    std::set<connectionPtr> workers;
     std::vector<Job> jobs;
     std::map<int, ActiveJob> activeJobs;
     asio::ip::port_type port{1500};
@@ -34,9 +34,9 @@ class WorkerManager{
     std::vector<std::vector<std::pair<std::string, int>>> shuffle
         (std::vector<std::pair<std::string, int>> &results, int workes);
     void assignMap(Job job
-        , std::set<connection_ptr> &availableWorkes);
+        , std::set<connectionPtr> &availableWorkes);
     void assignReduce(Job job
-        , std::set<connection_ptr> &availableWorkes);
+        , std::set<connectionPtr> &availableWorkes);
     void queueJob(Job job);
     void registerActiveJob(Job job);
     void checkConnections();
@@ -45,8 +45,8 @@ class WorkerManager{
         WorkerManager();
         ~WorkerManager();
 
-        void join(connection_ptr worker);
-        void leave(connection_ptr worker);
+        void join(connectionPtr worker);
+        void leave(connectionPtr worker);
         void mapResult(int job_id, int worker_id
             , std::vector<std::pair<std::string, int>> &result);
         bool reduceResult(int job_id, int worker_id
