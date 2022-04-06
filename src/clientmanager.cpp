@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: clientmanager.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include "clientmanager.h"
 #include <spdlog/spdlog.h>
 #include "protoutils.hpp"

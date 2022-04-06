@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: workermanager.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include "workermanager.h"
 #include "protoutils.hpp"
 #include <spdlog/spdlog.h>

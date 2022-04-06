@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: clientmanager.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef CLIENTMANAGER_H
 #define CLIENTMANAGER_H
 

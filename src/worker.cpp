@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: worker.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include <thread>
 #include <fstream>
 #include <chrono>

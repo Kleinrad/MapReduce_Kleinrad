@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: job.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef JOBTYPES_H
 #define JOBTYPES_H
 

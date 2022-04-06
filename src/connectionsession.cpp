@@ -1,6 +1,13 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: connectionsession.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include "connectionsession.h"
 #include <chrono>
-
 
 std::mutex ConnectionSession::mtx;
 

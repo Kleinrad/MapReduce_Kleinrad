@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: master.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include <spdlog/spdlog.h>
 #include <fstream>
 #include <thread>

@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: workermanager.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef WORKMANAGER_H
 #define WORKMANAGER_H
 

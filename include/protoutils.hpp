@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: protoutils.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef PROTOUTILS_H
 #define PROTOUTILS_H
 

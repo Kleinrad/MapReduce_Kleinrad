@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: client.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef CLIENT_H
 #define CLIENT_H
 

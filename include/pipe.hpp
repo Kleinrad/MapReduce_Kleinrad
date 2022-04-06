@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: pipe.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef PIPE_H
 #define PIPE_H
 

@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: master.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef MASTER_H
 #define MASTER_H
 

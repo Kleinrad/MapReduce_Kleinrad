@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: messageQueue.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef MESSAGEQUEUE_H
 #define MESSAGEQUEUE_H
 

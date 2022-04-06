@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: worker.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef WORKER_H
 #define WORKER_H
 

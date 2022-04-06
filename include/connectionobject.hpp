@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: connectionobject.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef CONNECTIONOBJECT_H
 #define CONNECTIONOBJECT_H
 
