@@ -177,7 +177,6 @@ The basic structure of implementing asio, multi-user communication this way, has
 
 To start the process of receiving and sending messages the ConnectionSession provides a $start$ function. Additionally the ConnectionSession implements the functions $sendMessage$, $isConnected$ and $closeConnection$ from the ConnectionObject class.  
 
-\pagebreak
 \subsection{Job}
 
 The Job class allows for uniform structure when processing jobs.
@@ -336,6 +335,7 @@ There are different reasons why a worker fails his task. The easiest for the mas
 To use MapReduce, clone the repository Kleinrad/kleinrad\_project\footfullcite{mapreduceRepo}. After all dependencies listed in section \ref{libraries} are satisfied, compile the project via meson. To ensure a successful build use meson 0.59.1+. Once compiled the three executables have been generated: $mr\_worker$, $mr\_master$, and $mr\_client$.\newline
 Start the $mr\_master$, which then will wait for incoming connections. After that, it is possible to start as many $mr\_worker$s and $mr\_client$s as needed. To place a request, use the command line interface provided by the client.
 
+\pagebreak
 \subsection{Command Line}
 The Client supports a variety of command-line arguments and commands.
 

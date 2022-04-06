@@ -20,8 +20,8 @@ class ClientManager{
         ~ClientManager();
 
         void registerJob(int job_id, int client_id);
-        void join(connection_ptr worker);
-        void leave(connection_ptr worker);
+        void join(connection_ptr client);
+        void leave(connection_ptr client);
         void sendResult(int job_id
             , std::map<std::string, int> &result);
         int generateID();
