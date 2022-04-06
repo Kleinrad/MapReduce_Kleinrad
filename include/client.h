@@ -15,7 +15,7 @@ catnr: 07
 #include "job.hpp"
 
 class Client{
-    int client_id;
+    int clientId;
     Pipe pipe;
     int lastJobTotal{0};
     std::map<std::string, int> lastJobResult;

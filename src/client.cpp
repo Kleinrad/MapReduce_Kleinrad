@@ -32,12 +32,12 @@ void Client::signOn(){
     if(pipe.reciveMessageType() == mapreduce::MessageType::ASSIGNMENT){
         mapreduce::Assignment assignment;
         pipe >> assignment;
-        client_id = assignment.id();
-        mapreduce::Confirm confirm = MessageGenerator::Confirm(client_id
+        clientId = assignment.id();
+        mapreduce::Confirm confirm = MessageGenerator::Confirm(clientId
             , mapreduce::ConnectionType::CLIENT);
         pipe.sendMessage(confirm);
         good = true;
-        spdlog::info("Client {} sign on", client_id);
+        spdlog::info("Client {} sign on", clientId);
     }else{
         spdlog::error("Invalid message type");
         throw std::runtime_error("Client::signOn: Invalid Message recived");
@@ -47,11 +47,11 @@ void Client::signOn(){
 
 void Client::signOff() {
     if(pipe){
-        mapreduce::SignOff signOff = MessageGenerator::SignOff(client_id, mapreduce::ConnectionType::CLIENT);
+        mapreduce::SignOff signOff = MessageGenerator::SignOff(clientId, mapreduce::ConnectionType::CLIENT);
         pipe.sendMessage(signOff);
     }
     good = false;
-    spdlog::info("Client {} sign off", client_id);
+    spdlog::info("Client {} sign off", clientId);
     exit(0);
 }
 
@@ -68,7 +68,7 @@ void Client::waitForResponse(){
     }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();
     }else{
-        //spdlog::error("Client {} received invalid message type ({})", client_id, type);
+        //spdlog::error("Client {} received invalid message type ({})", clientId, type);
         if(!pipe){
             good = false;
             spdlog::error("Connection closed");

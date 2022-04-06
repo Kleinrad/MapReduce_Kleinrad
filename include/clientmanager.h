@@ -19,7 +19,7 @@ catnr: 07
 class ClientManager{
     std::set<connection_ptr> clients;
     asio::ip::port_type port{1500};
-    std::map<int, int> job_client_map;
+    std::map<int, int> jobClientMap;
     std::mutex mtx;
     int totalConnections{0};
 
@@ -27,10 +27,10 @@ class ClientManager{
         ClientManager();
         ~ClientManager();
 
-        void registerJob(int job_id, int client_id);
+        void registerJob(int jobId, int clientId);
         void join(connection_ptr client);
         void leave(connection_ptr client);
-        void sendResult(int job_id
+        void sendResult(int jobId
             , std::map<std::string, int> &result);
         int generateID();
 };
