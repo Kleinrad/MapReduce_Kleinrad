@@ -23,16 +23,16 @@ class ClientManager{
     std::mutex mtx;
     int totalConnections{0};
 
-    public:
-        ClientManager();
-        ~ClientManager();
+  public:
+    ClientManager();
+    ~ClientManager();
 
-        void registerJob(int jobId, int clientId);
-        void join(connectionPtr client);
-        void leave(connectionPtr client);
-        void sendResult(int jobId
-            , std::map<std::string, int> &result);
-        int generateID();
+    void registerJob(int jobId, int clientId);
+    void join(connectionPtr client);
+    void leave(connectionPtr client);
+    void sendResult(int jobId
+        , std::map<std::string, int> &result);
+    int generateID();
 };
 
 #endif

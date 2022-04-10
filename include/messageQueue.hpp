@@ -35,7 +35,7 @@ class MessageQueue
     std::mutex mtx_cond;
     std::condition_variable cv;
 
-public:
+  public:
 
     void push(QueueItem* item){
         std::lock_guard<std::mutex> lock(mtx);

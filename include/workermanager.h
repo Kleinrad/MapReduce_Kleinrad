@@ -41,19 +41,19 @@ class WorkerManager{
     void registerActiveJob(Job job);
     void checkConnections();
 
-    public:
-        WorkerManager();
-        ~WorkerManager();
+  public:
+    WorkerManager();
+    ~WorkerManager();
 
-        void join(connectionPtr worker);
-        void leave(connectionPtr worker);
-        void mapResult(int jobId, int workerId
-            , std::vector<std::pair<std::string, int>> &result);
-        bool reduceResult(int jobId, int workerId
-            , std::map<std::string, int> &result);
-        bool assignJob(Job job);
-        void reAssignTask(int workerId);
-        int generateID();
+    void join(connectionPtr worker);
+    void leave(connectionPtr worker);
+    void mapResult(int jobId, int workerId
+        , std::vector<std::pair<std::string, int>> &result);
+    bool reduceResult(int jobId, int workerId
+        , std::map<std::string, int> &result);
+    bool assignJob(Job job);
+    void reAssignTask(int workerId);
+    int generateID();
 };
 
 #endif

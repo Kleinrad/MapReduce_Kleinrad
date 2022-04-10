@@ -22,12 +22,13 @@ class Worker {
     void handleMap(int type, std::string data, int jobId);
     void handleReduce(int type
         , mapreduce::TaskReduce::ReduceData data, int jobId);
-    public:
-        Worker(asio::ip::tcp::socket socket);
-        ~Worker();
 
-        void signOff();
-        void signOn();
+  public:
+    Worker(asio::ip::tcp::socket socket);
+    ~Worker();
+
+    void signOff();
+    void signOn();
 };
 
 #endif

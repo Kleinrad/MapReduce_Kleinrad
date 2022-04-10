@@ -92,7 +92,7 @@ struct ActiveJobStruct {
 class Job {
     static int job_counter;
 
-public:
+  public:
     int id;
     mapreduce::JobType type;
     std::string data;

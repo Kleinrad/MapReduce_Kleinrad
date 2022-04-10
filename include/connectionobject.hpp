@@ -12,16 +12,16 @@ catnr: 07
 #include <chrono>
 
 class ConnectionObject {
-    public:
-        int id{-1};
-        bool isAvailable{true};
-        std::chrono::time_point<std::chrono::system_clock> lastActive;
+  public:
+    int id{-1};
+    bool isAvailable{true};
+    std::chrono::time_point<std::chrono::system_clock> lastActive;
 
-        virtual ~ConnectionObject() {}
-        virtual void sendMessage(
-            google::protobuf::Message& message) = 0;
-        virtual bool isConnected() = 0;
-        virtual void closeConnection() = 0;
+    virtual ~ConnectionObject() {}
+    virtual void sendMessage(
+        google::protobuf::Message& message) = 0;
+    virtual bool isConnected() = 0;
+    virtual void closeConnection() = 0;
 
 };
 

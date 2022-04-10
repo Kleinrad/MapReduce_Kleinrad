@@ -18,12 +18,12 @@ class Master {
     WorkerManager &workerManager;
     ClientManager &clientManager;
 
-    public:
-      Master(WorkerManager &workerManager,
-            ClientManager &clientManager,
-            asio::ip::tcp::endpoint ep,
-            asio::io_context &ctx);
-      ~Master();
+  public:
+    Master(WorkerManager &workerManager,
+      ClientManager &clientManager,
+      asio::ip::tcp::endpoint ep,
+      asio::io_context &ctx);
+    ~Master();
 
       void acceptConnection();    
 };

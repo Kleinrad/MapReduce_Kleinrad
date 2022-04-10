@@ -21,18 +21,19 @@ class Client{
     std::map<std::string, int> lastJobResult;
 
     void waitForResponse();
-    public:
-        bool good;
+  
+  public:
+    Client(asio::ip::tcp::socket socket);
+    ~Client();
 
-        Client(asio::ip::tcp::socket socket);
-        ~Client();
+    void signOff();
+    void signOn();
+    void sendJob(Job job);
 
-        void signOff();
-        void signOn();
-        void sendJob(Job job);
+    void printResultsPlain(bool sorted = false);
+    void printResultsHistogram(bool sorted = false);
 
-        void printResultsPlain(bool sorted = false);
-        void printResultsHistogram(bool sorted = false);
+    bool good;
 };
 
 #endif
