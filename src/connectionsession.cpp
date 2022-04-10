@@ -1,6 +1,13 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: connectionsession.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include "connectionsession.h"
 #include <chrono>
-
 
 std::mutex ConnectionSession::mtx;
 
@@ -10,7 +17,7 @@ ConnectionSession::ConnectionSession(WorkerManager &workerManager,
                             asio::ip::tcp::socket socket) 
     : ConnectionObject(), workerManager(workerManager), 
     clientManager(clientManager), pipe(Pipe(std::move(socket))) {
-        last_active = std::chrono::system_clock::now();
+        lastActive = std::chrono::system_clock::now();
         queueThread = new std::thread(&ConnectionSession::checkMessageQueue, this);
         queueThread->detach();
 }
@@ -29,7 +36,7 @@ void ConnectionSession::sendMessage(
 void ConnectionSession::readMessage(){
     if(pipe){
         mapreduce::MessageType type = pipe.reciveMessageType();
-        last_active = std::chrono::system_clock::now();
+        lastActive = std::chrono::system_clock::now();
         if(type == mapreduce::MessageType::SIGN_OFF){
             if(this->type == mapreduce::ConnectionType::WORKER){
                 workerManager.leave(shared_from_this());
@@ -59,7 +66,7 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultMap.values()){
                 item.dataReduce->push_back(std::make_pair(r.key(), r.value()));
             }
-            item.job_id = resultMap.job_id();
+            item.jobId = resultMap.jobid();
             msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
@@ -69,13 +76,13 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultReduce.values()){
                 item.dataResult->insert(std::make_pair(r.key(), r.value()));
             }
-            item.job_id = resultReduce.job_id();
+            item.jobId = resultReduce.jobid();
             msgQueue.push(&item);
         }
         readMessage();
     }else{
         if(this->type == mapreduce::ConnectionType::WORKER){
-            if(!is_available){
+            if(!isAvailable){
                 workerManager.reAssignTask(id);
             }
             workerManager.leave(shared_from_this());
@@ -89,7 +96,7 @@ void ConnectionSession::readMessage(){
 
 
 void ConnectionSession::checkMessageQueue(){
-    while (true)
+    while(true)
     {
         QueueItem item = *(msgQueue.pop());
         std::lock_guard<std::mutex> lock(mtx);
@@ -108,13 +115,13 @@ void ConnectionSession::checkMessageQueue(){
             workerManager.assignJob(job);
         }
         if(type == mapreduce::MessageType::RESULT_MAP){
-            is_available = true;
-            workerManager.mapResult(item.job_id, id, *(item.dataReduce));
+            isAvailable = true;
+            workerManager.mapResult(item.jobId, id, *(item.dataReduce));
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
-            is_available = true;
-            if(workerManager.reduceResult(item.job_id, id, *(item.dataResult))){
-                clientManager.sendResult(item.job_id, *(item.dataResult));
+            isAvailable = true;
+            if(workerManager.reduceResult(item.jobId, id, *(item.dataResult))){
+                clientManager.sendResult(item.jobId, *(item.dataResult));
             }
         }
     }
@@ -135,7 +142,7 @@ bool ConnectionSession::assignID(){
             spdlog::error("Confirmation failed: Invalid id");
         }
     }else{
-        spdlog::error("Confirmation failed: Invalid message type ({})", type);
+        spdlog::error("Confirmation failed: Invalid message type({})", type);
     }
     return false;
 }

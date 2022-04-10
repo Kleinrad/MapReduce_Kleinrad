@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: messageQueue.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef MESSAGEQUEUE_H
 #define MESSAGEQUEUE_H
 
@@ -10,7 +18,7 @@
 struct QueueItem{
     mapreduce::MessageType type;
     mapreduce::JobType jobType;
-    int job_id;
+    int jobId;
     char* dataRaw;
     std::vector<std::pair<std::string, int>> *dataReduce = new std::vector<std::pair<std::string, int>>();
     std::map<std::string, int>* dataResult = new std::map<std::string, int>();
@@ -27,7 +35,7 @@ class MessageQueue
     std::mutex mtx_cond;
     std::condition_variable cv;
 
-public:
+  public:
 
     void push(QueueItem* item){
         std::lock_guard<std::mutex> lock(mtx);

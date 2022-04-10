@@ -1,19 +1,28 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: workermanager.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include "workermanager.h"
 #include "protoutils.hpp"
 #include <spdlog/spdlog.h>
 
 WorkerManager::WorkerManager(){
-    timeout_thread = std::thread(&WorkerManager::checkConnections, this);
-    timeout_thread.detach();
+    timeoutThread = std::thread(&WorkerManager::checkConnections, this);
+    timeoutThread.detach();
 }
 
 
 WorkerManager::~WorkerManager()
 {
-    timeout_thread.join();
+    timeoutThread.join();
 }
 
-void WorkerManager::join(connection_ptr worker)
+
+void WorkerManager::join(connectionPtr worker)
 {
     totalConnections++;
     spdlog::info("Worker {} connected", worker->id);
@@ -22,7 +31,7 @@ void WorkerManager::join(connection_ptr worker)
 }
 
 
-void WorkerManager::leave(connection_ptr worker)
+void WorkerManager::leave(connectionPtr worker)
 {
     std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::info("Worker {} sign off", worker->id);
@@ -35,9 +44,9 @@ bool WorkerManager::assignJob(Job job)
     spdlog::debug("attempting to lock workerMtx job id {} type {}", job.id, job.status);
     std::lock_guard<std::mutex> lock(workerMtx);
     spdlog::debug("locked workerMtx");
-    std::set<connection_ptr> availableWorkes;
+    std::set<connectionPtr> availableWorkes;
     for(auto &worker : workers){
-        if(worker->is_available){
+        if(worker->isAvailable){
             availableWorkes.insert(worker);
         }
     }
@@ -131,6 +140,7 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
     }
 }
 
+
 std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
         (std::vector<std::pair<std::string, int>> &results, int workers){
     std::vector<std::vector<std::pair<std::string, int>>> shuffled;
@@ -150,15 +160,15 @@ std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
 }
 
 
-void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWorkes)
+void WorkerManager::assignReduce(Job job, std::set<connectionPtr> &availableWorkes)
 {
     std::vector<std::vector<std::pair<std::string, int>>> shuffled =
             shuffle(job.results, availableWorkes.size());
     std::lock_guard<std::mutex> lock(activeJobMtx);
     spdlog::debug("------locked activeJobMtx [worker {}, shuffeled {}]", availableWorkes.size(), shuffled.size());
     for(auto &worker : availableWorkes){
-        if(worker->is_available){
-            worker->is_available = false;
+        if(worker->isAvailable){
+            worker->isAvailable = false;
             spdlog::debug("shuffled size {}", shuffled.size());
             mapreduce::TaskReduce task = 
                 MessageGenerator::TaskReduce(job.type, shuffled.back(), job.id);
@@ -172,12 +182,12 @@ void WorkerManager::assignReduce(Job job, std::set<connection_ptr> &availableWor
 }
 
 
-void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes){
+void WorkerManager::assignMap(Job job, std::set<connectionPtr> &availableWorkes){
     std::vector<std::string> data;
     splitRawData(job.data, data, availableWorkes.size(), true);
     std::lock_guard<std::mutex> lock(activeJobMtx);
     for(auto &worker : availableWorkes){
-        worker->is_available = false;
+        worker->isAvailable = false;
         mapreduce::TaskMap task = 
             MessageGenerator::TaskMap(job.type, data.back(), job.id);
         activeJobs[job.id].addWorker(worker->id, data.back());
@@ -188,13 +198,13 @@ void WorkerManager::assignMap(Job job, std::set<connection_ptr> &availableWorkes
 }
 
 
-void WorkerManager::mapResult(int job_id, int worker_id
+void WorkerManager::mapResult(int job_id, int workerId
             , std::vector<std::pair<std::string, int>> &result){
     std::lock_guard<std::mutex> lock(activeJobMtx);
     activeJobs[job_id].addResults(result);
-    activeJobs[job_id].removeWorker(worker_id);
+    activeJobs[job_id].removeWorker(workerId);
     spdlog::info("Job {} worker {} finished [Job active {}]"
-    , job_id, worker_id, activeJobs[job_id].isActive());
+    , job_id, workerId, activeJobs[job_id].isActive());
     if(!activeJobs[job_id].isActive()){
         Job job{activeJobs[job_id]};
         job.status = JobStatus::job_mapped;
@@ -204,16 +214,17 @@ void WorkerManager::mapResult(int job_id, int worker_id
     }
 }
 
-bool WorkerManager::reduceResult(int job_id, int worker_id
+
+bool WorkerManager::reduceResult(int job_id, int workerId
             , std::map<std::string, int> &result){
     spdlog::debug("trying to aquire lock reduce result");
     std::lock_guard<std::mutex> lock(activeJobMtx);
     spdlog::debug("aquired reduce result lock");
     activeJobs[job_id].addReducedData(result);
     spdlog::debug("reduce result added");
-    activeJobs[job_id].removeWorker(worker_id);
+    activeJobs[job_id].removeWorker(workerId);
     spdlog::info("Job {} worker {} finished [Job active {}]"
-    , job_id, worker_id, activeJobs[job_id].isActive());
+    , job_id, workerId, activeJobs[job_id].isActive());
     if(!activeJobs[job_id].isActive()){
         result = activeJobs[job_id].reducedData;
         activeJobs.erase(job_id);
@@ -222,16 +233,17 @@ bool WorkerManager::reduceResult(int job_id, int worker_id
     return false;
 }
 
-void WorkerManager::reAssignTask(int worker_id){
+
+void WorkerManager::reAssignTask(int workerId){
     std::lock_guard<std::mutex> lock(activeJobMtx);
-    spdlog::info("Reassigning task from worker {} {}", worker_id, activeJobs.size());
+    spdlog::info("Reassigning task from worker {} {}", workerId, activeJobs.size());
     for(auto &pair : activeJobs){
         spdlog::debug("reassign worker");
-        if(pair.second.contains(worker_id)){
-            Job job{pair.second, worker_id};
+        if(pair.second.contains(workerId)){
+            Job job{pair.second, workerId};
             spdlog::info("Reassigning");
             assignJob(job);
-            pair.second.removeWorker(worker_id);
+            pair.second.removeWorker(workerId);
         }    
     }
 }
@@ -240,7 +252,7 @@ void WorkerManager::reAssignTask(int worker_id){
 void WorkerManager::registerActiveJob(Job job){
     ActiveJob ajob{job};
     std::lock_guard<std::mutex> lock(activeJobMtx);
-    spdlog::info("Job {} registered [active job id {}]", job.id, ajob.job_id);
+    spdlog::info("Job {} registered [active job id {}]", job.id, ajob.jobId);
     activeJobs.insert({job.id, ajob}); 
 }
 
@@ -253,20 +265,20 @@ void WorkerManager::checkConnections(){
         bool has_available = false;
         for(auto &worker : workers){
             if(worker->isConnected()){
-                if(worker->is_available)
+                if(worker->isAvailable)
                     has_available = true;
-                if(worker->last_active + std::chrono::seconds(25) < std::chrono::system_clock::now()){
+                if(worker->lastActive + std::chrono::seconds(25) < std::chrono::system_clock::now()){
                     spdlog::error("Worker {} unreachable", worker->id);
-                }else if(worker->last_active + std::chrono::seconds(12) < std::chrono::system_clock::now()){
+                }else if(worker->lastActive + std::chrono::seconds(12) < std::chrono::system_clock::now()){
                     spdlog::info("Worker {} timeout", worker->id);
                     mapreduce::SignOff signOff = MessageGenerator::SignOff(0, mapreduce::ConnectionType::WORKER);
                     worker->sendMessage(signOff);
                     worker->closeConnection();
-                    if(!worker->is_available){
+                    if(!worker->isAvailable){
                         workerMtx.unlock();
                         reAssignTask(worker->id);
                     }
-                }else if(worker->last_active + std::chrono::seconds(10) < std::chrono::system_clock::now()){
+                }else if(worker->lastActive + std::chrono::seconds(10) < std::chrono::system_clock::now()){
                     mapreduce::Ping ping = MessageGenerator::Ping();
                     worker->sendMessage(ping);
                 }

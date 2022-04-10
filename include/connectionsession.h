@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: connectionsession.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef WORKERSESSION_H
 #define WORKERSESSION_H
 
@@ -27,13 +35,13 @@ class ConnectionSession : public ConnectionObject,
     bool assignID();
     void auth();
 
-    public:
-        ConnectionSession(WorkerManager &WorkerManager, ClientManager &clientManager
-                        , asio::ip::tcp::socket socket);
+  public:
+    ConnectionSession(WorkerManager &WorkerManager, ClientManager &clientManager
+                    , asio::ip::tcp::socket socket);
 
-        ~ConnectionSession();
+    ~ConnectionSession();
 
-        void start();
+    void start();
 };
 
 #endif

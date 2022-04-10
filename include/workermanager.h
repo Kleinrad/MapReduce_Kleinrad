@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: workermanager.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef WORKMANAGER_H
 #define WORKMANAGER_H
 
@@ -11,11 +19,11 @@
 #include "connectionobject.hpp"
 
 class WorkerManager{
-    std::set<connection_ptr> workers;
+    std::set<connectionPtr> workers;
     std::vector<Job> jobs;
     std::map<int, ActiveJob> activeJobs;
     asio::ip::port_type port{1500};
-    std::thread timeout_thread;
+    std::thread timeoutThread;
     std::mutex workerMtx;
     std::mutex activeJobMtx;
     std::mutex jobsMtx;
@@ -26,26 +34,26 @@ class WorkerManager{
     std::vector<std::vector<std::pair<std::string, int>>> shuffle
         (std::vector<std::pair<std::string, int>> &results, int workes);
     void assignMap(Job job
-        , std::set<connection_ptr> &availableWorkes);
+        , std::set<connectionPtr> &availableWorkes);
     void assignReduce(Job job
-        , std::set<connection_ptr> &availableWorkes);
+        , std::set<connectionPtr> &availableWorkes);
     void queueJob(Job job);
     void registerActiveJob(Job job);
     void checkConnections();
 
-    public:
-        WorkerManager();
-        ~WorkerManager();
+  public:
+    WorkerManager();
+    ~WorkerManager();
 
-        void join(connection_ptr worker);
-        void leave(connection_ptr worker);
-        void mapResult(int job_id, int worker_id
-            , std::vector<std::pair<std::string, int>> &result);
-        bool reduceResult(int job_id, int worker_id
-            , std::map<std::string, int> &result);
-        bool assignJob(Job job);
-        void reAssignTask(int worker_id);
-        int generateID();
+    void join(connectionPtr worker);
+    void leave(connectionPtr worker);
+    void mapResult(int jobId, int workerId
+        , std::vector<std::pair<std::string, int>> &result);
+    bool reduceResult(int jobId, int workerId
+        , std::map<std::string, int> &result);
+    bool assignJob(Job job);
+    void reAssignTask(int workerId);
+    int generateID();
 };
 
 #endif

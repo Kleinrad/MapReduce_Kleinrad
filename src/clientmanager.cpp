@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: clientmanager.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include "clientmanager.h"
 #include <spdlog/spdlog.h>
 #include "protoutils.hpp"
@@ -12,14 +20,14 @@ ClientManager::~ClientManager()
 }
 
 
-void ClientManager::registerJob(int job_id, int client_id)
+void ClientManager::registerJob(int jobId, int clientId)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    job_client_map[job_id] = client_id;
+    jobClientMap[jobId] = clientId;
 }
 
 
-void ClientManager::join(connection_ptr client)
+void ClientManager::join(connectionPtr client)
 {
     totalConnections++;
     spdlog::info("Client {} connected", client->id);
@@ -28,26 +36,28 @@ void ClientManager::join(connection_ptr client)
 }
 
 
-void ClientManager::leave(connection_ptr client)
+void ClientManager::leave(connectionPtr client)
 {
     spdlog::info("Client {} sign off", client->id);
     std::lock_guard<std::mutex> lock(mtx);
     clients.erase(client);
 }
 
-void ClientManager::sendResult(int job_id, std::map<std::string, int> &result)
+
+void ClientManager::sendResult(int jobId, std::map<std::string, int> &result)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    int client_id = job_client_map[job_id];
-    mapreduce::JobResult job_result = MessageGenerator::JobResult(job_id, result);
+    int clientId = jobClientMap[jobId];
+    mapreduce::JobResult job_result = MessageGenerator::JobResult(jobId, result);
     for(auto &client : clients){
-        if(client->id == client_id){
+        if(client->id == clientId){
             client->sendMessage(job_result);
             break;
         }
     }
-    job_client_map.erase(job_id);
+    jobClientMap.erase(jobId);
 }
+
 
 int ClientManager::generateID(){
     return totalConnections;

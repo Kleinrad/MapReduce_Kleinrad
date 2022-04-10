@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: job.hpp
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef JOBTYPES_H
 #define JOBTYPES_H
 
@@ -20,36 +28,36 @@ struct ActiveJobStruct {
     std::map<int, std::vector<std::pair<std::string, int>>> workerReduceData;
     std::vector<std::pair<std::string, int>> results;
     std::map<std::string, int> reducedData;
-    int job_id;
-    bool is_active{false};
+    int jobId;
+    bool active{false};
     JobStatus status;
     mapreduce::JobType type;
 
     ActiveJobStruct() {}
 
     ActiveJobStruct(int id, JobStatus status, mapreduce::JobType type) 
-        : job_id(id), status(status), type(type) {}
+        : jobId(id), status(status), type(type) {}
 
     void addWorker(int worker, std::string data) {
         workerData.insert({worker, data});
-        is_active = true;
+        active = true;
     }
 
     void addWorker(int worker, std::vector<std::pair<std::string, int>> data) {
         workerReduceData.insert({worker, data});
-        is_active = true;
+        active = true;
     }
 
     void removeWorker(int worker) {
         if(workerData.count(worker) > 0) {
             workerData.erase(worker);
             if(workerData.size() == 0) {
-                is_active = false;
+                active = false;
             }
         } else if(workerReduceData.count(worker) > 0) {
             workerReduceData.erase(worker);
             if(workerReduceData.size() == 0) {
-                is_active = false;
+                active = false;
             }
         }
     }
@@ -84,7 +92,7 @@ struct ActiveJobStruct {
 class Job {
     static int job_counter;
 
-public:
+  public:
     int id;
     mapreduce::JobType type;
     std::string data;
@@ -99,14 +107,14 @@ public:
     Job(mapreduce::JobType type, std::string data, int id)
         : id(id), type(type), data(data) {}
 
-    Job(ActiveJobStruct activeJob, int worker_id)
-        : id(activeJob.job_id), type(activeJob.type), 
+    Job(ActiveJobStruct activeJob, int workerId)
+        : id(activeJob.jobId), type(activeJob.type), 
           status(activeJob.status) {
-              data = activeJob.getWorkerData(worker_id);
+              data = activeJob.getWorkerData(workerId);
     }
 
     Job(ActiveJobStruct activeJob)
-        : id(activeJob.job_id), type(activeJob.type), 
+        : id(activeJob.jobId), type(activeJob.type), 
           status(activeJob.status), results(activeJob.results) {}
 };
 
@@ -117,7 +125,7 @@ struct ActiveJob : public ActiveJobStruct {
         : ActiveJobStruct(job.id, job.status, job.type) {}
 
     bool isActive(){
-        return is_active;
+        return active;
     }
 };
 

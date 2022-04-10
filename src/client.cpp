@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: client.cpp
+class: 5BHIF
+catnr: 07
+*/
+
 #include <spdlog/spdlog.h>
 #include <thread>
 #include "protoutils.hpp"
@@ -24,12 +32,12 @@ void Client::signOn(){
     if(pipe.reciveMessageType() == mapreduce::MessageType::ASSIGNMENT){
         mapreduce::Assignment assignment;
         pipe >> assignment;
-        client_id = assignment.id();
-        mapreduce::Confirm confirm = MessageGenerator::Confirm(client_id
+        clientId = assignment.id();
+        mapreduce::Confirm confirm = MessageGenerator::Confirm(clientId
             , mapreduce::ConnectionType::CLIENT);
         pipe.sendMessage(confirm);
         good = true;
-        spdlog::info("Client {} sign on", client_id);
+        spdlog::info("Client {} sign on", clientId);
     }else{
         spdlog::error("Invalid message type");
         throw std::runtime_error("Client::signOn: Invalid Message recived");
@@ -39,11 +47,11 @@ void Client::signOn(){
 
 void Client::signOff() {
     if(pipe){
-        mapreduce::SignOff signOff = MessageGenerator::SignOff(client_id, mapreduce::ConnectionType::CLIENT);
+        mapreduce::SignOff signOff = MessageGenerator::SignOff(clientId, mapreduce::ConnectionType::CLIENT);
         pipe.sendMessage(signOff);
     }
     good = false;
-    spdlog::info("Client {} sign off", client_id);
+    spdlog::info("Client {} sign off", clientId);
     exit(0);
 }
 
@@ -60,7 +68,7 @@ void Client::waitForResponse(){
     }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();
     }else{
-        //spdlog::error("Client {} received invalid message type ({})", client_id, type);
+        //spdlog::error("Client {} received invalid message type({})", clientId, type);
         if(!pipe){
             good = false;
             spdlog::error("Connection closed");
@@ -106,6 +114,7 @@ void Client::printResultsPlain(bool sorted){
     }
 }
 
+
 void Client::printResultsHistogram(bool sorted){
     if(lastJobResult.size() == 0){
         spdlog::error("No results to print");
@@ -138,6 +147,7 @@ void Client::printResultsHistogram(bool sorted){
     }
 }
 
+
 int main(int argc, char* argv[]) {
     CLI::App app{"MapReduce Client"};
     
@@ -148,7 +158,7 @@ int main(int argc, char* argv[]) {
 
     try {
         app.parse(argc, argv);
-    } catch (const CLI::ParseError &e) {
+    } catch(const CLI::ParseError &e) {
         return app.exit(e);
     }
 
@@ -175,15 +185,15 @@ int main(int argc, char* argv[]) {
     std::cout << "Connected to server [" << ipAddress << ":" << port << "]\n" << std::endl;
 
     std::string input;
-    while (client.good)
+    while(client.good)
     {
         std::cout << "# " << std::flush;
         std::getline(std::cin, input);
         if(input == "")
             continue;
-        if (input == "quit" || input == "q")
+        if(input == "quit" || input == "q")
             break;
-        if (input == "help" || input == "h"){
+        if(input == "help" || input == "h"){
             std::cout << "\nAvailable commands:" << std::endl;
             std::cout << "- quit, q" << std::endl;
             std::cout << "- help, h" << std::endl;
@@ -200,7 +210,7 @@ int main(int argc, char* argv[]) {
             std::cout << "-s: sort results\n" << std::endl;
             continue;
         }
-        if (input.find("send") == 0){
+        if(input.find("send") == 0){
             if(input.size() < 6){
                 spdlog::error("Invalid parameters");
                 continue;
@@ -247,7 +257,7 @@ int main(int argc, char* argv[]) {
                 continue;
             }
         }
-        if (input.find("print") == 0){
+        if(input.find("print") == 0){
             if(input.size() < 7){
                 spdlog::error("Invalid parameters");
                 continue;

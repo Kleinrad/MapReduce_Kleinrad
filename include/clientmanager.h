@@ -1,3 +1,11 @@
+/*
+author: Kleinrad Fabian
+matnr: i17053
+file: clientmanager.h
+class: 5BHIF
+catnr: 07
+*/
+
 #ifndef CLIENTMANAGER_H
 #define CLIENTMANAGER_H
 
@@ -9,22 +17,22 @@
 #include "connectionobject.hpp"
 
 class ClientManager{
-    std::set<connection_ptr> clients;
+    std::set<connectionPtr> clients;
     asio::ip::port_type port{1500};
-    std::map<int, int> job_client_map;
+    std::map<int, int> jobClientMap;
     std::mutex mtx;
     int totalConnections{0};
 
-    public:
-        ClientManager();
-        ~ClientManager();
+  public:
+    ClientManager();
+    ~ClientManager();
 
-        void registerJob(int job_id, int client_id);
-        void join(connection_ptr client);
-        void leave(connection_ptr client);
-        void sendResult(int job_id
-            , std::map<std::string, int> &result);
-        int generateID();
+    void registerJob(int jobId, int clientId);
+    void join(connectionPtr client);
+    void leave(connectionPtr client);
+    void sendResult(int jobId
+        , std::map<std::string, int> &result);
+    int generateID();
 };
 
 #endif
