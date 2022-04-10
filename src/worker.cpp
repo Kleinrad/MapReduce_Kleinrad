@@ -160,6 +160,7 @@ void Worker::signOff() {
     exit(0);
 }
 
+
 int main(){
     std::ifstream f("config.json");
     nlohmann::json j = nlohmann::json::parse(f);

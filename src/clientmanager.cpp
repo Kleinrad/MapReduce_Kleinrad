@@ -43,6 +43,7 @@ void ClientManager::leave(connectionPtr client)
     clients.erase(client);
 }
 
+
 void ClientManager::sendResult(int jobId, std::map<std::string, int> &result)
 {
     std::lock_guard<std::mutex> lock(mtx);
@@ -56,6 +57,7 @@ void ClientManager::sendResult(int jobId, std::map<std::string, int> &result)
     }
     jobClientMap.erase(jobId);
 }
+
 
 int ClientManager::generateID(){
     return totalConnections;

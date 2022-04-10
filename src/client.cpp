@@ -114,6 +114,7 @@ void Client::printResultsPlain(bool sorted){
     }
 }
 
+
 void Client::printResultsHistogram(bool sorted){
     if(lastJobResult.size() == 0){
         spdlog::error("No results to print");
@@ -145,6 +146,7 @@ void Client::printResultsHistogram(bool sorted){
         }
     }
 }
+
 
 int main(int argc, char* argv[]) {
     CLI::App app{"MapReduce Client"};

@@ -21,6 +21,7 @@ WorkerManager::~WorkerManager()
     timeoutThread.join();
 }
 
+
 void WorkerManager::join(connectionPtr worker)
 {
     totalConnections++;
@@ -139,6 +140,7 @@ void WorkerManager::splitRawData(std::string rawData, std::vector<std::string> &
     }
 }
 
+
 std::vector<std::vector<std::pair<std::string, int>>> WorkerManager::shuffle
         (std::vector<std::pair<std::string, int>> &results, int workers){
     std::vector<std::vector<std::pair<std::string, int>>> shuffled;
@@ -212,6 +214,7 @@ void WorkerManager::mapResult(int job_id, int workerId
     }
 }
 
+
 bool WorkerManager::reduceResult(int job_id, int workerId
             , std::map<std::string, int> &result){
     spdlog::debug("trying to aquire lock reduce result");
@@ -229,6 +232,7 @@ bool WorkerManager::reduceResult(int job_id, int workerId
     }
     return false;
 }
+
 
 void WorkerManager::reAssignTask(int workerId){
     std::lock_guard<std::mutex> lock(activeJobMtx);
