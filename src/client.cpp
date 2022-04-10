@@ -68,7 +68,7 @@ void Client::waitForResponse(){
     }else if(type == mapreduce::MessageType::SIGN_OFF){
         signOff();
     }else{
-        //spdlog::error("Client {} received invalid message type ({})", clientId, type);
+        //spdlog::error("Client {} received invalid message type({})", clientId, type);
         if(!pipe){
             good = false;
             spdlog::error("Connection closed");
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]) {
 
     try {
         app.parse(argc, argv);
-    } catch (const CLI::ParseError &e) {
+    } catch(const CLI::ParseError &e) {
         return app.exit(e);
     }
 
@@ -185,15 +185,15 @@ int main(int argc, char* argv[]) {
     std::cout << "Connected to server [" << ipAddress << ":" << port << "]\n" << std::endl;
 
     std::string input;
-    while (client.good)
+    while(client.good)
     {
         std::cout << "# " << std::flush;
         std::getline(std::cin, input);
         if(input == "")
             continue;
-        if (input == "quit" || input == "q")
+        if(input == "quit" || input == "q")
             break;
-        if (input == "help" || input == "h"){
+        if(input == "help" || input == "h"){
             std::cout << "\nAvailable commands:" << std::endl;
             std::cout << "- quit, q" << std::endl;
             std::cout << "- help, h" << std::endl;
@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
             std::cout << "-s: sort results\n" << std::endl;
             continue;
         }
-        if (input.find("send") == 0){
+        if(input.find("send") == 0){
             if(input.size() < 6){
                 spdlog::error("Invalid parameters");
                 continue;
@@ -257,7 +257,7 @@ int main(int argc, char* argv[]) {
                 continue;
             }
         }
-        if (input.find("print") == 0){
+        if(input.find("print") == 0){
             if(input.size() < 7){
                 spdlog::error("Invalid parameters");
                 continue;

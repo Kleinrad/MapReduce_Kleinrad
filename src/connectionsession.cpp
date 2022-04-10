@@ -96,7 +96,7 @@ void ConnectionSession::readMessage(){
 
 
 void ConnectionSession::checkMessageQueue(){
-    while (true)
+    while(true)
     {
         QueueItem item = *(msgQueue.pop());
         std::lock_guard<std::mutex> lock(mtx);
@@ -142,7 +142,7 @@ bool ConnectionSession::assignID(){
             spdlog::error("Confirmation failed: Invalid id");
         }
     }else{
-        spdlog::error("Confirmation failed: Invalid message type ({})", type);
+        spdlog::error("Confirmation failed: Invalid message type({})", type);
     }
     return false;
 }
