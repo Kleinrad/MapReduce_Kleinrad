@@ -67,10 +67,10 @@ class MessageGenerator{
         }
 
         static mapreduce::TaskMap TaskMap(mapreduce::JobType type
-            , std::string data, int job_id){
+            , std::string data, int jobId){
             mapreduce::TaskMap taskMap;
             taskMap.set_type(mapreduce::MessageType::TASK_MAP);
-            taskMap.set_job_id(job_id);
+            taskMap.set_jobid(jobId);
             taskMap.set_job_type(type);
             taskMap.set_data(data);
             return taskMap;
@@ -83,10 +83,10 @@ class MessageGenerator{
         }
 
         static mapreduce::ResultMap ResultMap(
-            std::vector<std::pair<std::string, int>> result, int job_id){
+            std::vector<std::pair<std::string, int>> result, int jobId){
             mapreduce::ResultMap resultMap;
             resultMap.set_type(mapreduce::MessageType::RESULT_MAP);
-            resultMap.set_job_id(job_id);
+            resultMap.set_jobid(jobId);
             for(auto& pair : result){
                 mapreduce::ResultMap::MapValues* v = resultMap.add_values();
                 v->set_key(pair.first);
@@ -97,10 +97,10 @@ class MessageGenerator{
 
         static mapreduce::TaskReduce TaskReduce(mapreduce::JobType type
             , std::vector<std::pair<std::string, int>> data
-            , int job_id){
+            , int jobId){
             mapreduce::TaskReduce taskReduce;
             taskReduce.set_type(mapreduce::MessageType::TASK_REDUCE);
-            taskReduce.set_job_id(job_id);
+            taskReduce.set_jobid(jobId);
             taskReduce.set_job_type(type);
             mapreduce::TaskReduce::ReduceData* rd = taskReduce.mutable_data();
             for(auto& pair : data){
@@ -112,10 +112,10 @@ class MessageGenerator{
         }
 
         static mapreduce::ResultReduce ResultReduce(std::map<std::string, int> &result
-            , int job_id){
+            , int jobId){
             mapreduce::ResultReduce resultReduce;
             resultReduce.set_type(mapreduce::MessageType::RESULT_REDUCE);
-            resultReduce.set_job_id(job_id);
+            resultReduce.set_jobid(jobId);
             for(auto& pair : result){
                 mapreduce::ResultReduce::ReduceValues* v = resultReduce.add_values();
                 v->set_key(pair.first);
@@ -124,11 +124,11 @@ class MessageGenerator{
             return resultReduce;
         }
 
-        static mapreduce::JobResult JobResult(int job_id
+        static mapreduce::JobResult JobResult(int jobId
             , std::map<std::string, int> &result){
             mapreduce::JobResult jobResult;
             jobResult.set_type(mapreduce::MessageType::JOB_RESULT);
-            jobResult.set_job_id(job_id);
+            jobResult.set_jobid(jobId);
             for(auto& pair : result){
                 mapreduce::JobResult::ResultData* v = jobResult.add_values();
                 v->set_key(pair.first);

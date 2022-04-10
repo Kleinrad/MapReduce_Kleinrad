@@ -20,10 +20,10 @@ ClientManager::~ClientManager()
 }
 
 
-void ClientManager::registerJob(int job_id, int clientId)
+void ClientManager::registerJob(int jobId, int clientId)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    jobClientMap[job_id] = clientId;
+    jobClientMap[jobId] = clientId;
 }
 
 
@@ -43,18 +43,18 @@ void ClientManager::leave(connectionPtr client)
     clients.erase(client);
 }
 
-void ClientManager::sendResult(int job_id, std::map<std::string, int> &result)
+void ClientManager::sendResult(int jobId, std::map<std::string, int> &result)
 {
     std::lock_guard<std::mutex> lock(mtx);
-    int clientId = jobClientMap[job_id];
-    mapreduce::JobResult job_result = MessageGenerator::JobResult(job_id, result);
+    int clientId = jobClientMap[jobId];
+    mapreduce::JobResult job_result = MessageGenerator::JobResult(jobId, result);
     for(auto &client : clients){
         if(client->id == clientId){
             client->sendMessage(job_result);
             break;
         }
     }
-    jobClientMap.erase(job_id);
+    jobClientMap.erase(jobId);
 }
 
 int ClientManager::generateID(){

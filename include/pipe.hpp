@@ -20,7 +20,7 @@ catnr: 07
 class Pipe {
     asio::ip::tcp::socket* socket{nullptr};
     std::mutex mtx;
-    bool is_closed{false};
+    bool closed{false};
 
     public:
         Pipe(asio::ip::tcp::socket socket){
@@ -36,12 +36,12 @@ class Pipe {
         
         explicit operator bool()
         {
-            return !is_closed;
+            return !closed;
         }
 
 
         void close(){
-            is_closed = true;
+            closed = true;
             if(socket)
                 socket->close();
         }
@@ -67,7 +67,7 @@ class Pipe {
                 socket->read_some(asio::buffer(&msgIndex, sizeof(msgIndex)));
             }catch(std::system_error &e){
                 spdlog::error("Connection ended", e.what());
-                is_closed = true;
+                closed = true;
             }
             return static_cast<mapreduce::MessageType>(msgIndex);
         }

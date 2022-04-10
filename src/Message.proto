@@ -43,7 +43,7 @@ message SignOff{
 
 message TaskMap{
     MessageType type = 1;
-    int32 job_id = 2;
+    int32 jobId = 2;
     JobType job_type = 3;
     bytes data = 4;
 }
@@ -58,7 +58,7 @@ message TaskReduce{
     }
     
     MessageType type = 1;
-    int32 job_id = 2;
+    int32 jobId = 2;
     JobType job_type = 3;
     ReduceData data = 4;
 }
@@ -70,7 +70,7 @@ message ResultMap{
     }
 
     MessageType type = 1;
-    int32 job_id = 2;
+    int32 jobId = 2;
     repeated MapValues values = 3;
 }
 
@@ -80,7 +80,7 @@ message ResultReduce{
         int32 value = 2;
     }
     MessageType type = 1;
-    int32 job_id = 2;
+    int32 jobId = 2;
     repeated ReduceValues values = 3;
 }
 
@@ -104,7 +104,7 @@ message JobResult{
         int32 value = 2;
     }
     MessageType type = 1;
-    int32 job_id = 2;
+    int32 jobId = 2;
     repeated ResultData values = 3;
 }
 

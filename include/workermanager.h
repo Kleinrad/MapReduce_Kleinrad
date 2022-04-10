@@ -23,7 +23,7 @@ class WorkerManager{
     std::vector<Job> jobs;
     std::map<int, ActiveJob> activeJobs;
     asio::ip::port_type port{1500};
-    std::thread timeout_thread;
+    std::thread timeoutThread;
     std::mutex workerMtx;
     std::mutex activeJobMtx;
     std::mutex jobsMtx;
@@ -47,12 +47,12 @@ class WorkerManager{
 
         void join(connectionPtr worker);
         void leave(connectionPtr worker);
-        void mapResult(int job_id, int worker_id
+        void mapResult(int jobId, int workerId
             , std::vector<std::pair<std::string, int>> &result);
-        bool reduceResult(int job_id, int worker_id
+        bool reduceResult(int jobId, int workerId
             , std::map<std::string, int> &result);
         bool assignJob(Job job);
-        void reAssignTask(int worker_id);
+        void reAssignTask(int workerId);
         int generateID();
 };
 

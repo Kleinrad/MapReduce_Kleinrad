@@ -14,14 +14,14 @@ catnr: 07
 #include "pipe.hpp"
 
 class Worker {
-    int worker_id;
+    int workerId;
     bool is_busy{false};
     Pipe pipe;
 
     void waitForTask();
-    void handleMap(int type, std::string data, int job_id);
+    void handleMap(int type, std::string data, int jobId);
     void handleReduce(int type
-        , mapreduce::TaskReduce::ReduceData data, int job_id);
+        , mapreduce::TaskReduce::ReduceData data, int jobId);
     public:
         Worker(asio::ip::tcp::socket socket);
         ~Worker();

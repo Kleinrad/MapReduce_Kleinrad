@@ -66,7 +66,7 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultMap.values()){
                 item.dataReduce->push_back(std::make_pair(r.key(), r.value()));
             }
-            item.job_id = resultMap.job_id();
+            item.jobId = resultMap.jobid();
             msgQueue.push(&item);
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
@@ -76,7 +76,7 @@ void ConnectionSession::readMessage(){
             for(auto& r : resultReduce.values()){
                 item.dataResult->insert(std::make_pair(r.key(), r.value()));
             }
-            item.job_id = resultReduce.job_id();
+            item.jobId = resultReduce.jobid();
             msgQueue.push(&item);
         }
         readMessage();
@@ -116,12 +116,12 @@ void ConnectionSession::checkMessageQueue(){
         }
         if(type == mapreduce::MessageType::RESULT_MAP){
             isAvailable = true;
-            workerManager.mapResult(item.job_id, id, *(item.dataReduce));
+            workerManager.mapResult(item.jobId, id, *(item.dataReduce));
         }
         if(type == mapreduce::MessageType::RESULT_REDUCE){
             isAvailable = true;
-            if(workerManager.reduceResult(item.job_id, id, *(item.dataResult))){
-                clientManager.sendResult(item.job_id, *(item.dataResult));
+            if(workerManager.reduceResult(item.jobId, id, *(item.dataResult))){
+                clientManager.sendResult(item.jobId, *(item.dataResult));
             }
         }
     }

@@ -18,7 +18,7 @@ catnr: 07
 struct QueueItem{
     mapreduce::MessageType type;
     mapreduce::JobType jobType;
-    int job_id;
+    int jobId;
     char* dataRaw;
     std::vector<std::pair<std::string, int>> *dataReduce = new std::vector<std::pair<std::string, int>>();
     std::map<std::string, int>* dataResult = new std::map<std::string, int>();
