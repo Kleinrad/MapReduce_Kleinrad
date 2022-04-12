@@ -42,7 +42,7 @@ void Master::acceptConnection(){
 
 
 int main(){
-    std::ifstream f("config.json");
+    std::ifstream f("../config.json");
     nlohmann::json j = nlohmann::json::parse(f);
 
     asio::io_context ctx;

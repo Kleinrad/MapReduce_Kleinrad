@@ -162,7 +162,7 @@ void Worker::signOff() {
 
 
 int main(){
-    std::ifstream f("config.json");
+    std::ifstream f("../config.json");
     nlohmann::json j = nlohmann::json::parse(f);
 
     spdlog::set_level(spdlog::level::info);
