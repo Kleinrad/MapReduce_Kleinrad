@@ -57,7 +57,6 @@ void Client::signOff() {
 
 
 void Client::waitForResponse(){
-    spdlog::info("waitnign");
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::JOB_RESULT){
         mapreduce::JobResult result;
