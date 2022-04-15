@@ -57,6 +57,7 @@ void Client::signOff() {
 
 
 void Client::waitForResponse(){
+    spdlog::info("waitnign");
     mapreduce::MessageType type = pipe.reciveMessageType();
     if(type == mapreduce::MessageType::JOB_RESULT){
         mapreduce::JobResult result;
@@ -80,11 +81,16 @@ void Client::waitForResponse(){
 
 
 void Client::sendJob(Job job){
-    mapreduce::JobRequest jobRequest = 
-        MessageGenerator::JobRequest(job.type, job.data, -1, -1);
-    lastJobTotal = job.data.size();
-    pipe.sendMessage(jobRequest);
-    waitForResponse();
+    try{
+        mapreduce::JobRequest jobRequest = 
+            MessageGenerator::JobRequest(job.type, job.data, -1, -1);
+        lastJobTotal = job.data.size();
+        pipe.sendMessage(jobRequest);
+        waitForResponse();
+    }catch(std::system_error &e){
+        spdlog::error("Connection closed");
+        exit(0);
+    }
 }
 
 
@@ -248,7 +254,7 @@ int main(int argc, char* argv[]) {
                 }
                 mapreduce::JobType jobType = mapreduce::JobType(type);
                 Job job(jobType, data);
-                std::cout << "\nJob sent, waiting for reply..." << std::endl;
+                std::cout << "\nSending job..." << std::endl;
                 client.sendJob(job);
                 std::cout << "Job finished" << std::endl;
                 continue;
