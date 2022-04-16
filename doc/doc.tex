@@ -63,6 +63,32 @@ In most implementations of a MapReduce model, a shuffle phase is carried out bet
 \subsubsection{Combine}
 An additional combine phase can be used after mapping to reduce the network traffic. Thereby, the large number of key/value pairs resulting from the mapping phase are reduced before they are transferred over the network. However, because of this local aggregation of data, it is possible to slow down the instead through shuffling optimized process of reducing data.\footfullcite{hadoop}
 
+\pagebreak
+\subsection{Process}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{img/MapReduceAblaufPart1}
+	\caption{Procedure of a MapReduce operation. The use-case depicted in this example represents one of two possible applications provided by the system developed as part of this project. Continued in figure \ref{fig:mapReduceProcess2}.}
+	\label{fig:mapReduceProcess1}
+\end{figure}
+
+Upon receiving the data to be processed, it needs to be split up into chunks to be assigned to workers. Splitting vast amounts of data has to be kept as simple as possible. By reducing the complexity of dividing the input data, performance is increased because the advantage of distributed computation is better utilized.\newline
+Individual data chunks then get sent to workers, which process the mapping phase. After receiving the data, which in this case takes the shape of a string, the workers execute the user-defined mapping function for the given input. In this example, the resulting key/value pairs represent individual characters and the number of occurrences.\newline
+Due to the nature of this application, the result after mapping the input data are a vast amount of key/value pairs. To decrease network load, a combine phase is being performed. The combine phase acts as a preliminary reduce phase for the individual workers. Depending on the number of duplicates present in the input data, the combine operation can decrease the key/value pair bundle to a fraction of the original size, further increasing performance. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\linewidth]{img/MapReduceAblaufPart2}
+	\caption{Procedure of a MapReduce operation. Continuation of figure \ref{fig:mapReduceProcess1}.}
+	\label{fig:mapReduceProcess2}
+\end{figure}
+
+Each worker sends their mapping result to the master, where the results get accumulated. Once every worker has finished, the master initiates the second phase. Similar to the mapping phase, the accumulated results must be divided up into chunks and distributed to available workers. The data chunks get shuffled to guarantee the most optimal outcome from the reduce phase. The shuffle phase ensures that pairs with the same key get grouped into the same data chunk. If no shuffling is performed, the risk of the split data consisting of only heterogeneous keys remains. This would result in the reduce phase having little to no effect on decreasing the number of key/value pairs.\newline
+Upon receiving mostly homogeneous data, the worker executes the user-defined reduce function. In this example, the value of pairs with similar keys gets aggregated. The extant key/value pairs then get sent to the master.\newline
+The result of this application being the number of character occurrences in a given input string.  
+
+\pagebreak
 \section{Classes}
 
 The class structure in this project is oriented in the MapReduce solution Disco\footfullcite{discoDoc}. In contrast to the realization, disco provides, only three parties are present in this project. Disco uses a central master to act as an interface between the client and the workers, which are referred to as slaves in disco. Additionally, disco has a server role. This server manages several workers and acts as an intermediary between the worker and master. However, the role of the server has not been realized in this implementation to steer away from high complexity and enable the realization of a reliably working model in the time span of this project.
